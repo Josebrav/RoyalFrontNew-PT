@@ -77,7 +77,7 @@ export const GAMES_CATALOG = [
     players: 1650,
     playPath: "/game/royalslots",
     // Sigue activo y jugable (/juegos, GameDetail, etc.) — solo se lo saca de la grilla de
-    // "Juegos Populares" del Home para hacerle lugar a Domino y GemasOfGold (tope de 8 tarjetas).
+    // "Juegos Populares" del Home para hacerle lugar a Domino y Gema of Gold (tope de 8 tarjetas).
     showOnHome: false,
     description:
       "La tragamonedas clásica de RoyalGames: rodillos cargados de símbolos dorados, multiplicadores y la chance de llevarte el premio mayor en cualquier giro.",
@@ -235,14 +235,14 @@ export const GAMES_CATALOG = [
       "La pasión del fútbol convertida en tragamonedas: símbolos de gol, penales de bonificación y la emoción del clásico en cada tirada.",
   },
   {
-    slug: "gemas-of-gold",
-    name: "GemasOfGold",
+    slug: "gema-of-gold",
+    name: "Gema of Gold",
     category: "slots",
     status: "active",
     image: gemaOfGoldImage,
     icon: "diamond",
     players: 980,
-    playPath: "/game/gemasofgold",
+    playPath: "/game/gemaofgold",
     description:
       "Gemas brillantes y cascadas de oro: una tragamonedas clásica con multiplicadores en cadena para los amantes de lo simple y lo dorado.",
   },
