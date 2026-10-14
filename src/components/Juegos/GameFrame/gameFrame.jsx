@@ -1,6 +1,59 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
 
+const HEARTBEAT_MS = 15 * 1000;
+// Pestañas en segundo plano reciben timers como mucho una vez por minuto, y el celular puede
+// pausarlas unos minutos sin que pase nada raro — por eso el umbral es holgado: un hueco así
+// solo se explica por una suspensión real (compu dormida, celular bloqueado mucho rato).
+const SUSPEND_GAP_MS = 30 * 60 * 1000;
+const STALE_AFTER_MS = 6 * 60 * 60 * 1000;
+const LONG_AWAY_MS = 30 * 60 * 1000;
+
+// Un juego que quedó abierto de un día para el otro (compu suspendida, pestaña olvidada) suele
+// volver roto: socket muerto, sesión vencida, estado a medias. Se recarga la página al volver,
+// pero NUNCA mientras la pestaña sigue a la vista y la compu despierta: el juego vive en un
+// iframe de otro origen y no podemos ver los clics de adentro, así que "visible y sin
+// suspensión" es lo que tomamos como que el usuario puede estar jugando — aunque lleve 6 horas.
+function useReloadWhenStale() {
+  useEffect(() => {
+    const openedAt = Date.now();
+    let lastBeat = openedAt;
+    let hiddenSince = document.visibilityState === "hidden" ? openedAt : null;
+    let reloadPending = false;
+
+    const reload = () => window.location.reload();
+
+    const beat = setInterval(() => {
+      const now = Date.now();
+      if (now - lastBeat > SUSPEND_GAP_MS) {
+        if (document.visibilityState === "visible") return reload();
+        reloadPending = true;
+      }
+      lastBeat = now;
+    }, HEARTBEAT_MS);
+
+    const onVisibilityChange = () => {
+      const now = Date.now();
+      if (document.visibilityState === "hidden") {
+        hiddenSince = now;
+        return;
+      }
+      const suspended = now - lastBeat > SUSPEND_GAP_MS;
+      const longAwayFromOldGame =
+        hiddenSince !== null && now - hiddenSince >= LONG_AWAY_MS && now - openedAt >= STALE_AFTER_MS;
+      hiddenSince = null;
+      lastBeat = now;
+      if (reloadPending || suspended || longAwayFromOldGame) reload();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      clearInterval(beat);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
+}
+
 // Shared wrapper for the externally-hosted game iframes (Minas, Royal Joker, Royal Pachinka,
 // Bingo). We don't control those games' internal HTML/canvas, so we can't detect or resize their
 // real content (different origin — the browser blocks reading cross-origin iframe dimensions).
@@ -15,6 +68,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scale, setScale] = useState(1);
   const hasFixedResolution = !!(nativeWidth && nativeHeight);
+  useReloadWhenStale();
 
   const toggleFullscreen = useCallback(() => {
     const el = wrapperRef.current;
