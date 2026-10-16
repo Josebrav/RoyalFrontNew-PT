@@ -42,23 +42,19 @@ const CONTENT = {
         content: "La privacidad de nuestros usuarios es una prioridad para nosotros. Consulta nuestra Política de Privacidad para entender cómo recopilamos, usamos y protegemos tu información personal."
       },
       {
-        title: "8. Identificación del prestador del servicio",
-        content: "ROYALJUEGOS.COM es operado por José Santos Bravo Parada (DNI 39.129.716, CUIL 23-39129716-9), persona física responsable de la plataforma. Para cualquier consulta, reclamo o notificación relacionada con estos Términos y Condiciones, podés escribirnos a royalgames2025@gmail.com."
-      },
-      {
-        title: "9. Limitación de responsabilidad",
+        title: "8. Limitación de responsabilidad",
         content: "ROYALJUEGOS.COM no se hace responsable de ningún daño directo o indirecto derivado del uso de nuestra plataforma, incluyendo cualquier reclamo basado en una expectativa de ganancia, premio o valor monetario real que estos Términos ya aclaran que el servicio no ofrece."
       },
       {
-        title: "10. Propiedad intelectual",
+        title: "9. Propiedad intelectual",
         content: "Todo el contenido de ROYALJUEGOS.COM está protegido por leyes de propiedad intelectual. No se permite la copia, reproducción o modificación de ningún material sin nuestro consentimiento previo."
       },
       {
-        title: "11. Modificaciones de los Términos y Condiciones",
+        title: "10. Modificaciones de los Términos y Condiciones",
         content: "Nos reservamos el derecho de modificar estos Términos y Condiciones en cualquier momento. Los cambios se notificarán mediante una actualización en esta sección."
       },
       {
-        title: "12. Jurisdicción y ley aplicable",
+        title: "11. Jurisdicción y ley aplicable",
         content: "Estos Términos y Condiciones se regirán e interpretarán de acuerdo con las leyes del país correspondiente al usuario."
       },
     ],
@@ -102,23 +98,19 @@ const CONTENT = {
         content: "Our users' privacy is a priority for us. Please check our Privacy Policy to understand how we collect, use, and protect your personal information."
       },
       {
-        title: "8. Service provider identification",
-        content: "ROYALJUEGOS.COM is operated by José Santos Bravo Parada (Argentine National ID / DNI 39.129.716, CUIL 23-39129716-9), the individual responsible for the platform. For any inquiry, claim, or notice related to these Terms and Conditions, you can write to us at royalgames2025@gmail.com."
-      },
-      {
-        title: "9. Limitation of liability",
+        title: "8. Limitation of liability",
         content: "ROYALJUEGOS.COM is not liable for any direct or indirect damage arising from the use of our platform, including any claim based on an expectation of real-money winnings, prizes, or monetary value that these Terms already clarify the service does not offer."
       },
       {
-        title: "10. Intellectual property",
+        title: "9. Intellectual property",
         content: "All content on ROYALJUEGOS.COM is protected by intellectual property law. Copying, reproducing, or modifying any material without our prior consent is not permitted."
       },
       {
-        title: "11. Changes to the Terms and Conditions",
+        title: "10. Changes to the Terms and Conditions",
         content: "We reserve the right to modify these Terms and Conditions at any time. Changes will be notified via an update to this section."
       },
       {
-        title: "12. Jurisdiction and applicable law",
+        title: "11. Jurisdiction and applicable law",
         content: "These Terms and Conditions shall be governed and interpreted in accordance with the laws of the user's corresponding country."
       },
     ],
@@ -162,23 +154,19 @@ const CONTENT = {
         content: "A privacidade dos nossos usuários é uma prioridade para nós. Consulte nossa Política de Privacidade para entender como coletamos, usamos e protegemos suas informações pessoais."
       },
       {
-        title: "8. Identificação do prestador de serviço",
-        content: "A ROYALJUEGOS.COM é operada por José Santos Bravo Parada (DNI 39.129.716, CUIL 23-39129716-9), pessoa física responsável pela plataforma. Para qualquer consulta, reclamação ou notificação relacionada a estes Termos e Condições, você pode escrever para royalgames2025@gmail.com."
-      },
-      {
-        title: "9. Limitação de responsabilidade",
+        title: "8. Limitação de responsabilidade",
         content: "A ROYALJUEGOS.COM não se responsabiliza por nenhum dano direto ou indireto decorrente do uso de nossa plataforma, incluindo qualquer reclamação baseada em uma expectativa de ganho, prêmio ou valor monetário real que estes Termos já esclarecem que o serviço não oferece."
       },
       {
-        title: "10. Propriedade intelectual",
+        title: "9. Propriedade intelectual",
         content: "Todo o conteúdo da ROYALJUEGOS.COM está protegido por leis de propriedade intelectual. Não é permitida a cópia, reprodução ou modificação de nenhum material sem nosso consentimento prévio."
       },
       {
-        title: "11. Modificações dos Termos e Condições",
+        title: "10. Modificações dos Termos e Condições",
         content: "Reservamo-nos o direito de modificar estes Termos e Condições a qualquer momento. As alterações serão notificadas por meio de uma atualização nesta seção."
       },
       {
-        title: "12. Jurisdição e lei aplicável",
+        title: "11. Jurisdição e lei aplicável",
         content: "Estes Termos e Condições serão regidos e interpretados de acordo com as leis do país correspondente ao usuário."
       },
     ],
