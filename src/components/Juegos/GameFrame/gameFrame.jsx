@@ -1,5 +1,33 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
+
+const TAB_ID_KEY = "rg_tab_id";
+
+// Identificador de esta pestaña, estable al recargarla (sessionStorage) y distinto en cada
+// pestaña. El juego lo manda al servidor para que un bono le pertenezca a la pestaña que lo
+// disparó: el mismo jugador con el juego abierto en dos pantallas no ve el bono de una en la otra.
+let fallbackTabId = null;
+
+function getTabId() {
+  try {
+    let id = sessionStorage.getItem(TAB_ID_KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem(TAB_ID_KEY, id);
+    }
+    return id;
+  } catch {
+    // Sin sessionStorage (bloqueado): id fijo mientras viva la página, así no cambia la URL del
+    // juego entre renders. Solo se pierde el "retomar al recargar".
+    if (!fallbackTabId) fallbackTabId = crypto.randomUUID();
+    return fallbackTabId;
+  }
+}
+
+function withTabId(src) {
+  if (!src) return src;
+  return `${src}${src.includes("?") ? "&" : "?"}tabId=${encodeURIComponent(getTabId())}`;
+}
 
 const HEARTBEAT_MS = 15 * 1000;
 // Pestañas en segundo plano reciben timers como mucho una vez por minuto, y el celular puede
@@ -69,6 +97,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
   const [scale, setScale] = useState(1);
   const hasFixedResolution = !!(nativeWidth && nativeHeight);
   useReloadWhenStale();
+  const frameSrc = useMemo(() => withTabId(src), [src]);
 
   const toggleFullscreen = useCallback(() => {
     const el = wrapperRef.current;
@@ -166,7 +195,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
               }}
             >
               <iframe
-                src={src}
+                src={frameSrc}
                 title={title}
                 scrolling="no"
                 style={{ width: "100%", height: "100%", border: "none", display: "block", overflow: "hidden" }}
@@ -174,7 +203,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
             </div>
           ) : (
             <iframe
-              src={src}
+              src={frameSrc}
               title={title}
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
