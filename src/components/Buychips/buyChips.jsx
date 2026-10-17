@@ -33,6 +33,16 @@ const countryConfig = {
 // en el backend. Sin él no se muestra PayPal, en vez de caer a un id fijo de otro entorno.
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 
+// Moneda en la que PayPal cobra: EUR para España, USD para el resto. Es la misma regla
+// que payPalCurrencyForCountry en el backend (payments.service.ts), que es quien decide;
+// acá solo se usa para cargar el SDK de PayPal en la moneda de la orden.
+const getPayPalCurrency = (country) =>
+  ["espana", "spain", "es"].includes(
+    (country || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  )
+    ? "EUR"
+    : "USD";
+
 // Mercado Pago usa una cuenta vendedora distinta por país (cada una solo liquida
 // en su propia moneda) — mapeamos la moneda resuelta al código de país del backend.
 const CURRENCY_TO_MERCADOPAGO_COUNTRY = { COP: "co", ARS: "ar", MXN: "mx" };
@@ -41,14 +51,14 @@ const CURRENCY_TO_MERCADOPAGO_COUNTRY = { COP: "co", ARS: "ar", MXN: "mx" };
 // (RoyalGamesBackend/src/modules/payments/chip-packages.ts) y decide fichas y precio
 // a partir del `id`: si cambiás algo acá, cambialo también allá.
 const chipOptions = [
-  { id: 1, basePrice: 1, amount: 500000, image: quinientosmil },
-  { id: 2, basePrice: 2, amount: 1000000, image: millon },
-  { id: 3, basePrice: 6, amount: 5000000, image: cincomillones },
-  { id: 4, basePrice: 15, amount: 15000000, image: quincemillones },
-  { id: 5, basePrice: 50, amount: 50000000, image: cincuentamillones },
-  { id: 6, basePrice: 200, amount: 250000000, image: doscincuenta },
-  { id: 7, basePrice: 500, amount: 1000000000, image: billon },
-  { id: 8, basePrice: 1000, amount: 2600000000, image: veinticeisb },
+  { id: 1, basePrice: 1, priceEur: 0.9, amount: 500000, image: quinientosmil },
+  { id: 2, basePrice: 2, priceEur: 1.8, amount: 1000000, image: millon },
+  { id: 3, basePrice: 6, priceEur: 5.4, amount: 5000000, image: cincomillones },
+  { id: 4, basePrice: 15, priceEur: 13.5, amount: 15000000, image: quincemillones },
+  { id: 5, basePrice: 50, priceEur: 45, amount: 50000000, image: cincuentamillones },
+  { id: 6, basePrice: 200, priceEur: 180, amount: 250000000, image: doscincuenta },
+  { id: 7, basePrice: 500, priceEur: 450, amount: 1000000000, image: billon },
+  { id: 8, basePrice: 1000, priceEur: 900, amount: 2600000000, image: veinticeisb },
 ];
 
 // Mismos tipos que puede devolver ChipsService.getHistory (backend) — usado tanto para las
@@ -99,6 +109,10 @@ export default function BuyChips() {
   });
   const resolvedConfigForUser = resolvedKeyForUser ? countryConfig[resolvedKeyForUser] : null;
   const { currency, exchangeRate, symbol } = resolvedConfigForUser || countryConfig["Estados Unidos"];
+  const paypalCurrency = getPayPalCurrency(userCountry);
+  // En EUR se muestra el precio exacto del catálogo (el que cobra PayPal), no una conversión.
+  const getDisplayPrice = (chip) =>
+    (currency === "EUR" ? chip.priceEur : chip.basePrice * exchangeRate).toFixed(2);
 
   // Automatically update active payment methods based on country/currency configuration
   useEffect(() => {
@@ -239,11 +253,14 @@ export default function BuyChips() {
     }
   };
 
+  // El SDK de PayPal solo lee sus opciones al montarse: el key lo recarga si cambia la
+  // moneda (por ejemplo cuando llega el perfil del usuario con su país).
   return (
     <PayPalScriptProvider
+      key={paypalCurrency}
       options={{
         "client-id": PAYPAL_CLIENT_ID || "sb",
-        currency: "USD",
+        currency: paypalCurrency,
       }}
     >
       <main className="flex-grow p-4 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface min-h-[85vh] pt-20 md:pt-24 relative">
@@ -375,7 +392,7 @@ export default function BuyChips() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {chipOptions.map((chip) => {
                         const isSelected = selectedChip?.id === chip.id;
-                        const formattedPrice = (chip.basePrice * exchangeRate).toFixed(2);
+                        const formattedPrice = getDisplayPrice(chip);
                         return (
                           <button
                             key={chip.id}
@@ -490,7 +507,7 @@ export default function BuyChips() {
                         <div className="flex justify-between items-end pt-2 border-t border-outline-variant/10">
                           <span className="font-label-lg text-label-lg text-white">Total a Pagar:</span>
                           <span className="font-headline-lg text-headline-lg text-primary">
-                            {symbol} {selectedChip ? new Intl.NumberFormat('es-ES').format((selectedChip.basePrice * exchangeRate).toFixed(2)) : "0.00"}
+                            {symbol} {selectedChip ? new Intl.NumberFormat('es-ES').format(getDisplayPrice(selectedChip)) : "0.00"}
                           </span>
                         </div>
                       </div>
@@ -506,7 +523,7 @@ export default function BuyChips() {
                           <PayPalButtons
                             style={{ layout: "vertical", shape: "pill", label: "pay" }}
                             createOrder={async (data, actions) => {
-                              // Solo mandamos el paquete: el backend cobra su precio en USD.
+                              // Solo mandamos el paquete: el backend cobra su precio en EUR (España) o USD.
                               try {
                                 const response = await axios.post(`${API_URL}/paypal/create-order`, {
                                   userId: currentUser?.id,
