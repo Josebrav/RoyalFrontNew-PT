@@ -17,6 +17,8 @@ import cincuentamillones from "../../assets/50millones.jpg";
 import doscincuenta from "../../assets/250millones.jpg";
 import billon from "../../assets/1billon.jpg";
 import veinticeisb from "../../assets/26billones.jpg";
+import { useAuth } from "../../context/oauthContext";
+import { PayPalLogo, MercadoPagoLogo } from "../ui/PaymentLogos";
 
 // País desde el que se paga (elegible en la página, no hace falta tenerlo en el perfil). Mercado
 // Pago tiene una cuenta vendedora por país y cada una solo cobra en su moneda; PayPal cobra en EUR
@@ -97,6 +99,7 @@ const HISTORY_TYPE_LABELS = {
 
 export default function BuyChips() {
   const navigate = useNavigate();
+  const auth = useAuth();
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
   const userCountry = currentUser?.country || null;
@@ -280,10 +283,12 @@ export default function BuyChips() {
         currency: paypalCurrency,
       }}
     >
-      <main className="flex-grow p-4 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface min-h-[85vh] pt-20 md:pt-24 relative">
+      <main className="flex-grow p-4 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface min-h-[85vh] pt-6 md:pt-8 relative">
         
-        {/* Step 0: Authentication Shield Overlay if not logged in */}
-        {!currentUser?.id && (
+        {/* Step 0: Authentication Shield Overlay if not logged in. Solo después de que terminó de
+            restaurarse la sesión (auth.loading): al recargar, la sesión tarda un instante en volver
+            y sin esto el cartel aparecía aunque el usuario sí estuviera logueado. */}
+        {!auth.loading && !currentUser?.id && (
           <div className="absolute inset-0 z-50 bg-[#16130d]/80 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center p-8 text-center my-6">
             <div className="glass-card max-w-md w-full p-8 rounded-2xl border border-outline-variant/30 space-y-6 shadow-2xl relative">
               <span className="material-symbols-outlined text-[72px] text-primary animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -430,10 +435,64 @@ export default function BuyChips() {
                     )}
                   </div>
 
-                  {/* Step 2: Select Chip Package */}
+                  {/* Step 2: Payment method (antes de los paquetes: define la moneda de los precios) */}
                   <div>
                     <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      2. Selecciona un Paquete de Fichas
+                      2. Medio de Pago
+                    </label>
+                    {availableMethods.length === 0 && (
+                      <p className="text-xs text-on-surface-variant">
+                        Todavía no hay medios de pago disponibles para {regionConfig.label}.
+                      </p>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {mercadoPago && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("mercadopago")}
+                          aria-pressed={paymentMethod === "mercadopago"}
+                          className={`glass-card p-4 rounded-xl flex items-center gap-3 text-left border-2 transition-all cursor-pointer ${
+                            paymentMethod === "mercadopago"
+                              ? "border-primary bg-primary/10 shadow-md"
+                              : "border-outline-variant/30 hover:border-primary/45"
+                          }`}
+                        >
+                          <span className="w-11 h-11 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                            <MercadoPagoLogo className="w-7 h-7" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-bold text-white">Mercado Pago</span>
+                            <span className="block text-[11px] text-on-surface-variant">Pagás en {mercadoPago.currency}</span>
+                          </span>
+                        </button>
+                      )}
+                      {PAYPAL_CLIENT_ID && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("paypal")}
+                          aria-pressed={paymentMethod === "paypal"}
+                          className={`glass-card p-4 rounded-xl flex items-center gap-3 text-left border-2 transition-all cursor-pointer ${
+                            paymentMethod === "paypal"
+                              ? "border-primary bg-primary/10 shadow-md"
+                              : "border-outline-variant/30 hover:border-primary/45"
+                          }`}
+                        >
+                          <span className="w-11 h-11 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                            <PayPalLogo className="w-6 h-6" />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-bold text-white">PayPal</span>
+                            <span className="block text-[11px] text-on-surface-variant">Pagás en {paypalCurrency} · cuenta PayPal o tarjeta</span>
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Step 3: Select Chip Package */}
+                  <div>
+                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
+                      3. Selecciona un Paquete de Fichas
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {visibleChipOptions.map((chip) => {
@@ -482,66 +541,11 @@ export default function BuyChips() {
                     </div>
                   </div>
 
-                  {/* Step 3: Select Payment Method */}
-                  <div>
-                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      3. Método de Pago Disponible
-                    </label>
-                    {availableMethods.length === 0 && (
-                      <p className="text-xs text-on-surface-variant">
-                        Todavía no hay medios de pago disponibles para {regionConfig.label}.
-                      </p>
-                    )}
-                    <div className="grid grid-cols-2 gap-4">
-
-                      {/* PayPal Button */}
-                      {PAYPAL_CLIENT_ID && (
-                        <button
-                          onClick={() => setPaymentMethod("paypal")}
-                          className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
-                            paymentMethod === "paypal"
-                              ? "border-primary bg-primary/5 shadow-md"
-                              : "border-outline-variant/30 hover:border-primary/45"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-primary text-[28px]">payments</span>
-                          <span className="text-xs font-bold text-white">PayPal</span>
-                        </button>
-                      )}
-
-                      {/* Mercado Pago Button: solo en los países que tienen cuenta de Mercado Pago */}
-                      {mercadoPago && (
-                        <button
-                          onClick={() => setPaymentMethod("mercadopago")}
-                          className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
-                            paymentMethod === "mercadopago"
-                              ? "border-primary bg-primary/5 shadow-md"
-                              : "border-outline-variant/30 hover:border-primary/45"
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-primary text-[28px]">qr_code_scanner</span>
-                          <span className="text-xs font-bold text-white">Mercado Pago</span>
-                        </button>
-                      )}
-
-                    </div>
-
-                    {availableMethods.includes(paymentMethod) && (
-                      <div className="mt-6 p-4 bg-primary/5 rounded-xl border border-primary/20 flex gap-3 text-left">
-                        <span className="material-symbols-outlined text-primary">info</span>
-                        <p className="text-xs text-on-surface-variant leading-relaxed">
-                          {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
-                          {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
                 </div>
 
                 {/* Right Side: Checkout summary & Actions (Col-Span 5) */}
-                <div className="lg:col-span-5">
-                  <div className="glass-card p-6 rounded-2xl border border-outline-variant/20 relative overflow-hidden bg-[#12121A]/60 flex flex-col h-full justify-between">
+                <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
+                  <div className="glass-card p-6 rounded-2xl border border-outline-variant/20 relative overflow-hidden bg-[#12121A]/60 flex flex-col">
                     
                     {/* Atmospheric gold glow */}
                     <div className="absolute inset-0 royal-gold-gradient opacity-[0.02] blur-3xl pointer-events-none"></div>
@@ -575,6 +579,12 @@ export default function BuyChips() {
 
                     {/* GATEWAYS ACTIVE REGION */}
                     <div className="mt-8 pt-6 border-t border-outline-variant/10 relative z-10 space-y-4">
+                      {availableMethods.includes(paymentMethod) && (
+                        <p className="text-xs text-on-surface-variant leading-relaxed text-left">
+                          {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
+                          {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
+                        </p>
+                      )}
                       
                       {/* PAYPAL ACTIVE RENDER */}
                       {paymentMethod === "paypal" && PAYPAL_CLIENT_ID && (
