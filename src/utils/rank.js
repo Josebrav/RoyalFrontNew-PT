@@ -1,16 +1,17 @@
 /**
- * Rank tiers are driven by lifetime deposited chips (backend field `totalChipsDeposited`),
- * using the app's fixed 1000 chips = $1 USD rate. Keep these thresholds in sync with
- * UsersService.RANK_THRESHOLDS in the backend.
+ * Los rangos dependen de las fichas cargadas de por vida (campo `totalChipsDeposited` del
+ * backend). Cada umbral coincide con un paquete del catálogo (aprox. Plata ~$6, Oro ~$50,
+ * Platino ~$200, Diamante ~$500). Mantener sincronizado con UsersService.RANK_THRESHOLDS en el
+ * backend, que es quien decide el rango real (esto solo arma la barra de progreso).
  */
 export const RANK_ORDER = ["bronze", "silver", "gold", "platinum", "diamond"];
 
 export const RANK_THRESHOLDS = {
   bronze: 0,
-  silver: 1000,
-  gold: 5000,
-  platinum: 10000,
-  diamond: 50000,
+  silver: 5_000_000,
+  gold: 50_000_000,
+  platinum: 250_000_000,
+  diamond: 1_000_000_000,
 };
 
 export const RANK_META = {
