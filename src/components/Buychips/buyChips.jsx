@@ -6,7 +6,7 @@ import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Swal from "sweetalert2";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import RankBadge from "../ui/RankBadge/rankBadge";
-import { getRankMeta, getNextRank } from "../../utils/rank";
+import { getNextRank } from "../../utils/rank";
 
 // Import local image assets representing chip packages
 import quinientosmil from "../../assets/500000.jpg";
@@ -104,7 +104,6 @@ export default function BuyChips() {
   const { currentUser } = useSelector((state) => state);
   const userCountry = currentUser?.country || null;
   const totalChipsDeposited = Number(currentUser?.totalChipsDeposited || 0);
-  const rankMeta = getRankMeta(currentUser?.rank);
   const nextRank = getNextRank(currentUser?.rank);
   const rankProgressPercentage = nextRank
     ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
@@ -321,55 +320,6 @@ export default function BuyChips() {
           </p>
         </header>
 
-        {/* Metric Cards Row */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-
-          {/* Card 1: Real Chips Balance */}
-          <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-[72px]">monetization_on</span>
-            </div>
-            <p className="font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider">Mi Balance de Fichas</p>
-            <div className="flex items-baseline gap-2">
-              <span className="font-headline-lg text-headline-lg text-white">
-                {new Intl.NumberFormat('es-ES').format(currentUser?.chips || 0)}
-              </span>
-              <span className="text-primary font-bold text-xs">CHIPS</span>
-            </div>
-            <div className="mt-4 flex items-center text-xs text-green-400">
-              <span className="material-symbols-outlined text-[14px] mr-1">check_circle</span>
-              Acreditado y disponible para jugar
-            </div>
-          </div>
-
-          {/* Card 2: Real Rank */}
-          <div className="glass-card p-6 rounded-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-[72px]">{rankMeta.icon}</span>
-            </div>
-            <div className="flex items-center justify-between mb-2">
-              <p className="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Mi Rango</p>
-              <RankBadge tier={currentUser?.rank} size="sm" />
-            </div>
-            {nextRank ? (
-              <>
-                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-2 w-full overflow-hidden mt-4">
-                  <div className="royal-gold-gradient h-full rounded-full" style={{ width: `${rankProgressPercentage}%` }}></div>
-                </div>
-                <p className="mt-2 text-[10px] text-on-surface-variant uppercase tracking-wider">
-                  {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)} / {new Intl.NumberFormat('es-ES').format(nextRank.threshold)} hacia {nextRank.label} ({rankProgressPercentage}%)
-                </p>
-              </>
-            ) : (
-              <div className="mt-4 flex items-center text-xs text-primary">
-                <span className="material-symbols-outlined text-[14px] mr-1">workspace_premium</span>
-                Rango máximo alcanzado
-              </div>
-            )}
-          </div>
-
-        </section>
-
         {/* Interactive Workspace Panel */}
         <div className="glass-card rounded-2xl overflow-hidden mb-12 shadow-2xl">
           
@@ -544,7 +494,43 @@ export default function BuyChips() {
                 </div>
 
                 {/* Right Side: Checkout summary & Actions (Col-Span 5) */}
-                <div className="lg:col-span-5 lg:sticky lg:top-24 self-start">
+                <div className="lg:col-span-5 lg:sticky lg:top-24 self-start space-y-4">
+                  {/* Balance y rango: al costado del depósito, no en una fila aparte arriba */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="glass-card p-4 rounded-xl text-left">
+                      <p className="text-[10px] text-on-surface-variant mb-1 uppercase tracking-wider font-bold">Mi Balance</p>
+                      <p className="text-lg font-bold text-white leading-tight break-all">
+                        {new Intl.NumberFormat('es-ES').format(currentUser?.chips || 0)}
+                        <span className="text-primary font-bold text-[10px] ml-1">CHIPS</span>
+                      </p>
+                      <p className="mt-2 flex items-center text-[10px] text-green-400">
+                        <span className="material-symbols-outlined text-[12px] mr-1">check_circle</span>
+                        Disponible para jugar
+                      </p>
+                    </div>
+                    <div className="glass-card p-4 rounded-xl text-left">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Mi Rango</p>
+                        <RankBadge tier={currentUser?.rank} size="sm" />
+                      </div>
+                      {nextRank ? (
+                        <>
+                          <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-2 w-full overflow-hidden mt-3">
+                            <div className="royal-gold-gradient h-full rounded-full" style={{ width: `${rankProgressPercentage}%` }}></div>
+                          </div>
+                          <p className="mt-2 text-[10px] text-on-surface-variant leading-snug">
+                            {rankProgressPercentage}% hacia {nextRank.label}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="mt-3 flex items-center text-[10px] text-primary">
+                          <span className="material-symbols-outlined text-[12px] mr-1">workspace_premium</span>
+                          Rango máximo alcanzado
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="glass-card p-6 rounded-2xl border border-outline-variant/20 relative overflow-hidden bg-[#12121A]/60 flex flex-col">
                     
                     {/* Atmospheric gold glow */}
