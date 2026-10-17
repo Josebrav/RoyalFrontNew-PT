@@ -18,34 +18,53 @@ import doscincuenta from "../../assets/250millones.jpg";
 import billon from "../../assets/1billon.jpg";
 import veinticeisb from "../../assets/26billones.jpg";
 
-// Configuración estática de precios y monedas por país
-const countryConfig = {
-  argentina: { name: "Argentina", currency: "ARS", exchangeRate: 1000, symbol: "$" },
-  brasil: { name: "Brasil", currency: "BRL", exchangeRate: 5, symbol: "R$" },
-  colombia: { name: "Colombia", currency: "COP", exchangeRate: 5200, symbol: "$" },
-  "Estados Unidos": { name: "Estados Unidos (USD)", currency: "USD", exchangeRate: 1, symbol: "$" },
-  espana: { name: "España (EUR)", currency: "EUR", exchangeRate: 0.9, symbol: "€" },
-  mexico: { name: "México (MXN)", currency: "MXN", exchangeRate: 20, symbol: "$" },
-  "resto del mundo": { name: "Resto del Mundo (USD)", currency: "USD", exchangeRate: 1, symbol: "$" },
+// País desde el que se paga (elegible en la página, no hace falta tenerlo en el perfil). Mercado
+// Pago tiene una cuenta vendedora por país y cada una solo cobra en su moneda; PayPal cobra en EUR
+// en España y en USD en el resto. Las tasas son las mismas que MERCADOPAGO_COUNTRY_CONFIG en el
+// backend (payments.service.ts), que es quien decide el precio real: si cambiás una, cambiá la otra.
+const PAYMENT_REGIONS = {
+  ar: { label: "Argentina", mercadoPago: { country: "ar", currency: "ARS", rate: 1000, symbol: "$" }, paypalCurrency: "USD" },
+  co: { label: "Colombia", mercadoPago: { country: "co", currency: "COP", rate: 5200, symbol: "$" }, paypalCurrency: "USD" },
+  mx: { label: "México", mercadoPago: { country: "mx", currency: "MXN", rate: 20, symbol: "$" }, paypalCurrency: "USD" },
+  es: { label: "España", mercadoPago: null, paypalCurrency: "EUR" },
+  other: { label: "Otro país", mercadoPago: null, paypalCurrency: "USD" },
 };
+const REGION_ORDER = ["ar", "co", "mx", "es", "other"];
+
+const PAYPAL_PRICING = {
+  USD: { symbol: "US$", price: (chip) => chip.basePrice },
+  EUR: { symbol: "€", price: (chip) => chip.priceEur },
+};
+
+const MEXICO_TIMEZONES = new Set([
+  "America/Mexico_City", "America/Cancun", "America/Merida", "America/Monterrey", "America/Matamoros",
+  "America/Chihuahua", "America/Ciudad_Juarez", "America/Ojinaga", "America/Mazatlan",
+  "America/Bahia_Banderas", "America/Hermosillo", "America/Tijuana",
+]);
+
+// Desde dónde se conecta el usuario, por la zona horaria del dispositivo: no manda la IP a ningún
+// servicio externo y distingue bien los países que nos importan (cada uno tiene zonas propias).
+function detectRegionFromConnection() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    if (tz.startsWith("America/Argentina/") || tz === "America/Buenos_Aires") return "ar";
+    if (tz === "America/Bogota") return "co";
+    if (MEXICO_TIMEZONES.has(tz)) return "mx";
+    if (tz === "Europe/Madrid" || tz === "Atlantic/Canary" || tz === "Africa/Ceuta") return "es";
+  } catch {
+    // Sin Intl: se cae al país del perfil.
+  }
+  return null;
+}
+
+function regionFromProfileCountry(country) {
+  const normalized = (country || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  return { argentina: "ar", colombia: "co", mexico: "mx", espana: "es", spain: "es" }[normalized] || null;
+}
 
 // Client id de PayPal: tiene que ser del mismo entorno (sandbox o live) que PAYPAL_MODE
 // en el backend. Sin él no se muestra PayPal, en vez de caer a un id fijo de otro entorno.
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-
-// Moneda en la que PayPal cobra: EUR para España, USD para el resto. Es la misma regla
-// que payPalCurrencyForCountry en el backend (payments.service.ts), que es quien decide;
-// acá solo se usa para cargar el SDK de PayPal en la moneda de la orden.
-const getPayPalCurrency = (country) =>
-  ["espana", "spain", "es"].includes(
-    (country || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-  )
-    ? "EUR"
-    : "USD";
-
-// Mercado Pago usa una cuenta vendedora distinta por país (cada una solo liquida
-// en su propia moneda) — mapeamos la moneda resuelta al código de país del backend.
-const CURRENCY_TO_MERCADOPAGO_COUNTRY = { COP: "co", ARS: "ar", MXN: "mx" };
 
 // Paquetes de fichas, solo para mostrar. El backend tiene el catálogo real
 // (RoyalGamesBackend/src/modules/payments/chip-packages.ts) y decide fichas y precio
@@ -77,7 +96,6 @@ export default function BuyChips() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
-  // Country is taken from the user's profile; if missing, purchases are blocked
   const userCountry = currentUser?.country || null;
   const totalChipsDeposited = Number(currentUser?.totalChipsDeposited || 0);
   const rankMeta = getRankMeta(currentUser?.rank);
@@ -99,30 +117,29 @@ export default function BuyChips() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyTypeFilter, setHistoryTypeFilter] = useState("all");
 
-  // Resolve currency/exchange/symbol from user's profile country
-  const resolvedKeyForUser = Object.keys(countryConfig).find((k) => {
-    if (!userCountry) return false;
-    return (
-      k.toLowerCase() === userCountry.toLowerCase() ||
-      countryConfig[k].name.toLowerCase().startsWith(userCountry.toLowerCase())
-    );
-  });
-  const resolvedConfigForUser = resolvedKeyForUser ? countryConfig[resolvedKeyForUser] : null;
-  const { currency, exchangeRate, symbol } = resolvedConfigForUser || countryConfig["Estados Unidos"];
-  const paypalCurrency = getPayPalCurrency(userCountry);
-  // En EUR se muestra el precio exacto del catálogo (el que cobra PayPal), no una conversión.
-  const getDisplayPrice = (chip) =>
-    (currency === "EUR" ? chip.priceEur : chip.basePrice * exchangeRate).toFixed(2);
+  // País de pago: el que elija el usuario en la página; si no eligió, desde dónde se conecta; si no
+  // se puede detectar, el de su perfil; y si tampoco hay, "Otro país" (PayPal en dólares).
+  const [detectedRegion] = useState(detectRegionFromConnection);
+  const [chosenRegion, setChosenRegion] = useState(null);
+  const region = chosenRegion || detectedRegion || regionFromProfileCountry(userCountry) || "other";
+  const regionConfig = PAYMENT_REGIONS[region];
+  const mercadoPago = regionConfig.mercadoPago;
+  const paypalCurrency = regionConfig.paypalCurrency;
 
-  // Automatically update active payment methods based on country/currency configuration
+  // Medio de pago por defecto al cambiar de país: Mercado Pago donde existe, si no PayPal.
   useEffect(() => {
-    if (!resolvedConfigForUser) return; // can't decide gateway without country
-    if (resolvedConfigForUser.currency === "MXN" || resolvedConfigForUser.currency === "ARS" || resolvedConfigForUser.currency === "COP") {
-      setPaymentMethod("mercadopago");
-    } else {
-      setPaymentMethod("paypal");
-    }
-  }, [resolvedConfigForUser]);
+    setPaymentMethod(mercadoPago ? "mercadopago" : "paypal");
+  }, [region, mercadoPago]);
+
+  const availableMethods = [mercadoPago && "mercadopago", PAYPAL_CLIENT_ID && "paypal"].filter(Boolean);
+
+  // Moneda y precio según el medio elegido: Mercado Pago cobra en la moneda local de su cuenta,
+  // PayPal en EUR (España) o USD con el precio exacto del catálogo, no una conversión.
+  const pricing = paymentMethod === "mercadopago" && mercadoPago
+    ? { currency: mercadoPago.currency, symbol: mercadoPago.symbol, price: (chip) => chip.basePrice * mercadoPago.rate }
+    : { currency: paypalCurrency, ...PAYPAL_PRICING[paypalCurrency] };
+  const { currency, symbol } = pricing;
+  const getDisplayPrice = (chip) => pricing.price(chip).toFixed(2);
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -146,11 +163,6 @@ export default function BuyChips() {
   const filteredHistory =
     historyTypeFilter === "all" ? paymentHistory : paymentHistory.filter((item) => item.type === historyTypeFilter);
 
-  // country selection removed — country must be set in user profile
-  const handleCountryChange = (e) => {
-    // no-op: kept for compatibility
-  };
-
   // Mercado Pago order checkout redirection
   const createOrder = async (method) => {
     if (!currentUser?.id) {
@@ -158,17 +170,6 @@ export default function BuyChips() {
         icon: "warning",
         title: "Sesión requerida",
         text: "Debes iniciar sesión para comprar fichas.",
-        confirmButtonColor: "#C9A84C",
-      });
-      return;
-    }
-
-    // Block purchases if user hasn't set country in profile
-    if (!userCountry) {
-      Swal.fire({
-        icon: "warning",
-        title: "País no configurado",
-        text: "Debes configurar tu país en tu perfil antes de realizar compras.",
         confirmButtonColor: "#C9A84C",
       });
       return;
@@ -187,16 +188,16 @@ export default function BuyChips() {
     // Mercado Pago cobra siempre en la moneda real de la cuenta vendedora del país
     // (no hay una sola cuenta "multi-moneda") — por eso mandamos el país a una ruta
     // dedicada en vez del endpoint genérico, y el backend decide la moneda, no nosotros.
-    const mpCountry = CURRENCY_TO_MERCADOPAGO_COUNTRY[currency];
-    if (!mpCountry) {
+    if (!mercadoPago) {
       Swal.fire({
         icon: "warning",
         title: "Mercado Pago no disponible",
-        text: "Mercado Pago no está disponible para tu país. Probá con PayPal.",
+        text: `Mercado Pago no está disponible para ${regionConfig.label}. Probá con PayPal.`,
         confirmButtonColor: "#C9A84C",
       });
       return;
     }
+    const mpCountry = mercadoPago.country;
 
     // Solo mandamos el paquete: fichas y precio los calcula el backend.
     const payload = {
@@ -229,7 +230,7 @@ export default function BuyChips() {
         icon: isAccountNotReady ? "warning" : "error",
         title: isAccountNotReady ? "Mercado Pago no disponible" : "Error de Pasarela",
         text: isAccountNotReady
-          ? "Mercado Pago no está disponible para tu país todavía. Probá con PayPal mientras tanto."
+          ? `Mercado Pago todavía no está disponible para ${regionConfig.label}. Probá con PayPal mientras tanto.`
           : "Hubo un error al generar tu orden de pago. Inténtalo de nuevo.",
         confirmButtonColor: "#C9A84C",
       });
@@ -254,7 +255,7 @@ export default function BuyChips() {
   };
 
   // El SDK de PayPal solo lee sus opciones al montarse: el key lo recarga si cambia la
-  // moneda (por ejemplo cuando llega el perfil del usuario con su país).
+  // moneda (por ejemplo al elegir España en el selector de país).
   return (
     <PayPalScriptProvider
       key={paypalCurrency}
@@ -432,15 +433,49 @@ export default function BuyChips() {
                     </div>
                   </div>
 
-                  {/* Step 2: Select Payment Method */}
+                  {/* Step 2: Payment country */}
                   <div>
                     <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      2. Método de Pago Disponible
+                      2. País desde el que pagás
                     </label>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {REGION_ORDER.map((key) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => setChosenRegion(key)}
+                          aria-pressed={region === key}
+                          className={`glass-card px-2 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                            region === key
+                              ? "border-primary bg-primary/10 text-white shadow-md"
+                              : "border-outline-variant/30 text-on-surface-variant hover:border-primary/45"
+                          }`}
+                        >
+                          {PAYMENT_REGIONS[key].label}
+                        </button>
+                      ))}
+                    </div>
+                    {!chosenRegion && detectedRegion && (
+                      <p className="mt-2 text-[11px] text-on-surface-variant">
+                        Detectamos que te conectás desde {PAYMENT_REGIONS[detectedRegion].label}. Si no es así, elegí otro país.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Step 3: Select Payment Method */}
+                  <div>
+                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
+                      3. Método de Pago Disponible
+                    </label>
+                    {availableMethods.length === 0 && (
+                      <p className="text-xs text-on-surface-variant">
+                        Todavía no hay medios de pago disponibles para {regionConfig.label}.
+                      </p>
+                    )}
                     <div className="grid grid-cols-2 gap-4">
-                      
+
                       {/* PayPal Button */}
-                      {currency !== "MXN" && PAYPAL_CLIENT_ID && (
+                      {PAYPAL_CLIENT_ID && (
                         <button
                           onClick={() => setPaymentMethod("paypal")}
                           className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
@@ -454,28 +489,32 @@ export default function BuyChips() {
                         </button>
                       )}
 
-                      {/* Mercado Pago Button */}
-                      <button
-                        onClick={() => setPaymentMethod("mercadopago")}
-                        className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
-                          paymentMethod === "mercadopago"
-                            ? "border-primary bg-primary/5 shadow-md"
-                            : "border-outline-variant/30 hover:border-primary/45"
-                        }`}
-                      >
-                        <span className="material-symbols-outlined text-primary text-[28px]">qr_code_scanner</span>
-                        <span className="text-xs font-bold text-white">Mercado Pago</span>
-                      </button>
+                      {/* Mercado Pago Button: solo en los países que tienen cuenta de Mercado Pago */}
+                      {mercadoPago && (
+                        <button
+                          onClick={() => setPaymentMethod("mercadopago")}
+                          className={`glass-card p-4 rounded-xl flex flex-col items-center justify-center gap-2 border transition-all ${
+                            paymentMethod === "mercadopago"
+                              ? "border-primary bg-primary/5 shadow-md"
+                              : "border-outline-variant/30 hover:border-primary/45"
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-primary text-[28px]">qr_code_scanner</span>
+                          <span className="text-xs font-bold text-white">Mercado Pago</span>
+                        </button>
+                      )}
 
                     </div>
 
-                    <div className="mt-6 p-4 bg-primary/5 rounded-xl border border-primary/20 flex gap-3 text-left">
-                      <span className="material-symbols-outlined text-primary">info</span>
-                      <p className="text-xs text-on-surface-variant leading-relaxed">
-                        {paymentMethod === "paypal" && "Los depósitos a través de PayPal se acreditan instantáneamente tras la confirmación de la venta en nuestro backend."}
-                        {paymentMethod === "mercadopago" && "Mediante Mercado Pago redirigiremos tu sesión de forma segura para completar el pago. Recibimos USD y MXN locales."}
-                      </p>
-                    </div>
+                    {availableMethods.includes(paymentMethod) && (
+                      <div className="mt-6 p-4 bg-primary/5 rounded-xl border border-primary/20 flex gap-3 text-left">
+                        <span className="material-symbols-outlined text-primary">info</span>
+                        <p className="text-xs text-on-surface-variant leading-relaxed">
+                          {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
+                          {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                 </div>
@@ -523,11 +562,13 @@ export default function BuyChips() {
                           <PayPalButtons
                             style={{ layout: "vertical", shape: "pill", label: "pay" }}
                             createOrder={async (data, actions) => {
-                              // Solo mandamos el paquete: el backend cobra su precio en EUR (España) o USD.
+                              // Mandamos el paquete y la moneda del país elegido: el backend cobra el
+                              // precio de su catálogo en esa moneda (EUR para España, USD para el resto).
                               try {
                                 const response = await axios.post(`${API_URL}/paypal/create-order`, {
                                   userId: currentUser?.id,
                                   packageId: selectedChip.id,
+                                  currency: paypalCurrency,
                                 });
                                 return response.data.orderId; // Return orderId to PayPal SDK
                               } catch (err) {
@@ -598,7 +639,7 @@ export default function BuyChips() {
                       )}
 
                       {/* MERCADO PAGO ACTIVE RENDER */}
-                      {paymentMethod === "mercadopago" && (
+                      {paymentMethod === "mercadopago" && mercadoPago && (
                         <button
                           onClick={createOrder}
                           className="w-full royal-gold-gradient py-4 rounded-xl text-[#0A0A0F] font-bold text-md uppercase tracking-wider hover:brightness-110 active:scale-[0.98] transition-all shadow-lg royal-gold-glow flex items-center justify-center gap-2 cursor-pointer border-0"
