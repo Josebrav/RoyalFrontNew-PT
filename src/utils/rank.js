@@ -1,17 +1,17 @@
 /**
  * Los rangos dependen de las fichas cargadas de por vida (campo `totalChipsDeposited` del
- * backend). Cada umbral coincide con un paquete del catálogo (aprox. Plata ~$6, Oro ~$50,
- * Platino ~$200, Diamante ~$500). Mantener sincronizado con UsersService.RANK_THRESHOLDS en el
- * backend, que es quien decide el rango real (esto solo arma la barra de progreso).
+ * backend), atados a los paquetes en dólares: Plata = paquete de $5, Oro = $50, Platino = $200,
+ * Diamante = $500. Mantener sincronizado con UsersService.RANK_THRESHOLDS en el backend, que es
+ * quien decide el rango real (esto solo arma la barra de progreso).
  */
 export const RANK_ORDER = ["bronze", "silver", "gold", "platinum", "diamond"];
 
 export const RANK_THRESHOLDS = {
   bronze: 0,
-  silver: 5_000_000,
-  gold: 50_000_000,
-  platinum: 250_000_000,
-  diamond: 1_000_000_000,
+  silver: 15_000_000,
+  gold: 250_000_000,
+  platinum: 1_500_000_000,
+  diamond: 7_500_000_000,
 };
 
 export const RANK_META = {

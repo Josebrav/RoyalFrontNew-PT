@@ -33,10 +33,11 @@ const PAYMENT_REGIONS = {
 };
 const REGION_ORDER = ["ar", "co", "mx", "es", "other"];
 
-const PAYPAL_PRICING = {
-  USD: { symbol: "US$", price: (chip) => chip.basePrice },
-  EUR: { symbol: "€", price: (chip) => chip.priceEur },
-};
+const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
+
+// "Fichas base" de la promo: lo que da la tasa de siempre (500.000 fichas por dólar o euro, 500 por
+// peso). Cada paquete se muestra como base + X% gratis = total; el total es lo que se acredita.
+const BASE_CHIPS_PER_UNIT = { USD: 500_000, EUR: 500_000, ARS: 500 };
 
 const MEXICO_TIMEZONES = new Set([
   "America/Mexico_City", "America/Cancun", "America/Merida", "America/Monterrey", "America/Matamoros",
@@ -68,22 +69,35 @@ function regionFromProfileCountry(country) {
 // en el backend. Sin él no se muestra PayPal, en vez de caer a un id fijo de otro entorno.
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 
-// Paquetes de fichas, solo para mostrar. El backend tiene el catálogo real
-// (RoyalGamesBackend/src/modules/payments/chip-packages.ts) y decide fichas y precio
-// a partir del `id`: si cambiás algo acá, cambialo también allá.
-const chipOptions = [
-  { id: 1, basePrice: 1, priceEur: 0.9, amount: 500000, image: quinientosmil },
-  { id: 2, basePrice: 2, priceEur: 1.8, amount: 1000000, image: millon },
-  { id: 3, basePrice: 6, priceEur: 5.4, amount: 5000000, image: cincomillones },
-  { id: 4, basePrice: 15, priceEur: 13.5, amount: 15000000, image: quincemillones },
-  { id: 5, basePrice: 50, priceEur: 45, amount: 50000000, image: cincuentamillones },
-  { id: 6, basePrice: 200, priceEur: 180, amount: 250000000, image: doscincuenta },
-  { id: 7, basePrice: 500, priceEur: 450, amount: 1000000000, image: billon },
-  { id: 8, basePrice: 1000, priceEur: 900, amount: 2600000000, image: veinticeisb },
-  // Paquete de prueba para verificar pagos reales sin gastar casi nada: solo PayPal (el backend lo
-  // rechaza en Mercado Pago). Visible para todos los usuarios.
-  { id: 9, basePrice: 0.1, priceEur: 0.1, amount: 29, image: quinientosmil, testOnly: true },
-];
+// Paquetes de fichas por moneda, solo para mostrar. El backend tiene el catálogo real
+// (RoyalGamesBackend/src/modules/payments/chip-packages.ts) y decide fichas y precio a partir del
+// `id`: si cambiás algo acá, cambialo también allá. USD: PayPal en dólares y Mercado Pago
+// Colombia/México (convertido a su moneda). EUR: PayPal España. ARS: Mercado Pago Argentina.
+const PACKAGE_IMAGES = [quinientosmil, millon, cincomillones, quincemillones, cincuentamillones, doscincuenta, billon, veinticeisb];
+const tiers = (currency, firstId, rows) =>
+  rows.map(([price, chips], i) => ({ id: firstId + i, currency, price, chips, image: PACKAGE_IMAGES[i] }));
+// Paquete de prueba para verificar pagos reales sin gastar casi nada: solo PayPal (el backend lo
+// rechaza en Mercado Pago).
+const testPackage = (id, currency) => ({ id, currency, price: 0.1, chips: 29, image: quinientosmil, testOnly: true });
+
+const CHIP_CATALOG = {
+  USD: [
+    ...tiers("USD", 101, [[1, 2_500_000], [5, 15_000_000], [10, 40_000_000], [50, 250_000_000],
+      [100, 600_000_000], [200, 1_500_000_000], [500, 7_500_000_000], [1000, 20_000_000_000]]),
+    testPackage(901, "USD"),
+  ],
+  EUR: [
+    ...tiers("EUR", 201, [[1, 3_000_000], [5, 20_000_000], [10, 50_000_000], [50, 300_000_000],
+      [100, 750_000_000], [200, 2_000_000_000], [500, 10_000_000_000], [1000, 25_000_000_000]]),
+    testPackage(902, "EUR"),
+  ],
+  ARS: tiers("ARS", 301, [[100, 100_000], [500, 750_000], [1_000, 2_500_000], [5_000, 15_000_000],
+    [10_000, 50_000_000], [100_000, 750_000_000], [500_000, 5_000_000_000], [1_000_000, 15_000_000_000]]),
+};
+
+// Porcentaje "gratis" de la promo: cuánto más que las fichas base da el paquete.
+const baseChipsOf = (chip) => chip.price * BASE_CHIPS_PER_UNIT[chip.currency];
+const promoPercentOf = (chip) => Math.round((chip.chips / baseChipsOf(chip) - 1) * 100);
 
 // Mismos tipos que puede devolver ChipsService.getHistory (backend) — usado tanto para las
 // opciones del filtro como (junto con el signo de item.chips) para el ícono/color de cada fila.
@@ -108,7 +122,7 @@ export default function BuyChips() {
   const rankProgressPercentage = nextRank
     ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
     : 100;
-  const [selectedChip, setSelectedChip] = useState(chipOptions[0]);
+  const [selectedChip, setSelectedChip] = useState(CHIP_CATALOG.USD[0]);
   
   // Navigation tabs state: "deposit", "history"
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "history" ? "history" : "deposit");
@@ -138,26 +152,27 @@ export default function BuyChips() {
 
   const availableMethods = [mercadoPago && "mercadopago", PAYPAL_CLIENT_ID && "paypal"].filter(Boolean);
 
-  // Moneda y precio según el medio elegido: Mercado Pago cobra en la moneda local de su cuenta,
-  // PayPal en EUR (España) o USD con el precio exacto del catálogo, no una conversión.
-  const pricing = paymentMethod === "mercadopago" && mercadoPago
-    ? { currency: mercadoPago.currency, symbol: mercadoPago.symbol, price: (chip) => chip.basePrice * mercadoPago.rate }
-    : { currency: paypalCurrency, ...PAYPAL_PRICING[paypalCurrency] };
-  const { currency, symbol } = pricing;
-  const getDisplayPrice = (chip) => pricing.price(chip).toFixed(2);
-  // Con centavos siempre 2 decimales ("0,10", "0,90"); montos enteros sin decimales ("1.000").
+  // Qué paquetes y en qué moneda: Mercado Pago Argentina vende los de pesos; Colombia/México los de
+  // USD convertidos a su moneda; PayPal los de USD o EUR (España) con el precio tal cual.
+  const payingWithMercadoPago = paymentMethod === "mercadopago" && !!mercadoPago;
+  const catalogCurrency = payingWithMercadoPago ? (mercadoPago.currency === "ARS" ? "ARS" : "USD") : paypalCurrency;
+  const displayRate = payingWithMercadoPago && catalogCurrency === "USD" ? mercadoPago.rate : 1;
+  const currency = payingWithMercadoPago ? mercadoPago.currency : paypalCurrency;
+  const symbol = payingWithMercadoPago ? mercadoPago.symbol : PAYPAL_SYMBOLS[paypalCurrency];
+  const getDisplayPrice = (chip) => (chip.price * displayRate).toFixed(2);
+  // Con centavos siempre 2 decimales ("0,10"); montos enteros sin decimales ("1.000").
   const formatPrice = (chip) => {
     const value = Number(getDisplayPrice(chip));
     const decimals = Number.isInteger(value) ? 0 : 2;
     return new Intl.NumberFormat("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: 2 }).format(value);
   };
+  const formatChips = (amount) => new Intl.NumberFormat("es-ES").format(amount);
 
-  // El paquete de prueba solo aparece con PayPal elegido (Mercado Pago no lo acepta).
-  const showTestPackage = paymentMethod === "paypal";
-  const visibleChipOptions = chipOptions.filter((chip) => !chip.testOnly || showTestPackage);
+  // El paquete de prueba solo aparece con PayPal (Mercado Pago no lo acepta).
+  const visibleChipOptions = CHIP_CATALOG[catalogCurrency].filter((chip) => !chip.testOnly || paymentMethod === "paypal");
   useEffect(() => {
-    if (selectedChip?.testOnly && !showTestPackage) setSelectedChip(chipOptions[0]);
-  }, [selectedChip, showTestPackage]);
+    if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
+  }, [catalogCurrency, paymentMethod]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -467,24 +482,32 @@ export default function BuyChips() {
                                 <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
                               </div>
                             )}
-                            <div className="w-full aspect-square rounded-lg overflow-hidden mb-3">
+                            {/* Fichas base arriba; abajo la promo con el total que se acredita */}
+                            <p className="text-sm font-black text-white tracking-tight truncate w-full mb-2">
+                              {formatChips(chip.testOnly ? chip.chips : baseChipsOf(chip))}
+                            </p>
+                            <div className="w-full aspect-square rounded-lg overflow-hidden mb-2">
                               <img
                                 src={chip.image}
-                                alt={`Fichas ${chip.amount}`}
+                                alt={`Fichas ${chip.chips}`}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             </div>
-                            <div className="space-y-1 w-full">
-                              <p className="text-xs font-bold text-white uppercase tracking-tighter truncate">
-                                {new Intl.NumberFormat('es-ES').format(chip.amount)}
-                              </p>
-                              <p className="text-[10px] text-on-surface-variant uppercase tracking-wider block">FICHAS</p>
-                              <div className="bg-[#0A0A0F] py-1 px-2 rounded-full border border-outline-variant/10 mt-1">
-                                <span className="text-xs font-bold text-primary">
-                                  {symbol} {formatPrice(chip)}
-                                </span>
-                              </div>
+                            <div className="bg-[#0A0A0F] py-1 px-2 rounded-full border border-outline-variant/10 w-full">
+                              <span className="text-sm font-bold text-primary">
+                                {symbol} {formatPrice(chip)}
+                              </span>
                             </div>
+                            {chip.testOnly ? (
+                              <p className="mt-2 text-[10px] text-on-surface-variant uppercase tracking-wider">= {formatChips(chip.chips)} fichas</p>
+                            ) : (
+                              <div className="mt-2 w-full rounded-lg border-2 border-amber-400 bg-amber-50 px-1 py-1.5 leading-tight">
+                                <p className="text-sm font-black text-amber-600">+{promoPercentOf(chip)}%</p>
+                                <p className="text-[11px] font-black text-amber-600 uppercase">Gratis</p>
+                                <p className="text-[11px] font-bold text-[#3a2a00] mt-0.5 truncate">= {formatChips(chip.chips)}</p>
+                                <p className="text-[9px] text-[#3a2a00]/70 uppercase">fichas</p>
+                              </div>
+                            )}
                           </button>
                         );
                       })}
@@ -546,7 +569,7 @@ export default function BuyChips() {
                         <div className="flex justify-between items-center text-sm">
                           <span className="text-on-surface-variant">Paquete Seleccionado</span>
                           <span className="text-white font-bold">
-                            {selectedChip ? new Intl.NumberFormat('es-ES').format(selectedChip.amount) : "0"} Fichas
+                            {selectedChip ? formatChips(selectedChip.chips) : "0"} Fichas
                           </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
@@ -621,7 +644,7 @@ export default function BuyChips() {
                                 Swal.fire({
                                   icon: "success",
                                   title: "¡Depósito Exitoso!",
-                                  text: `¡Pago completado! Se han acreditado ${new Intl.NumberFormat('es-ES').format(selectedChip.amount)} fichas en tu cuenta.`,
+                                  text: `¡Pago completado! Se han acreditado ${formatChips(selectedChip.chips)} fichas en tu cuenta.`,
                                   confirmButtonColor: "#C9A84C",
                                 }).then(() => {
                                   // Refresh browser state or redirect
