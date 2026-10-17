@@ -578,7 +578,9 @@ export default function BuyChips() {
                       
                       {/* PAYPAL ACTIVE RENDER */}
                       {paymentMethod === "paypal" && PAYPAL_CLIENT_ID && (
-                        <div className="w-full">
+                        // Fondo claro a propósito: PayPal dibuja sus botones y el formulario de tarjeta con
+                        // texto oscuro, que sobre el fondo oscuro de la página no se leía.
+                        <div className="w-full bg-white rounded-xl p-4 shadow-inner">
                           <PayPalButtons
                             style={{ layout: "vertical", shape: "pill", label: "pay" }}
                             createOrder={async (data, actions) => {
