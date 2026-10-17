@@ -385,10 +385,39 @@ export default function BuyChips() {
                 {/* Left Side: Configuration & Grid (Col-Span 7) */}
                 <div className="lg:col-span-7 space-y-8 text-left">
                   
-                  {/* Step 1: Select Chip Package */}
+                  {/* Step 1: Payment country (primero: los precios de los paquetes dependen de él) */}
                   <div>
                     <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      1. Selecciona un Paquete de Fichas
+                      1. País desde el que pagás
+                    </label>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {REGION_ORDER.map((key) => (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => setChosenRegion(key)}
+                          aria-pressed={region === key}
+                          className={`glass-card px-2 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                            region === key
+                              ? "border-primary bg-primary/10 text-white shadow-md"
+                              : "border-outline-variant/30 text-on-surface-variant hover:border-primary/45"
+                          }`}
+                        >
+                          {PAYMENT_REGIONS[key].label}
+                        </button>
+                      ))}
+                    </div>
+                    {!chosenRegion && detectedRegion && (
+                      <p className="mt-2 text-[11px] text-on-surface-variant">
+                        Detectamos que te conectás desde {PAYMENT_REGIONS[detectedRegion].label}. Si no es así, elegí otro país.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Step 2: Select Chip Package */}
+                  <div>
+                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
+                      2. Selecciona un Paquete de Fichas
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {chipOptions.map((chip) => {
@@ -431,35 +460,6 @@ export default function BuyChips() {
                         );
                       })}
                     </div>
-                  </div>
-
-                  {/* Step 2: Payment country */}
-                  <div>
-                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      2. País desde el que pagás
-                    </label>
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                      {REGION_ORDER.map((key) => (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={() => setChosenRegion(key)}
-                          aria-pressed={region === key}
-                          className={`glass-card px-2 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                            region === key
-                              ? "border-primary bg-primary/10 text-white shadow-md"
-                              : "border-outline-variant/30 text-on-surface-variant hover:border-primary/45"
-                          }`}
-                        >
-                          {PAYMENT_REGIONS[key].label}
-                        </button>
-                      ))}
-                    </div>
-                    {!chosenRegion && detectedRegion && (
-                      <p className="mt-2 text-[11px] text-on-surface-variant">
-                        Detectamos que te conectás desde {PAYMENT_REGIONS[detectedRegion].label}. Si no es así, elegí otro país.
-                      </p>
-                    )}
                   </div>
 
                   {/* Step 3: Select Payment Method */}
