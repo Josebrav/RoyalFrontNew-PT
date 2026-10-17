@@ -78,6 +78,9 @@ const chipOptions = [
   { id: 6, basePrice: 200, priceEur: 180, amount: 250000000, image: doscincuenta },
   { id: 7, basePrice: 500, priceEur: 450, amount: 1000000000, image: billon },
   { id: 8, basePrice: 1000, priceEur: 900, amount: 2600000000, image: veinticeisb },
+  // Paquete de prueba para verificar pagos reales sin gastar casi nada: solo PayPal (el backend lo
+  // rechaza en Mercado Pago) y solo visible para administradores.
+  { id: 9, basePrice: 0.1, priceEur: 0.1, amount: 29, image: quinientosmil, testOnly: true },
 ];
 
 // Mismos tipos que puede devolver ChipsService.getHistory (backend) — usado tanto para las
@@ -140,6 +143,19 @@ export default function BuyChips() {
     : { currency: paypalCurrency, ...PAYPAL_PRICING[paypalCurrency] };
   const { currency, symbol } = pricing;
   const getDisplayPrice = (chip) => pricing.price(chip).toFixed(2);
+  // Con centavos siempre 2 decimales ("0,10", "0,90"); montos enteros sin decimales ("1.000").
+  const formatPrice = (chip) => {
+    const value = Number(getDisplayPrice(chip));
+    const decimals = Number.isInteger(value) ? 0 : 2;
+    return new Intl.NumberFormat("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: 2 }).format(value);
+  };
+
+  // El paquete de prueba solo aparece para administradores y con PayPal elegido.
+  const showTestPackage = currentUser?.role === "admin" && paymentMethod === "paypal";
+  const visibleChipOptions = chipOptions.filter((chip) => !chip.testOnly || showTestPackage);
+  useEffect(() => {
+    if (selectedChip?.testOnly && !showTestPackage) setSelectedChip(chipOptions[0]);
+  }, [selectedChip, showTestPackage]);
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -420,9 +436,8 @@ export default function BuyChips() {
                       2. Selecciona un Paquete de Fichas
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      {chipOptions.map((chip) => {
+                      {visibleChipOptions.map((chip) => {
                         const isSelected = selectedChip?.id === chip.id;
-                        const formattedPrice = getDisplayPrice(chip);
                         return (
                           <button
                             key={chip.id}
@@ -433,6 +448,11 @@ export default function BuyChips() {
                                 : "border-outline-variant/20 hover:border-primary/50"
                             }`}
                           >
+                            {chip.testOnly && (
+                              <div className="absolute top-1.5 left-1.5 z-10 bg-amber-500 text-[#0A0A0F] text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
+                                Prueba
+                              </div>
+                            )}
                             {isSelected && (
                               <div className="absolute top-1.5 right-1.5 bg-primary rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                                 <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
@@ -452,7 +472,7 @@ export default function BuyChips() {
                               <p className="text-[10px] text-on-surface-variant uppercase tracking-wider block">FICHAS</p>
                               <div className="bg-[#0A0A0F] py-1 px-2 rounded-full border border-outline-variant/10 mt-1">
                                 <span className="text-xs font-bold text-primary">
-                                  {symbol} {new Intl.NumberFormat('es-ES').format(formattedPrice)}
+                                  {symbol} {formatPrice(chip)}
                                 </span>
                               </div>
                             </div>
@@ -546,7 +566,7 @@ export default function BuyChips() {
                         <div className="flex justify-between items-end pt-2 border-t border-outline-variant/10">
                           <span className="font-label-lg text-label-lg text-white">Total a Pagar:</span>
                           <span className="font-headline-lg text-headline-lg text-primary">
-                            {symbol} {selectedChip ? new Intl.NumberFormat('es-ES').format(getDisplayPrice(selectedChip)) : "0.00"}
+                            {symbol} {selectedChip ? formatPrice(selectedChip) : "0"}
                           </span>
                         </div>
                       </div>
