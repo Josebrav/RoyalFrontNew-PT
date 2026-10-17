@@ -36,7 +36,7 @@ const REGION_ORDER = ["ar", "co", "mx", "es", "other"];
 const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
 
 // "Fichas base" de la promo: lo que da la tasa de siempre (500.000 fichas por dólar o euro, 500 por
-// peso). Cada paquete se muestra como base + X% gratis = total; el total es lo que se acredita.
+// peso). Cada paquete muestra su bonus (+X%) y el total que recibe, que es lo que se acredita.
 const BASE_CHIPS_PER_UNIT = { USD: 500_000, EUR: 500_000, ARS: 500 };
 
 const MEXICO_TIMEZONES = new Set([
@@ -95,7 +95,7 @@ const CHIP_CATALOG = {
     [10_000, 50_000_000], [100_000, 750_000_000], [500_000, 5_000_000_000], [1_000_000, 15_000_000_000]]),
 };
 
-// Porcentaje "gratis" de la promo: cuánto más que las fichas base da el paquete.
+// Porcentaje de bonus: cuánto más que las fichas base da el paquete.
 const baseChipsOf = (chip) => chip.price * BASE_CHIPS_PER_UNIT[chip.currency];
 const promoPercentOf = (chip) => Math.round((chip.chips / baseChipsOf(chip) - 1) * 100);
 
@@ -473,7 +473,7 @@ export default function BuyChips() {
                             }`}
                           >
                             {chip.testOnly && (
-                              <div className="absolute top-1.5 left-1.5 z-10 bg-amber-500 text-[#0A0A0F] text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
+                              <div className="absolute top-1.5 left-1.5 z-10 bg-yellow-400 text-[#0A0A0F] text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
                                 Prueba
                               </div>
                             )}
@@ -482,10 +482,7 @@ export default function BuyChips() {
                                 <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
                               </div>
                             )}
-                            {/* Fichas base arriba; abajo la promo con el total que se acredita */}
-                            <p className="text-sm font-black text-white tracking-tight truncate w-full mb-2">
-                              {formatChips(chip.testOnly ? chip.chips : baseChipsOf(chip))}
-                            </p>
+                            {/* Imagen y precio; abajo el bonus en amarillo con el total que se acredita */}
                             <div className="w-full aspect-square rounded-lg overflow-hidden mb-2">
                               <img
                                 src={chip.image}
@@ -499,13 +496,13 @@ export default function BuyChips() {
                               </span>
                             </div>
                             {chip.testOnly ? (
-                              <p className="mt-2 text-[10px] text-on-surface-variant uppercase tracking-wider">= {formatChips(chip.chips)} fichas</p>
+                              <p className="mt-2 text-[11px] text-on-surface-variant">Recibís {formatChips(chip.chips)} fichas</p>
                             ) : (
-                              <div className="mt-2 w-full rounded-lg border-2 border-amber-400 bg-amber-50 px-1 py-1.5 leading-tight">
-                                <p className="text-sm font-black text-amber-600">+{promoPercentOf(chip)}%</p>
-                                <p className="text-[11px] font-black text-amber-600 uppercase">Gratis</p>
-                                <p className="text-[11px] font-bold text-[#3a2a00] mt-0.5 truncate">= {formatChips(chip.chips)}</p>
-                                <p className="text-[9px] text-[#3a2a00]/70 uppercase">fichas</p>
+                              <div className="mt-2 w-full rounded-lg border border-yellow-400 bg-yellow-400/15 px-1.5 py-1.5 leading-tight">
+                                <p className="text-[11px] font-black text-yellow-300 uppercase tracking-wide">Bonus +{promoPercentOf(chip)}%</p>
+                                <p className="text-[10px] text-yellow-100/80 mt-0.5">Recibís</p>
+                                <p className="text-xs font-black text-white truncate">{formatChips(chip.chips)} fichas</p>
+                                <p className="text-[9px] text-yellow-100/60 mt-0.5 truncate">base {formatChips(baseChipsOf(chip))}</p>
                               </div>
                             )}
                           </button>
