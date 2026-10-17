@@ -81,7 +81,7 @@ const chipOptions = [
   { id: 7, basePrice: 500, priceEur: 450, amount: 1000000000, image: billon },
   { id: 8, basePrice: 1000, priceEur: 900, amount: 2600000000, image: veinticeisb },
   // Paquete de prueba para verificar pagos reales sin gastar casi nada: solo PayPal (el backend lo
-  // rechaza en Mercado Pago) y solo visible para administradores.
+  // rechaza en Mercado Pago). Visible para todos los usuarios.
   { id: 9, basePrice: 0.1, priceEur: 0.1, amount: 29, image: quinientosmil, testOnly: true },
 ];
 
@@ -152,8 +152,8 @@ export default function BuyChips() {
     return new Intl.NumberFormat("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: 2 }).format(value);
   };
 
-  // El paquete de prueba solo aparece para administradores y con PayPal elegido.
-  const showTestPackage = currentUser?.role === "admin" && paymentMethod === "paypal";
+  // El paquete de prueba solo aparece con PayPal elegido (Mercado Pago no lo acepta).
+  const showTestPackage = paymentMethod === "paypal";
   const visibleChipOptions = chipOptions.filter((chip) => !chip.testOnly || showTestPackage);
   useEffect(() => {
     if (selectedChip?.testOnly && !showTestPackage) setSelectedChip(chipOptions[0]);
