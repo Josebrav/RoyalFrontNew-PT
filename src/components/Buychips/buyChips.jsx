@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import API_URL from '../../api/rutaApi';
@@ -145,6 +145,12 @@ export default function BuyChips() {
     ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
     : 100;
   const [selectedChip, setSelectedChip] = useState(CHIP_CATALOG.USD[0]);
+
+  // Los botones de PayPal se ven bien sobre el fondo oscuro, pero el formulario de tarjeta que
+  // despliegan tiene texto oscuro: el fondo blanco se pone solo mientras ese formulario está abierto
+  // (se nota porque la zona de PayPal crece mucho más que la altura de los dos botones).
+  const paypalBoxRef = useRef(null);
+  const [paypalFormOpen, setPaypalFormOpen] = useState(false);
   
   // Navigation tabs state: "deposit", "history"
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") === "history" ? "history" : "deposit");
@@ -173,6 +179,17 @@ export default function BuyChips() {
   }, [region, mercadoPago]);
 
   const availableMethods = [mercadoPago && "mercadopago", PAYPAL_CLIENT_ID && "paypal"].filter(Boolean);
+
+  useEffect(() => {
+    const el = paypalBoxRef.current;
+    if (!el) {
+      setPaypalFormOpen(false);
+      return;
+    }
+    const observer = new ResizeObserver(([entry]) => setPaypalFormOpen(entry.contentRect.height > 220));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [paymentMethod]);
 
   // Qué paquetes y en qué moneda: Mercado Pago Argentina vende los de pesos; Colombia/México los de
   // USD convertidos a su moneda; PayPal los de USD o EUR (España) con el precio tal cual.
@@ -629,9 +646,11 @@ export default function BuyChips() {
                   <div className="w-full lg:w-[380px] flex-shrink-0">
                       {/* PAYPAL ACTIVE RENDER */}
                       {paymentMethod === "paypal" && PAYPAL_CLIENT_ID && (
-                        // Fondo claro a propósito: PayPal dibuja sus botones y el formulario de tarjeta con
-                        // texto oscuro, que sobre el fondo oscuro de la página no se leía.
-                        <div className="w-full bg-white rounded-xl p-3 shadow-inner">
+                        // Fondo blanco solo con el formulario de tarjeta abierto (ver paypalFormOpen).
+                        <div
+                          ref={paypalBoxRef}
+                          className={`w-full rounded-xl transition-colors ${paypalFormOpen ? "bg-white p-3 shadow-inner" : ""}`}
+                        >
                           <PayPalButtons
                             style={{ layout: "vertical", shape: "pill", label: "pay" }}
                             createOrder={async (data, actions) => {
