@@ -19,6 +19,7 @@ import billon from "../../assets/1billon.jpg";
 import veinticeisb from "../../assets/26billones.jpg";
 import { useAuth } from "../../context/oauthContext";
 import { PayPalLogo, MercadoPagoLogo } from "../ui/PaymentLogos";
+import EditableImage from "../ui/EditableImage";
 
 // País desde el que se paga (elegible en la página, no hace falta tenerlo en el perfil). Mercado
 // Pago tiene una cuenta vendedora por país y cada una solo cobra en su moneda; PayPal cobra en EUR
@@ -102,8 +103,9 @@ const CHIP_CATALOG = {
       [100, 750_000_000], [200, 2_000_000_000], [500, 10_000_000_000], [1000, 25_000_000_000]]),
     testPackage(902, "EUR"),
   ],
-  ARS: tiers("ARS", 301, [[100, 100_000], [500, 750_000], [1_000, 2_500_000], [5_000, 15_000_000],
-    [10_000, 50_000_000], [100_000, 750_000_000], [500_000, 5_000_000_000], [1_000_000, 15_000_000_000]]),
+  // Argentina: 20% más de fichas que el equivalente en dólares.
+  ARS: tiers("ARS", 301, [[100, 120_000], [500, 900_000], [1_000, 3_000_000], [5_000, 18_000_000],
+    [10_000, 60_000_000], [100_000, 900_000_000], [500_000, 6_000_000_000], [1_000_000, 18_000_000_000]]),
 };
 
 // Porcentaje de bonus: cuánto más que las fichas base da el paquete.
@@ -476,12 +478,19 @@ export default function BuyChips() {
                         const baseChips = chip.testOnly ? chip.chips : baseChipsOf(chip);
                         const image = chip.testOnly ? null : IMAGE_BY_BASE_CHIPS[baseChips];
                         return (
-                          <button
+                          <div
                             key={chip.id}
-                            type="button"
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setSelectedChip(chip)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setSelectedChip(chip);
+                              }
+                            }}
                             aria-pressed={isSelected}
-                            className="flex flex-col gap-2 text-center cursor-pointer select-none group relative active:scale-95 transition-transform bg-transparent border-0 p-0"
+                            className="flex flex-col gap-2 text-center cursor-pointer select-none group relative active:scale-95 transition-transform rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                           >
                             <div
                               className={`relative w-full rounded-xl overflow-hidden border-2 transition-all ${
@@ -496,23 +505,25 @@ export default function BuyChips() {
                                 </div>
                               )}
                               {isSelected && (
-                                <div className="absolute top-1.5 right-1.5 z-10 bg-primary rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                                <div className="absolute bottom-11 right-2 z-10 bg-primary rounded-full w-5 h-5 flex items-center justify-center shadow-md">
                                   <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
                                 </div>
                               )}
-                              {image ? (
-                                <img
-                                  src={image}
-                                  alt={`${formatChips(baseChips)} fichas`}
-                                  className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
-                                />
-                              ) : (
-                                <div className="w-full aspect-square bg-gradient-to-b from-surface-container-high to-surface-container-lowest flex items-start justify-center pt-4">
-                                  <span className="text-white font-black text-base [text-shadow:0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
-                                    {formatChips(baseChips)}
-                                  </span>
-                                </div>
-                              )}
+                              <EditableImage
+                                contentKey={`chips.packageImage.${baseChips}`}
+                                fallbackSrc={image}
+                                alt={`${formatChips(baseChips)} fichas`}
+                                className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
+                                recommendedSize={`cuadrada, 1000×1000px aprox., con el número ${formatChips(baseChips)}`}
+                                allowLink={false}
+                                placeholder={
+                                  <div className="w-full h-full bg-gradient-to-b from-surface-container-high to-surface-container-lowest flex items-start justify-center pt-4">
+                                    <span className="text-white font-black text-base [text-shadow:0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+                                      {formatChips(baseChips)}
+                                    </span>
+                                  </div>
+                                }
+                              />
                               <div className="bg-white py-1.5">
                                 <span className="text-base font-black text-[#0A0A0F]">
                                   {symbol} {formatPrice(chip)}
@@ -535,7 +546,7 @@ export default function BuyChips() {
                                 <p className="text-[10px] text-neutral-600">fichas</p>
                               </div>
                             )}
-                          </button>
+                          </div>
                         );
                       })}
                     </div>
