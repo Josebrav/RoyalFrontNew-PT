@@ -382,10 +382,10 @@ export default function BuyChips() {
               <div className="space-y-5 text-left">
 
                 {/* Franja 1: país, medio de pago, balance y rango */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
 
                   {/* Step 1: Payment country (primero: los precios de los paquetes dependen de él) */}
-                  <div className="lg:col-span-5">
+                  <div className="lg:col-span-5 rounded-2xl border border-outline-variant/25 bg-black/25 p-3">
                     <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                       1. País desde el que pagás
                     </label>
@@ -414,7 +414,7 @@ export default function BuyChips() {
                   </div>
 
                   {/* Step 2: Payment method (antes de los paquetes: define la moneda de los precios) */}
-                  <div className="lg:col-span-4">
+                  <div className="lg:col-span-4 rounded-2xl border border-outline-variant/25 bg-black/25 p-3">
                     <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                       2. Medio de Pago
                     </label>
@@ -468,7 +468,9 @@ export default function BuyChips() {
                   </div>
 
                   {/* Balance y rango */}
-                  <div className="lg:col-span-3 grid grid-cols-2 gap-2 lg:mt-6">
+                  <div className="lg:col-span-3 rounded-2xl border border-outline-variant/25 bg-black/25 p-3">
+                    <p className="text-xs font-bold text-primary mb-2 uppercase tracking-wider">Tu cuenta</p>
+                    <div className="grid grid-cols-2 gap-2">
                     <div className="glass-card px-3 py-2 rounded-xl">
                       <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Mi Balance</p>
                       <p className="text-sm font-bold text-white leading-tight break-all">
@@ -491,6 +493,7 @@ export default function BuyChips() {
                       ) : (
                         <p className="mt-2 text-[10px] text-primary">Rango máximo alcanzado</p>
                       )}
+                    </div>
                     </div>
                   </div>
                 </div>
