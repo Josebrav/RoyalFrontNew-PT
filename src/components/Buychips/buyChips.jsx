@@ -310,7 +310,7 @@ export default function BuyChips() {
         currency: paypalCurrency,
       }}
     >
-      <main className="flex-grow p-4 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface min-h-[85vh] pt-6 md:pt-8 relative">
+      <main className="flex-grow p-4 md:p-margin-desktop max-w-container-max mx-auto w-full select-none text-on-surface min-h-[85vh] pt-4 md:pt-5 relative">
         
         {/* Step 0: Authentication Shield Overlay if not logged in. Solo después de que terminó de
             restaurarse la sesión (auth.loading): al recargar, la sesión tarda un instante en volver
@@ -335,27 +335,27 @@ export default function BuyChips() {
           </div>
         )}
 
-        {/* Page Header */}
-        <header className="mb-8">
-          <h1 className="font-display-lg text-display-lg text-primary tracking-tight mb-2 flex items-center gap-3">
-            <span className="material-symbols-outlined text-[40px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
+        {/* Page Header (compacto: la idea es que el depósito entero entre en una pantalla) */}
+        <header className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+          <h1 className="text-3xl font-black text-primary tracking-tight flex items-center gap-2">
+            <span className="material-symbols-outlined text-[30px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
               account_balance_wallet
             </span>
             Billetera Royal
           </h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
+          <p className="text-sm text-on-surface-variant">
             Administra tus fondos, adquiere fichas y gestiona tus transacciones seguras.
           </p>
         </header>
 
         {/* Interactive Workspace Panel */}
-        <div className="glass-card rounded-2xl overflow-hidden mb-12 shadow-2xl">
-          
+        <div className="glass-card rounded-2xl overflow-hidden mb-6 shadow-2xl">
+
           {/* Navigation Tabs */}
           <div className="flex border-b border-outline-variant/10 bg-[#12121A]/80">
             <button
               onClick={() => setActiveTab("deposit")}
-              className={`flex-1 py-4 font-label-lg text-label-lg transition-all border-b-2 font-bold ${
+              className={`flex-1 py-2.5 text-sm transition-all border-b-2 font-bold ${
                 activeTab === "deposit"
                   ? "text-primary border-primary bg-primary/5"
                   : "text-on-surface-variant hover:text-on-surface border-transparent"
@@ -365,7 +365,7 @@ export default function BuyChips() {
             </button>
             <button
               onClick={() => setActiveTab("history")}
-              className={`flex-1 py-4 font-label-lg text-label-lg transition-all border-b-2 font-bold ${
+              className={`flex-1 py-2.5 text-sm transition-all border-b-2 font-bold ${
                 activeTab === "history"
                   ? "text-primary border-primary bg-primary/5"
                   : "text-on-surface-variant hover:text-on-surface border-transparent"
@@ -375,18 +375,18 @@ export default function BuyChips() {
             </button>
           </div>
 
-          <div className="p-6 md:p-10">
-            
-            {/* VIEW 1: DEPOSIT & CHEKOUT */}
+          <div className="p-4 md:p-6">
+
+            {/* VIEW 1: DEPOSIT & CHECKOUT — tres franjas: opciones, paquetes en una fila, cobro */}
             {activeTab === "deposit" && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                
-                {/* Left Side: Configuration & Grid (Col-Span 7) */}
-                <div className="lg:col-span-7 space-y-8 text-left">
-                  
+              <div className="space-y-5 text-left">
+
+                {/* Franja 1: país, medio de pago, balance y rango */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
                   {/* Step 1: Payment country (primero: los precios de los paquetes dependen de él) */}
-                  <div>
-                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
+                  <div className="lg:col-span-5">
+                    <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                       1. País desde el que pagás
                     </label>
                     <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -396,7 +396,7 @@ export default function BuyChips() {
                           type="button"
                           onClick={() => setChosenRegion(key)}
                           aria-pressed={region === key}
-                          className={`glass-card px-2 py-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          className={`glass-card px-2 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                             region === key
                               ? "border-primary bg-primary/10 text-white shadow-md"
                               : "border-outline-variant/30 text-on-surface-variant hover:border-primary/45"
@@ -407,15 +407,15 @@ export default function BuyChips() {
                       ))}
                     </div>
                     {!chosenRegion && detectedRegion && (
-                      <p className="mt-2 text-[11px] text-on-surface-variant">
+                      <p className="mt-1.5 text-[11px] text-on-surface-variant">
                         Detectamos que te conectás desde {PAYMENT_REGIONS[detectedRegion].label}. Si no es así, elegí otro país.
                       </p>
                     )}
                   </div>
 
                   {/* Step 2: Payment method (antes de los paquetes: define la moneda de los precios) */}
-                  <div>
-                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
+                  <div className="lg:col-span-4">
+                    <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                       2. Medio de Pago
                     </label>
                     {availableMethods.length === 0 && (
@@ -423,24 +423,24 @@ export default function BuyChips() {
                         Todavía no hay medios de pago disponibles para {regionConfig.label}.
                       </p>
                     )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2">
                       {mercadoPago && (
                         <button
                           type="button"
                           onClick={() => setPaymentMethod("mercadopago")}
                           aria-pressed={paymentMethod === "mercadopago"}
-                          className={`glass-card p-4 rounded-xl flex items-center gap-3 text-left border-2 transition-all cursor-pointer ${
+                          className={`glass-card px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
                             paymentMethod === "mercadopago"
                               ? "border-primary bg-primary/10 shadow-md"
                               : "border-outline-variant/30 hover:border-primary/45"
                           }`}
                         >
-                          <span className="w-11 h-11 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                            <MercadoPagoLogo className="w-7 h-7" />
+                          <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                            <MercadoPagoLogo className="w-5 h-5" />
                           </span>
                           <span className="min-w-0">
-                            <span className="block text-sm font-bold text-white">Mercado Pago</span>
-                            <span className="block text-[11px] text-on-surface-variant">Pagás en {mercadoPago.currency}</span>
+                            <span className="block text-xs font-bold text-white">Mercado Pago</span>
+                            <span className="block text-[10px] text-on-surface-variant">Pagás en {mercadoPago.currency}</span>
                           </span>
                         </button>
                       )}
@@ -449,195 +449,171 @@ export default function BuyChips() {
                           type="button"
                           onClick={() => setPaymentMethod("paypal")}
                           aria-pressed={paymentMethod === "paypal"}
-                          className={`glass-card p-4 rounded-xl flex items-center gap-3 text-left border-2 transition-all cursor-pointer ${
+                          className={`glass-card px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
                             paymentMethod === "paypal"
                               ? "border-primary bg-primary/10 shadow-md"
                               : "border-outline-variant/30 hover:border-primary/45"
                           }`}
                         >
-                          <span className="w-11 h-11 rounded-full bg-white flex items-center justify-center flex-shrink-0">
-                            <PayPalLogo className="w-6 h-6" />
+                          <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
+                            <PayPalLogo className="w-4 h-4" />
                           </span>
                           <span className="min-w-0">
-                            <span className="block text-sm font-bold text-white">PayPal</span>
-                            <span className="block text-[11px] text-on-surface-variant">Pagás en {paypalCurrency} · cuenta PayPal o tarjeta</span>
+                            <span className="block text-xs font-bold text-white">PayPal</span>
+                            <span className="block text-[10px] text-on-surface-variant">Pagás en {paypalCurrency} · cuenta o tarjeta</span>
                           </span>
                         </button>
                       )}
                     </div>
                   </div>
 
-                  {/* Step 3: Select Chip Package */}
-                  <div>
-                    <label className="font-label-lg text-label-lg text-primary mb-3 block uppercase tracking-wider">
-                      3. Selecciona un Paquete de Fichas
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      {visibleChipOptions.map((chip) => {
-                        const isSelected = selectedChip?.id === chip.id;
-                        const baseChips = chip.testOnly ? chip.chips : baseChipsOf(chip);
-                        const image = chip.testOnly ? null : IMAGE_BY_BASE_CHIPS[baseChips];
-                        return (
-                          <div
-                            key={chip.id}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => setSelectedChip(chip)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                setSelectedChip(chip);
-                              }
-                            }}
-                            aria-pressed={isSelected}
-                            className="flex flex-col gap-2 text-center cursor-pointer select-none group relative active:scale-95 transition-transform rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                          >
-                            <div
-                              className={`relative w-full rounded-xl overflow-hidden border-2 transition-all ${
-                                isSelected
-                                  ? "border-primary shadow-[0_0_15px_rgba(201,168,76,0.35)]"
-                                  : "border-outline-variant/20 group-hover:border-primary/50"
-                              }`}
-                            >
-                              {chip.testOnly && (
-                                <div className="absolute top-1.5 left-1.5 z-10 bg-yellow-400 text-[#0A0A0F] text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
-                                  Prueba
-                                </div>
-                              )}
-                              {isSelected && (
-                                <div className="absolute bottom-11 right-2 z-10 bg-primary rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-                                  <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
-                                </div>
-                              )}
-                              <EditableImage
-                                contentKey={`chips.packageImage.${baseChips}`}
-                                fallbackSrc={image}
-                                alt={`${formatChips(baseChips)} fichas`}
-                                className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
-                                recommendedSize={`cuadrada, 1000×1000px aprox., con el número ${formatChips(baseChips)}`}
-                                allowLink={false}
-                                placeholder={
-                                  <div className="w-full h-full bg-gradient-to-b from-surface-container-high to-surface-container-lowest flex items-start justify-center pt-4">
-                                    <span className="text-white font-black text-base [text-shadow:0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
-                                      {formatChips(baseChips)}
-                                    </span>
-                                  </div>
-                                }
-                              />
-                              <div className="bg-white py-1.5">
-                                <span className="text-base font-black text-[#0A0A0F]">
-                                  {symbol} {formatPrice(chip)}
-                                </span>
-                              </div>
-                            </div>
-                            {chip.testOnly ? (
-                              <div className="w-full rounded-xl border-2 border-outline-variant/30 bg-surface-container-high px-1 py-2 leading-tight">
-                                <p className="text-[10px] text-on-surface-variant">Recibís</p>
-                                <p className="text-sm font-black text-white">{formatChips(chip.chips)} fichas</p>
-                              </div>
-                            ) : (
-                              <div className="w-full rounded-xl border-2 border-yellow-400 bg-gradient-to-b from-yellow-100 to-yellow-200 px-1 py-2 leading-tight">
-                                <p className="text-lg font-black text-yellow-700">+{promoPercentOf(chip)}%</p>
-                                <p className="text-[11px] font-black text-yellow-700 uppercase tracking-wider">Bonus</p>
-                                <p className="text-[10px] text-neutral-600 mt-1">Recibís</p>
-                                <p className={`font-black text-neutral-900 whitespace-nowrap ${formatChips(chip.chips).length > 11 ? "text-[11px]" : "text-sm"}`}>
-                                  {formatChips(chip.chips)}
-                                </p>
-                                <p className="text-[10px] text-neutral-600">fichas</p>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Right Side: Checkout summary & Actions (Col-Span 5) */}
-                <div className="lg:col-span-5 lg:sticky lg:top-24 self-start space-y-4">
-                  {/* Balance y rango: al costado del depósito, no en una fila aparte arriba */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="glass-card p-4 rounded-xl text-left">
-                      <p className="text-[10px] text-on-surface-variant mb-1 uppercase tracking-wider font-bold">Mi Balance</p>
-                      <p className="text-lg font-bold text-white leading-tight break-all">
+                  {/* Balance y rango */}
+                  <div className="lg:col-span-3 grid grid-cols-2 gap-2 lg:mt-6">
+                    <div className="glass-card px-3 py-2 rounded-xl">
+                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Mi Balance</p>
+                      <p className="text-sm font-bold text-white leading-tight break-all">
                         {new Intl.NumberFormat('es-ES').format(currentUser?.chips || 0)}
-                        <span className="text-primary font-bold text-[10px] ml-1">CHIPS</span>
                       </p>
-                      <p className="mt-2 flex items-center text-[10px] text-green-400">
-                        <span className="material-symbols-outlined text-[12px] mr-1">check_circle</span>
-                        Disponible para jugar
-                      </p>
+                      <p className="text-[10px] text-green-400">Disponible para jugar</p>
                     </div>
-                    <div className="glass-card p-4 rounded-xl text-left">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Mi Rango</p>
+                    <div className="glass-card px-3 py-2 rounded-xl">
+                      <div className="flex items-center justify-between gap-1">
+                        <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Rango</p>
                         <RankBadge tier={currentUser?.rank} size="sm" />
                       </div>
                       {nextRank ? (
                         <>
-                          <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-2 w-full overflow-hidden mt-3">
+                          <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-1.5 w-full overflow-hidden mt-2">
                             <div className="royal-gold-gradient h-full rounded-full" style={{ width: `${rankProgressPercentage}%` }}></div>
                           </div>
-                          <p className="mt-2 text-[10px] text-on-surface-variant leading-snug">
-                            {rankProgressPercentage}% hacia {nextRank.label}
-                          </p>
+                          <p className="mt-1 text-[10px] text-on-surface-variant">{rankProgressPercentage}% hacia {nextRank.label}</p>
                         </>
                       ) : (
-                        <p className="mt-3 flex items-center text-[10px] text-primary">
-                          <span className="material-symbols-outlined text-[12px] mr-1">workspace_premium</span>
-                          Rango máximo alcanzado
-                        </p>
+                        <p className="mt-2 text-[10px] text-primary">Rango máximo alcanzado</p>
                       )}
                     </div>
                   </div>
+                </div>
 
-                  <div className="glass-card p-6 rounded-2xl border border-outline-variant/20 relative overflow-hidden bg-[#12121A]/60 flex flex-col">
-                    
-                    {/* Atmospheric gold glow */}
-                    <div className="absolute inset-0 royal-gold-gradient opacity-[0.02] blur-3xl pointer-events-none"></div>
-
-                    <div className="space-y-6 text-left relative z-10">
-                      <h3 className="font-headline-sm text-headline-sm text-white border-b border-outline-variant/10 pb-4">
-                        Resumen del Depósito
-                      </h3>
-
-                      {/* Selected package detail */}
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-on-surface-variant">Paquete Seleccionado</span>
-                          <span className="text-white font-bold">
-                            {selectedChip ? formatChips(selectedChip.chips) : "0"} Fichas
-                          </span>
+                {/* Franja 2: paquetes, todos en una fila en pantallas grandes */}
+                <div>
+                  <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
+                    3. Selecciona un Paquete de Fichas
+                  </label>
+                  <div
+                    className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3"
+                    style={{ "--pkg-cols": visibleChipOptions.length }}
+                  >
+                    {visibleChipOptions.map((chip) => {
+                      const isSelected = selectedChip?.id === chip.id;
+                      const baseChips = chip.testOnly ? chip.chips : baseChipsOf(chip);
+                      const image = chip.testOnly ? null : IMAGE_BY_BASE_CHIPS[baseChips];
+                      return (
+                        <div
+                          key={chip.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setSelectedChip(chip)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setSelectedChip(chip);
+                            }
+                          }}
+                          aria-pressed={isSelected}
+                          className="flex flex-col gap-1.5 text-center cursor-pointer select-none group relative active:scale-95 transition-transform rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                          <div
+                            className={`relative w-full rounded-xl overflow-hidden border-2 transition-all ${
+                              isSelected
+                                ? "border-primary shadow-[0_0_15px_rgba(201,168,76,0.35)]"
+                                : "border-outline-variant/20 group-hover:border-primary/50"
+                            }`}
+                          >
+                            {chip.testOnly && (
+                              <div className="absolute top-1.5 left-1.5 z-10 bg-yellow-400 text-[#0A0A0F] text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
+                                Prueba
+                              </div>
+                            )}
+                            {isSelected && (
+                              <div className="absolute bottom-9 right-1.5 z-10 bg-primary rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                                <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
+                              </div>
+                            )}
+                            <EditableImage
+                              contentKey={`chips.packageImage.${baseChips}`}
+                              fallbackSrc={image}
+                              alt={`${formatChips(baseChips)} fichas`}
+                              className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
+                              recommendedSize={`cuadrada, 1000×1000px aprox., con el número ${formatChips(baseChips)}`}
+                              allowLink={false}
+                              placeholder={
+                                <div className="w-full h-full bg-gradient-to-b from-surface-container-high to-surface-container-lowest flex items-start justify-center pt-3">
+                                  <span className="text-white font-black text-sm [text-shadow:0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+                                    {formatChips(baseChips)}
+                                  </span>
+                                </div>
+                              }
+                            />
+                            <div className="bg-white py-1">
+                              <span className="text-sm font-black text-[#0A0A0F] whitespace-nowrap">
+                                {symbol} {formatPrice(chip)}
+                              </span>
+                            </div>
+                          </div>
+                          {chip.testOnly ? (
+                            <div className="w-full rounded-xl border-2 border-outline-variant/30 bg-surface-container-high px-1 py-1.5 leading-tight">
+                              <p className="text-[9px] text-on-surface-variant">Recibís</p>
+                              <p className="text-xs font-black text-white">{formatChips(chip.chips)} fichas</p>
+                            </div>
+                          ) : (
+                            <div className="w-full rounded-xl border-2 border-yellow-400 bg-gradient-to-b from-yellow-100 to-yellow-200 px-1 py-1.5 leading-tight">
+                              <p className="text-base font-black text-yellow-700">+{promoPercentOf(chip)}%</p>
+                              <p className="text-[10px] font-black text-yellow-700 uppercase tracking-wider">Bonus</p>
+                              <p className="text-[9px] text-neutral-600 mt-0.5">Recibís</p>
+                              <p className={`font-black text-neutral-900 whitespace-nowrap ${formatChips(chip.chips).length > 11 ? "text-[10px]" : "text-xs"}`}>
+                                {formatChips(chip.chips)}
+                              </p>
+                              <p className="text-[9px] text-neutral-600">fichas</p>
+                            </div>
+                          )}
                         </div>
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-on-surface-variant">Moneda / Divisa</span>
-                          <span className="text-primary font-bold">{currency}</span>
-                        </div>
-                        <div className="flex justify-between items-end pt-2 border-t border-outline-variant/10">
-                          <span className="font-label-lg text-label-lg text-white">Total a Pagar:</span>
-                          <span className="font-headline-lg text-headline-lg text-primary">
-                            {symbol} {selectedChip ? formatPrice(selectedChip) : "0"}
-                          </span>
-                        </div>
-                      </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
+                {/* Franja 3: resumen y cobro */}
+                <div className="glass-card rounded-2xl border border-outline-variant/20 bg-[#12121A]/60 p-4 flex flex-col lg:flex-row lg:items-center gap-4">
+                  <div className="flex-1 min-w-0 flex flex-wrap items-end gap-x-8 gap-y-2">
+                    <div>
+                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Paquete</p>
+                      <p className="text-sm text-white font-bold">{selectedChip ? formatChips(selectedChip.chips) : "0"} fichas</p>
                     </div>
+                    <div>
+                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Moneda</p>
+                      <p className="text-sm text-primary font-bold">{currency}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Total a pagar</p>
+                      <p className="text-3xl font-black text-primary leading-none">
+                        {symbol} {selectedChip ? formatPrice(selectedChip) : "0"}
+                      </p>
+                    </div>
+                    {availableMethods.includes(paymentMethod) && (
+                      <p className="basis-full text-[11px] text-on-surface-variant leading-snug">
+                        {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
+                        {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
+                      </p>
+                    )}
+                  </div>
 
-                    {/* GATEWAYS ACTIVE REGION */}
-                    <div className="mt-8 pt-6 border-t border-outline-variant/10 relative z-10 space-y-4">
-                      {availableMethods.includes(paymentMethod) && (
-                        <p className="text-xs text-on-surface-variant leading-relaxed text-left">
-                          {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
-                          {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
-                        </p>
-                      )}
-                      
+                  <div className="w-full lg:w-[380px] flex-shrink-0">
                       {/* PAYPAL ACTIVE RENDER */}
                       {paymentMethod === "paypal" && PAYPAL_CLIENT_ID && (
                         // Fondo claro a propósito: PayPal dibuja sus botones y el formulario de tarjeta con
                         // texto oscuro, que sobre el fondo oscuro de la página no se leía.
-                        <div className="w-full bg-white rounded-xl p-4 shadow-inner">
+                        <div className="w-full bg-white rounded-xl p-3 shadow-inner">
                           <PayPalButtons
                             style={{ layout: "vertical", shape: "pill", label: "pay" }}
                             createOrder={async (data, actions) => {
@@ -727,14 +703,6 @@ export default function BuyChips() {
                           Proceder con Mercado Pago
                         </button>
                       )}
-
-                      {/* SSL Security badges */}
-                      <div className="flex justify-center items-center gap-6 opacity-30 pt-2">
-                        <span className="material-symbols-outlined text-[28px] text-white">shield_lock</span>
-                        <span className="material-symbols-outlined text-[28px] text-white">verified_user</span>
-                        <span className="material-symbols-outlined text-[28px] text-white">lock_reset</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
