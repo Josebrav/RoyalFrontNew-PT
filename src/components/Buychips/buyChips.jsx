@@ -70,6 +70,15 @@ function regionFromProfileCountry(country) {
 // en el backend. Sin él no se muestra PayPal, en vez de caer a un id fijo de otro entorno.
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 
+// Tilde en la esquina de una opción elegida.
+function SelectedMark() {
+  return (
+    <span className="absolute top-1 right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
+      <span className="material-symbols-outlined text-[13px] text-[#0A0A0F] font-bold">check</span>
+    </span>
+  );
+}
+
 // Paquetes de fichas por moneda, solo para mostrar. El backend tiene el catálogo real
 // (RoyalGamesBackend/src/modules/payments/chip-packages.ts) y decide fichas y precio a partir del
 // `id`: si cambiás algo acá, cambialo también allá. USD: PayPal en dólares y Mercado Pago
@@ -396,10 +405,10 @@ export default function BuyChips() {
                           type="button"
                           onClick={() => setChosenRegion(key)}
                           aria-pressed={region === key}
-                          className={`glass-card px-2 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                          className={`px-2 py-2.5 rounded-xl text-xs font-bold border-2 transition-all cursor-pointer ${
                             region === key
-                              ? "border-primary bg-primary/10 text-white shadow-md"
-                              : "border-outline-variant/30 text-on-surface-variant hover:border-primary/45"
+                              ? "royal-gold-gradient border-primary text-[#0A0A0F] shadow-[0_0_14px_rgba(230,195,100,0.55)]"
+                              : "glass-card border-outline-variant/30 text-on-surface-variant hover:border-primary/45 hover:text-white"
                           }`}
                         >
                           {PAYMENT_REGIONS[key].label}
@@ -429,12 +438,13 @@ export default function BuyChips() {
                           type="button"
                           onClick={() => setPaymentMethod("mercadopago")}
                           aria-pressed={paymentMethod === "mercadopago"}
-                          className={`glass-card px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
+                          className={`glass-card relative px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
                             paymentMethod === "mercadopago"
-                              ? "border-primary bg-primary/10 shadow-md"
-                              : "border-outline-variant/30 hover:border-primary/45"
+                              ? "border-primary bg-primary/20 shadow-[0_0_14px_rgba(230,195,100,0.45)]"
+                              : "border-outline-variant/30 opacity-70 hover:opacity-100 hover:border-primary/45"
                           }`}
                         >
+                          {paymentMethod === "mercadopago" && <SelectedMark />}
                           <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
                             <MercadoPagoLogo className="w-5 h-5" />
                           </span>
@@ -449,12 +459,13 @@ export default function BuyChips() {
                           type="button"
                           onClick={() => setPaymentMethod("paypal")}
                           aria-pressed={paymentMethod === "paypal"}
-                          className={`glass-card px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
+                          className={`glass-card relative px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
                             paymentMethod === "paypal"
-                              ? "border-primary bg-primary/10 shadow-md"
-                              : "border-outline-variant/30 hover:border-primary/45"
+                              ? "border-primary bg-primary/20 shadow-[0_0_14px_rgba(230,195,100,0.45)]"
+                              : "border-outline-variant/30 opacity-70 hover:opacity-100 hover:border-primary/45"
                           }`}
                         >
+                          {paymentMethod === "paypal" && <SelectedMark />}
                           <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0">
                             <PayPalLogo className="w-4 h-4" />
                           </span>
@@ -524,7 +535,11 @@ export default function BuyChips() {
                             }
                           }}
                           aria-pressed={isSelected}
-                          className="flex flex-col gap-1.5 text-center cursor-pointer select-none group relative active:scale-95 transition-transform rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                          className={`flex flex-col gap-1.5 text-center cursor-pointer select-none group relative active:scale-95 transition-all rounded-xl p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                            isSelected
+                              ? "ring-4 ring-primary bg-primary/15 shadow-[0_0_22px_rgba(230,195,100,0.55)]"
+                              : "opacity-75 hover:opacity-100"
+                          }`}
                         >
                           <div
                             className={`relative w-full rounded-xl overflow-hidden border-2 transition-all ${
@@ -539,8 +554,8 @@ export default function BuyChips() {
                               </div>
                             )}
                             {isSelected && (
-                              <div className="absolute bottom-9 right-1.5 z-10 bg-primary rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-                                <span className="material-symbols-outlined text-[12px] text-[#0A0A0F] font-bold">check</span>
+                              <div className="absolute bottom-9 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
+                                <span className="material-symbols-outlined text-[14px] text-[#0A0A0F] font-bold">check</span>
                               </div>
                             )}
                             <EditableImage
@@ -699,11 +714,12 @@ export default function BuyChips() {
                       {/* MERCADO PAGO ACTIVE RENDER */}
                       {paymentMethod === "mercadopago" && mercadoPago && (
                         <button
+                          type="button"
                           onClick={createOrder}
-                          className="w-full royal-gold-gradient py-4 rounded-xl text-[#0A0A0F] font-bold text-md uppercase tracking-wider hover:brightness-110 active:scale-[0.98] transition-all shadow-lg royal-gold-glow flex items-center justify-center gap-2 cursor-pointer border-0"
+                          className="w-full bg-[#009EE3] hover:bg-[#0089C7] py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer border-0"
                         >
-                          <span className="material-symbols-outlined text-[20px] font-bold">qr_code_scanner</span>
-                          Proceder con Mercado Pago
+                          <MercadoPagoLogo className="w-8 h-8" color="#FFFFFF" />
+                          Pagar con Mercado Pago
                         </button>
                       )}
                   </div>
