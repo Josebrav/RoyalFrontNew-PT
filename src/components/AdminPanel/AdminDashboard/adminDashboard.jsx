@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchAdminOverview } from '../../../redux/actions';
 import { RANK_META } from '../../../utils/rank';
+import CountryStats from './countryStats';
 
 const numberFormat = (n) => new Intl.NumberFormat('es-ES').format(n || 0);
 
@@ -208,6 +209,8 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
+        <CountryStats viewerIsAdmin={viewerIsAdmin} />
       </div>
     </div>
   );
