@@ -21,7 +21,8 @@ import { useAuth } from "../../context/oauthContext";
 import { PayPalLogo, MercadoPagoLogo } from "../ui/PaymentLogos";
 import EditableImage from "../ui/EditableImage";
 
-// País desde el que se paga (elegible en la página, no hace falta tenerlo en el perfil). Mercado
+// País desde el que se paga: lo decide el backend por la IP de conexión (GET /payments/region) y
+// cada jugador solo ve las opciones de su país; solo los admins pueden cambiarlo para probar. Mercado
 // Pago tiene una cuenta vendedora por país y cada una solo cobra en su moneda; PayPal cobra en EUR
 // en España y en USD en el resto. Las tasas son las mismas que MERCADOPAGO_COUNTRY_CONFIG en el
 // backend (payments.service.ts), que es quien decide el precio real: si cambiás una, cambiá la otra.
@@ -39,32 +40,6 @@ const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
 // "Fichas base" de la promo: lo que da la tasa de siempre (500.000 fichas por dólar o euro, 500 por
 // peso). Cada paquete muestra su bonus (+X%) y el total que recibe, que es lo que se acredita.
 const BASE_CHIPS_PER_UNIT = { USD: 500_000, EUR: 500_000, ARS: 500 };
-
-const MEXICO_TIMEZONES = new Set([
-  "America/Mexico_City", "America/Cancun", "America/Merida", "America/Monterrey", "America/Matamoros",
-  "America/Chihuahua", "America/Ciudad_Juarez", "America/Ojinaga", "America/Mazatlan",
-  "America/Bahia_Banderas", "America/Hermosillo", "America/Tijuana",
-]);
-
-// Desde dónde se conecta el usuario, por la zona horaria del dispositivo: no manda la IP a ningún
-// servicio externo y distingue bien los países que nos importan (cada uno tiene zonas propias).
-function detectRegionFromConnection() {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    if (tz.startsWith("America/Argentina/") || tz === "America/Buenos_Aires") return "ar";
-    if (tz === "America/Bogota") return "co";
-    if (MEXICO_TIMEZONES.has(tz)) return "mx";
-    if (tz === "Europe/Madrid" || tz === "Atlantic/Canary" || tz === "Africa/Ceuta") return "es";
-  } catch {
-    // Sin Intl: se cae al país del perfil.
-  }
-  return null;
-}
-
-function regionFromProfileCountry(country) {
-  const normalized = (country || "").trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  return { argentina: "ar", colombia: "co", mexico: "mx", espana: "es", spain: "es" }[normalized] || null;
-}
 
 // Client id de PayPal: tiene que ser del mismo entorno (sandbox o live) que PAYPAL_MODE
 // en el backend. Sin él no se muestra PayPal, en vez de caer a un id fijo de otro entorno.
@@ -138,7 +113,7 @@ export default function BuyChips() {
   const auth = useAuth();
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
-  const userCountry = currentUser?.country || null;
+  const viewerIsAdmin = currentUser?.role === "admin";
   const totalChipsDeposited = Number(currentUser?.totalChipsDeposited || 0);
   const nextRank = getNextRank(currentUser?.rank);
   const rankProgressPercentage = nextRank
@@ -164,11 +139,23 @@ export default function BuyChips() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyTypeFilter, setHistoryTypeFilter] = useState("all");
 
-  // País de pago: el que elija el usuario en la página; si no eligió, desde dónde se conecta; si no
-  // se puede detectar, el de su perfil; y si tampoco hay, "Otro país" (PayPal en dólares).
-  const [detectedRegion] = useState(detectRegionFromConnection);
+  // País de pago: el que detecta el backend por la IP (el mismo que valida al crear la orden). Si
+  // no responde, "Otro país" (PayPal en dólares). Solo un admin puede elegir otro para probar.
+  const [detectedRegion, setDetectedRegion] = useState(null);
+  const [regionLoading, setRegionLoading] = useState(true);
   const [chosenRegion, setChosenRegion] = useState(null);
-  const region = chosenRegion || detectedRegion || regionFromProfileCountry(userCountry) || "other";
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get(`${API_URL}/payments/region`)
+      .then(({ data }) => !cancelled && setDetectedRegion(PAYMENT_REGIONS[data?.region] ? data.region : "other"))
+      .catch(() => !cancelled && setDetectedRegion("other"))
+      .finally(() => !cancelled && setRegionLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const region = (viewerIsAdmin && chosenRegion) || detectedRegion || "other";
   const regionConfig = PAYMENT_REGIONS[region];
   const mercadoPago = regionConfig.mercadoPago;
   const paypalCurrency = regionConfig.paypalCurrency;
@@ -404,7 +391,12 @@ export default function BuyChips() {
           <div className="p-4 md:p-6">
 
             {/* VIEW 1: DEPOSIT & CHECKOUT — tres franjas: opciones, paquetes en una fila, cobro */}
-            {activeTab === "deposit" && (
+            {activeTab === "deposit" && regionLoading && (
+              <div className="flex justify-center py-16">
+                <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+              </div>
+            )}
+            {activeTab === "deposit" && !regionLoading && (
               <div className="space-y-5 text-left">
 
                 {/* Franja 1: país, medio de pago, balance y rango */}
@@ -413,8 +405,20 @@ export default function BuyChips() {
                   {/* Step 1: Payment country (primero: los precios de los paquetes dependen de él) */}
                   <div className="lg:col-span-5 rounded-2xl border border-outline-variant/25 bg-black/25 p-3">
                     <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
-                      1. País desde el que pagás
+                      1. {viewerIsAdmin ? "País desde el que pagás" : "Tu país"}
                     </label>
+                    {!viewerIsAdmin && (
+                      <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 border-primary bg-primary/10">
+                        <span className="material-symbols-outlined text-primary">public</span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-bold text-white">{regionConfig.label}</span>
+                          <span className="block text-[11px] text-on-surface-variant">
+                            Opciones de compra disponibles según desde dónde te conectás.
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                    {viewerIsAdmin && (
                     <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                       {REGION_ORDER.map((key) => (
                         <button
@@ -432,9 +436,10 @@ export default function BuyChips() {
                         </button>
                       ))}
                     </div>
-                    {!chosenRegion && detectedRegion && (
+                    )}
+                    {viewerIsAdmin && detectedRegion && (
                       <p className="mt-1.5 text-[11px] text-on-surface-variant">
-                        Detectamos que te conectás desde {PAYMENT_REGIONS[detectedRegion].label}. Si no es así, elegí otro país.
+                        Tu conexión: {PAYMENT_REGIONS[detectedRegion].label}. Como admin podés elegir otro país para probar; los jugadores solo ven el suyo.
                       </p>
                     )}
                   </div>
