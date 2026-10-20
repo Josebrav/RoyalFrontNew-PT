@@ -193,6 +193,15 @@ export default function News() {
   const [searchParams] = useSearchParams();
   const linkedId = searchParams.get("articulo");
   const [highlightedId, setHighlightedId] = useState(null);
+  // Las noticias se muestran cerradas (título + comienzo del texto); "Ver más" las despliega.
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
+  const toggleExpanded = (id) =>
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   const handledLinkRef = useRef(null);
   useEffect(() => {
     if (!linkedId || handledLinkRef.current === linkedId) return;
@@ -201,6 +210,7 @@ export default function News() {
     handledLinkRef.current = linkedId;
     setCurrentPage(Math.floor(index / itemsPerPage) + 1);
     setHighlightedId(linkedId);
+    setExpandedIds((prev) => new Set(prev).add(linkedId));
     setTimeout(() => document.getElementById(`noticia-${linkedId}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
     setTimeout(() => setHighlightedId(null), 4000);
   }, [linkedId, novedades]);
@@ -305,7 +315,34 @@ export default function News() {
                     {novedad.tag}
                   </span>
                 </div>
-                <p className="text-on-surface-variant text-sm leading-relaxed whitespace-pre-line">{novedad.texto}</p>
+                {(() => {
+                  const isExpanded = expandedIds.has(novedad.id);
+                  const isLong = novedad.texto.length > 160 || novedad.texto.includes("\n");
+                  return (
+                    <>
+                      <p
+                        className={`text-on-surface-variant text-sm leading-relaxed ${
+                          isExpanded ? "whitespace-pre-line" : "line-clamp-2"
+                        }`}
+                      >
+                        {novedad.texto}
+                      </p>
+                      {isLong && (
+                        <button
+                          type="button"
+                          onClick={() => toggleExpanded(novedad.id)}
+                          aria-expanded={isExpanded}
+                          className="mt-2 text-xs font-bold text-primary hover:underline cursor-pointer bg-transparent border-0 p-0 flex items-center gap-1"
+                        >
+                          {isExpanded ? "Ver menos" : "Ver más"}
+                          <span className="material-symbols-outlined text-[16px]">
+                            {isExpanded ? "expand_less" : "expand_more"}
+                          </span>
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
               {canManage && (
                 <div className="flex flex-col gap-1.5 flex-shrink-0">
