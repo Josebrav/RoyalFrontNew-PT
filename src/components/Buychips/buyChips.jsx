@@ -73,21 +73,12 @@ const IMAGE_BY_BASE_CHIPS = {
 };
 const tiers = (currency, firstId, rows) =>
   rows.map(([price, chips], i) => ({ id: firstId + i, currency, price, chips }));
-// Paquete de prueba para verificar pagos reales sin gastar casi nada: solo PayPal (el backend lo
-// rechaza en Mercado Pago).
-const testPackage = (id, currency) => ({ id, currency, price: 0.1, chips: 29, testOnly: true });
 
 const CHIP_CATALOG = {
-  USD: [
-    ...tiers("USD", 101, [[1, 2_500_000], [5, 15_000_000], [10, 40_000_000], [50, 250_000_000],
-      [100, 600_000_000], [200, 1_500_000_000], [500, 7_500_000_000], [1000, 20_000_000_000]]),
-    testPackage(901, "USD"),
-  ],
-  EUR: [
-    ...tiers("EUR", 201, [[1, 3_000_000], [5, 20_000_000], [10, 50_000_000], [50, 300_000_000],
-      [100, 750_000_000], [200, 2_000_000_000], [500, 10_000_000_000], [1000, 25_000_000_000]]),
-    testPackage(902, "EUR"),
-  ],
+  USD: tiers("USD", 101, [[1, 2_500_000], [5, 15_000_000], [10, 40_000_000], [50, 250_000_000],
+    [100, 600_000_000], [200, 1_500_000_000], [500, 7_500_000_000], [1000, 20_000_000_000]]),
+  EUR: tiers("EUR", 201, [[1, 3_000_000], [5, 20_000_000], [10, 50_000_000], [50, 300_000_000],
+    [100, 750_000_000], [200, 2_000_000_000], [500, 10_000_000_000], [1000, 25_000_000_000]]),
   // Argentina: 20% más de fichas que el equivalente en dólares.
   ARS: tiers("ARS", 301, [[100, 120_000], [500, 900_000], [1_000, 3_000_000], [5_000, 18_000_000],
     [10_000, 60_000_000], [100_000, 900_000_000], [500_000, 6_000_000_000], [1_000_000, 18_000_000_000]]),
@@ -198,8 +189,7 @@ export default function BuyChips() {
   };
   const formatChips = (amount) => new Intl.NumberFormat("es-ES").format(amount);
 
-  // El paquete de prueba solo aparece con PayPal (Mercado Pago no lo acepta).
-  const visibleChipOptions = CHIP_CATALOG[catalogCurrency].filter((chip) => !chip.testOnly || paymentMethod === "paypal");
+  const visibleChipOptions = CHIP_CATALOG[catalogCurrency];
   useEffect(() => {
     if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
   }, [catalogCurrency, paymentMethod]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -561,8 +551,8 @@ export default function BuyChips() {
                   >
                     {visibleChipOptions.map((chip) => {
                       const isSelected = selectedChip?.id === chip.id;
-                      const baseChips = chip.testOnly ? chip.chips : baseChipsOf(chip);
-                      const image = chip.testOnly ? null : IMAGE_BY_BASE_CHIPS[baseChips];
+                      const baseChips = baseChipsOf(chip);
+                      const image = IMAGE_BY_BASE_CHIPS[baseChips];
                       return (
                         <div
                           key={chip.id}
@@ -589,11 +579,6 @@ export default function BuyChips() {
                                 : "border-outline-variant/20 group-hover:border-primary/50"
                             }`}
                           >
-                            {chip.testOnly && (
-                              <div className="absolute top-1.5 left-1.5 z-10 bg-yellow-400 text-[#0A0A0F] text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded">
-                                Prueba
-                              </div>
-                            )}
                             {isSelected && (
                               <div className="absolute bottom-9 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
                                 <span className="material-symbols-outlined text-[14px] text-[#0A0A0F] font-bold">check</span>
@@ -620,13 +605,7 @@ export default function BuyChips() {
                               </span>
                             </div>
                           </div>
-                          {chip.testOnly ? (
-                            <div className="w-full rounded-xl border-2 border-outline-variant/30 bg-surface-container-high px-1 py-1.5 leading-tight">
-                              <p className="text-[9px] text-on-surface-variant">Recibís</p>
-                              <p className="text-xs font-black text-white">{formatChips(chip.chips)} fichas</p>
-                            </div>
-                          ) : (
-                            <div className="w-full rounded-xl border-2 border-yellow-400 bg-gradient-to-b from-yellow-100 to-yellow-200 px-1 py-1.5 leading-tight">
+                          <div className="w-full rounded-xl border-2 border-yellow-400 bg-gradient-to-b from-yellow-100 to-yellow-200 px-1 py-1.5 leading-tight">
                               <p className="text-base font-black text-yellow-700">+{promoPercentOf(chip)}%</p>
                               <p className="text-[10px] font-black text-yellow-700 uppercase tracking-wider">Bonus</p>
                               <p className="text-[9px] text-neutral-600 mt-0.5">Recibís</p>
@@ -635,7 +614,6 @@ export default function BuyChips() {
                               </p>
                               <p className="text-[9px] text-neutral-600">fichas</p>
                             </div>
-                          )}
                         </div>
                       );
                     })}
