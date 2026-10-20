@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../../data/newsLinks";
 import Swal from "sweetalert2";
 import { CATEGORY_META, getGameBySlug } from "../../../data/gamesCatalog";
 import { swalThemeConfig } from "../../../utils/formatters";
@@ -123,6 +124,14 @@ export default function GameDetail() {
                     </div>
                   ))
                 )}
+                <button
+                  type="button"
+                  onClick={() => navigate(newsArticlePath(POINTS_AND_TOURNAMENTS_NEWS_ID))}
+                  className="w-full text-center text-xs font-bold text-primary hover:underline cursor-pointer bg-transparent border-0 pt-1 flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">emoji_events</span>
+                  ¿Cómo funcionan los puntos y torneos?
+                </button>
               </div>
             </div>
           )}

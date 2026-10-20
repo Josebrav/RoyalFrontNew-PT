@@ -25,6 +25,7 @@ import { fetchUserProfile, getUserByEmail } from "../../redux/actions";
 import API_URL from "../../api/rutaApi";
 import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
+import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
 const SIMULATED_ONLINE_MAX = 34;
@@ -474,6 +475,14 @@ export default function Home() {
                       </div>
                     ))
                   )}
+                <button
+                  type="button"
+                  onClick={() => navigate(newsArticlePath(POINTS_AND_TOURNAMENTS_NEWS_ID))}
+                  className="w-full text-center text-xs font-bold text-emerald-400 hover:underline cursor-pointer bg-transparent border-0 pt-1 flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">emoji_events</span>
+                  ¿Cómo funcionan los puntos y torneos?
+                </button>
                 </div>
               </div>
 
