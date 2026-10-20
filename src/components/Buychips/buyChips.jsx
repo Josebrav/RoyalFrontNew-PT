@@ -6,7 +6,8 @@ import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Swal from "sweetalert2";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import RankBadge from "../ui/RankBadge/rankBadge";
-import { getNextRank } from "../../utils/rank";
+import { RANK_META } from "../../utils/rank";
+import useRankStatus from "../../utils/useRankStatus";
 
 // Import local image assets representing chip packages
 import quinientosmil from "../../assets/500000.jpg";
@@ -114,11 +115,14 @@ export default function BuyChips() {
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
   const viewerIsAdmin = currentUser?.role === "admin";
-  const totalChipsDeposited = Number(currentUser?.totalChipsDeposited || 0);
-  const nextRank = getNextRank(currentUser?.rank);
-  const rankProgressPercentage = nextRank
-    ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
+  // Rango en dólares + % de fichas extra en cada compra (sistema de rangos, ver /rangos).
+  const rankStatus = useRankStatus(currentUser?.id);
+  const nextRank = rankStatus?.nextRank ? RANK_META[rankStatus.nextRank] : null;
+  const rankProgressPercentage = rankStatus?.nextThreshold
+    ? Math.min(Math.round((rankStatus.points / rankStatus.nextThreshold) * 100), 100)
     : 100;
+  const rankBonusPercent = rankStatus?.bonusPercent || 0;
+  const withRankBonus = (chips) => Number(chips || 0) + Math.floor((Number(chips || 0) * rankBonusPercent) / 100);
   const [selectedChip, setSelectedChip] = useState(CHIP_CATALOG.USD[0]);
 
   // Los botones de PayPal se ven bien sobre el fondo oscuro, pero el formulario de tarjeta que
@@ -359,6 +363,14 @@ export default function BuyChips() {
           <p className="text-sm text-on-surface-variant">
             Administra tus fondos, adquiere fichas y gestiona tus transacciones seguras.
           </p>
+          <button
+            type="button"
+            onClick={() => navigate("/rangos")}
+            className="ml-auto self-center px-4 py-2 rounded-xl border-2 border-primary/60 text-primary font-bold text-sm flex items-center gap-2 hover:bg-primary/10 transition-colors cursor-pointer bg-transparent"
+          >
+            <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+            Sistema de Rangos
+          </button>
         </header>
 
         {/* Interactive Workspace Panel */}
@@ -514,7 +526,7 @@ export default function BuyChips() {
                     <div className="glass-card px-3 py-2 rounded-xl">
                       <div className="flex items-center justify-between gap-1">
                         <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Rango</p>
-                        <RankBadge tier={currentUser?.rank} size="sm" />
+                        <RankBadge tier={rankStatus?.rank || currentUser?.rank} size="sm" />
                       </div>
                       {nextRank ? (
                         <>
@@ -526,6 +538,13 @@ export default function BuyChips() {
                       ) : (
                         <p className="mt-2 text-[10px] text-primary">Rango máximo alcanzado</p>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => navigate("/rangos")}
+                        className="mt-1 text-[10px] font-bold text-primary underline cursor-pointer bg-transparent border-0 p-0"
+                      >
+                        {rankBonusPercent > 0 ? `+${rankBonusPercent}% fichas por tu rango` : "¿Cómo subo de rango?"}
+                      </button>
                     </div>
                     </div>
                   </div>
@@ -630,6 +649,16 @@ export default function BuyChips() {
                       <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Paquete</p>
                       <p className="text-sm text-white font-bold">{selectedChip ? formatChips(selectedChip.chips) : "0"} fichas</p>
                     </div>
+                    {rankBonusPercent > 0 && selectedChip && (
+                      <div>
+                        <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">
+                          Bono {RANK_META[rankStatus?.rank]?.label || "de rango"} +{rankBonusPercent}%
+                        </p>
+                        <p className="text-sm text-green-400 font-bold">
+                          Recibís {formatChips(withRankBonus(selectedChip.chips))} fichas
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Moneda</p>
                       <p className="text-sm text-primary font-bold">{currency}</p>
@@ -700,7 +729,7 @@ export default function BuyChips() {
                                 Swal.fire({
                                   icon: "success",
                                   title: "¡Depósito Exitoso!",
-                                  text: `¡Pago completado! Se han acreditado ${formatChips(selectedChip.chips)} fichas en tu cuenta.`,
+                                  text: `¡Pago completado! Se han acreditado ${formatChips(withRankBonus(selectedChip.chips))} fichas en tu cuenta.`,
                                   confirmButtonColor: "#C9A84C",
                                 }).then(() => {
                                   // Refresh browser state or redirect

@@ -1,18 +1,36 @@
 /**
- * Los rangos dependen de las fichas cargadas de por vida (campo `totalChipsDeposited` del
- * backend), atados a los paquetes en dólares: Plata = paquete de $5, Oro = $50, Platino = $200,
- * Diamante = $500. Mantener sincronizado con UsersService.RANK_THRESHOLDS en el backend, que es
- * quien decide el rango real (esto solo arma la barra de progreso).
+ * Sistema de rangos (espejo de RoyalGamesBackend/src/common/constants/rank-system.ts, que es quien
+ * decide de verdad): se sube solo comprando fichas, contando lo cargado en dólares (1 € = 1 US$,
+ * $1.500 ARS = 1 US$). Cada rango da un % fijo de fichas extra en todas las compras y se mantiene
+ * cargando al menos MONTHLY_MAINTENANCE_USD por mes; si no, baja un rango.
  */
 export const RANK_ORDER = ["bronze", "silver", "gold", "platinum", "diamond"];
 
+/** Dólares acumulados para llegar a cada rango. */
 export const RANK_THRESHOLDS = {
   bronze: 0,
-  silver: 15_000_000,
-  gold: 250_000_000,
-  platinum: 1_500_000_000,
-  diamond: 7_500_000_000,
+  silver: 10,
+  gold: 100,
+  platinum: 1_000,
+  diamond: 5_000,
 };
+
+/** Fichas extra (%) en cada compra según el rango. */
+export const RANK_BONUS_PERCENT = {
+  bronze: 0,
+  silver: 10,
+  gold: 25,
+  platinum: 50,
+  diamond: 100,
+};
+
+export const MONTHLY_MAINTENANCE_USD = 10;
+export const ARS_PER_USD = 1_500;
+
+export const formatUsd = (n) =>
+  `US$${new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2 }).format(Number(n) || 0)}`;
+export const formatArsEquivalent = (usd) =>
+  `$${new Intl.NumberFormat("es-ES").format(Math.round((Number(usd) || 0) * ARS_PER_USD))} ARS`;
 
 export const RANK_META = {
   bronze: {
@@ -48,7 +66,7 @@ export const getRankMeta = (tier) => RANK_META[tier] || RANK_META.bronze;
  * Returns { label, threshold } for the tier above `tier`, or null if already at the top.
  */
 export const getNextRank = (tier) => {
-  const index = RANK_ORDER.indexOf(tier);
+  const index = RANK_ORDER.indexOf(tier || "bronze");
   if (index === -1 || index === RANK_ORDER.length - 1) {
     return null;
   }

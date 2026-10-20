@@ -12,6 +12,7 @@ import BuyChips from './components/Buychips/buyChips';
 import LogOut from './components/Logout/logout';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
+import RankSystem from './components/RankSystem/rankSystem';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
@@ -173,6 +174,7 @@ function App() {
             <Route path="/admin/trophies" element={<ProtectedRoute><Trophies /></ProtectedRoute>} />
             <Route path="/admin/game-images" element={<ProtectedRoute><GameImages /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
+            <Route path="/rangos" element={<RankSystem />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
             <Route path="/privacidad" element={<Privacidad />} />
