@@ -13,14 +13,20 @@ export default function GameDetail() {
   const navigate = useNavigate();
   const game = getGameBySlug(slug);
   const [topPlayers, setTopPlayers] = useState([]);
+  // Royal Slots muestra el mismo ranking que su lobby en el juego: solo sus slots, por semana
+  // (lunes a domingo) o mes calendario, igual que los torneos. El resto: total del juego.
+  const isRoyalSlots = game?.slug === "royalslots";
+  const [rankingPeriod, setRankingPeriod] = useState("weekly");
 
   useEffect(() => {
     if (!game || game.status !== "active") return;
-    axios
-      .get(`${API_URL}/leaderboard/top-winners/${game.slug}?limit=5`)
-      .then(({ data }) => setTopPlayers(data))
-      .catch(() => {});
-  }, [game]);
+    const request = isRoyalSlots
+      ? axios
+          .get(`${API_URL}/leaderboard/${rankingPeriod}?scope=royalslots&limit=5`)
+          .then(({ data }) => data.map((row) => ({ id: row.userId, nick: row.nick, totalWon: row.chips })))
+      : axios.get(`${API_URL}/leaderboard/top-winners/${game.slug}?limit=5`).then(({ data }) => data);
+    request.then(setTopPlayers).catch(() => {});
+  }, [game, isRoyalSlots, rankingPeriod]);
 
   if (!game) {
     return (
@@ -102,9 +108,33 @@ export default function GameDetail() {
                 <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
               </div>
               <div className="p-6 space-y-3">
+                {isRoyalSlots && (
+                  <div className="flex gap-2 mb-1">
+                    {[
+                      ["weekly", "Semanal"],
+                      ["monthly", "Mensual"],
+                    ].map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setRankingPeriod(key)}
+                        aria-pressed={rankingPeriod === key}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold border cursor-pointer transition-colors ${
+                          rankingPeriod === key
+                            ? "bg-primary text-on-primary border-primary"
+                            : "bg-transparent text-on-surface-variant border-outline-variant/30 hover:text-white"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {topPlayers.length === 0 ? (
                   <p className="text-on-surface-variant text-sm text-center py-4">
-                    Todavía no hay ganadores registrados en este juego. ¡Sé el primero!
+                    {isRoyalSlots
+                      ? `Todavía no hay ganadores ${rankingPeriod === "weekly" ? "esta semana" : "este mes"}. ¡Sé el primero!`
+                      : "Todavía no hay ganadores registrados en este juego. ¡Sé el primero!"}
                   </p>
                 ) : (
                   topPlayers.map((player, index) => (
