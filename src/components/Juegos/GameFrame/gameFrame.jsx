@@ -90,7 +90,9 @@ function useReloadWhenStale() {
 // with transform: scale() so the whole game always fits without clipping, letterboxed if the
 // screen's aspect ratio doesn't match. Games whose native resolution isn't known yet fall back to
 // the old 100%/scroll behavior, plus the Fullscreen API toggle either way.
-export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
+// onBack (opcional): muestra un boton arriba a la izquierda para volver (ej. de una slot al lobby
+// de Royal Slots, que vive en esta misma pagina).
+export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBack, backLabel = "Volver" }) {
   const wrapperRef = useRef(null);
   const scaleContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -207,6 +209,36 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
               title={title}
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
+          )}
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              title={backLabel}
+              style={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                zIndex: 10,
+                height: 36,
+                padding: "0 12px 0 8px",
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(0,0,0,0.55)",
+                color: "#C9A84C",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                fontWeight: 700,
+                fontSize: 13,
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                arrow_back
+              </span>
+              {backLabel}
+            </button>
           )}
           <button
             type="button"

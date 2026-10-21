@@ -1,13 +1,14 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import GameFrame from "../GameFrame/gameFrame";
+import { HUB_SLOTS } from "../../../data/slotHub";
 
 const SugarCalavera = () => {
   const currentUser = useSelector((state) => state.currentUser);
   const jugadorID = currentUser?.id || "default-id";
-  const gameURL = `https://sugarcalavera.s3.us-east-1.amazonaws.com/calavera/index.html?jugadorID=${jugadorID}`;
+  const game = HUB_SLOTS.sugarcalavera;
 
-  return <GameFrame src={jugadorID ? gameURL : null} title="Sugar Calavera" nativeWidth={1920} nativeHeight={1080} />;
+  return <GameFrame src={jugadorID ? game.url(jugadorID) : null} title={game.title} nativeWidth={1920} nativeHeight={1080} />;
 };
 
 export default SugarCalavera;
