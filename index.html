@@ -4,6 +4,15 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6569283873873097"
      crossorigin="anonymous"></script>
     <meta charset="UTF-8" />
+    <!-- Fondo oscuro inline, antes que cualquier otra cosa en <head>: sin esto, html/body no
+         tienen background propio (index.css no lo define, el bg oscuro real lo pone recien el
+         Container de Chakra dentro de App.jsx) y quedan blancos por default del navegador hasta
+         que React monta y Tailwind/Chakra terminan de pintar. En rutas de juego eso se nota mucho
+         mas: el iframe de Unity (una pagina propia, mucho mas liviana) suele pintar su fondo oscuro
+         antes que el shell de React, dejando una franja blanca arriba justo donde deberia estar
+         el Nav — el mismo tipo de "invisible en cold load" ya visto en Home.jsx, pero por CSS en
+         vez de por una animacion trabada. -->
+    <style>html, body { background: #16130d; }</style>
     <link rel="icon" type="image/svg+xml" href="/logo.avif" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
