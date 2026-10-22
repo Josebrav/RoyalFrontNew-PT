@@ -140,7 +140,7 @@ export const GAMES_CATALOG = [
     slug: "royal-ruleta",
     name: "Royal Ruleta (x500)",
     category: "casino",
-    status: "soon",
+    status: "active",
     image: ruletaImage,
     icon: "donut_large",
     players: 1120,
