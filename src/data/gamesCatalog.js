@@ -10,13 +10,15 @@ import dominoImage from "../assets/domino.png";
 // la categoría necesita notarse de un vistazo (ej. la grilla de "Juegos Populares" del Home) en
 // vez de un simple texto de color — `className` (solo texto) sigue igual para no tocar los demás
 // usos ya existentes (GamesCatalog, GameDetail, etc.).
+// accent/accentTo: colores de la categoría para paneles de cada juego (ej. "Top Ganadores"), así no
+// todo el sitio es dorado sobre negro. El dorado queda para la marca y los botones de jugar.
 export const CATEGORY_META = {
-  bingo: { label: "Bingo", className: "text-[#c9a84c]", chipClassName: "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/40" },
-  casino: { label: "Casino", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40" },
-  cartas: { label: "Cartas", className: "text-[#4f8fe0]", chipClassName: "bg-[#4f8fe0]/15 text-[#4f8fe0] border border-[#4f8fe0]/40" },
-  otros: { label: "Otros", className: "text-[#4caf7d]", chipClassName: "bg-[#4caf7d]/15 text-[#4caf7d] border border-[#4caf7d]/40" },
-  slots: { label: "Slots", className: "text-[#a855f7]", chipClassName: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/40" },
-  mesa: { label: "Mesa", className: "text-[#2dd4bf]", chipClassName: "bg-[#2dd4bf]/15 text-[#2dd4bf] border border-[#2dd4bf]/40" },
+  bingo: { label: "Bingo", className: "text-[#c9a84c]", chipClassName: "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/40", accent: "#f97316", accentTo: "#c2410c" },
+  casino: { label: "Casino", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40", accent: "#ef4444", accentTo: "#9f1239" },
+  cartas: { label: "Cartas", className: "text-[#4f8fe0]", chipClassName: "bg-[#4f8fe0]/15 text-[#4f8fe0] border border-[#4f8fe0]/40", accent: "#3b82f6", accentTo: "#1e3a8a" },
+  otros: { label: "Otros", className: "text-[#4caf7d]", chipClassName: "bg-[#4caf7d]/15 text-[#4caf7d] border border-[#4caf7d]/40", accent: "#22c55e", accentTo: "#0f766e" },
+  slots: { label: "Slots", className: "text-[#a855f7]", chipClassName: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/40", accent: "#a855f7", accentTo: "#4c1d95" },
+  mesa: { label: "Mesa", className: "text-[#2dd4bf]", chipClassName: "bg-[#2dd4bf]/15 text-[#2dd4bf] border border-[#2dd4bf]/40", accent: "#14b8a6", accentTo: "#155e75" },
 };
 
 export const CATEGORY_ORDER = ["bingo", "casino", "cartas", "otros", "slots", "mesa"];
@@ -141,6 +143,8 @@ export const GAMES_CATALOG = [
     status: "soon",
     image: ruletaImage,
     icon: "donut_large",
+    players: 1120,
+    playPath: "/game/royalruleta",
     description:
       "Ruleta europea con multiplicador especial de hasta x500. Apuesta a tu número, color o docena favorita y deja girar la rueda.",
   },
