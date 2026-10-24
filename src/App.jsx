@@ -38,6 +38,7 @@ import AdminPrizes from './components/AdminPanel/Prizes/prizes';
 import AdminReferrals from './components/AdminPanel/Referrals/referrals';
 import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
 import MinesBots from './components/AdminPanel/MinesBots/minesBots';
+import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
 import UnityBots from './components/AdminPanel/UnityBots/unityBots';
 import Trophies from './components/AdminPanel/Trophies/trophies';
 import GameImages from './components/AdminPanel/GameImages/gameImages';
@@ -171,6 +172,7 @@ function App() {
             <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/admin/bingo-bots" element={<ProtectedRoute><BingoBots /></ProtectedRoute>} />
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
+            <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
             <Route path="/admin/unity-bots" element={<ProtectedRoute><UnityBots /></ProtectedRoute>} />
             <Route path="/admin/trophies" element={<ProtectedRoute><Trophies /></ProtectedRoute>} />
             <Route path="/admin/game-images" element={<ProtectedRoute><GameImages /></ProtectedRoute>} />
