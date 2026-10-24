@@ -135,7 +135,7 @@ function App() {
 
   return (
     <Container
-      bg="#16130d"
+      bg="#303030"
       color="#e9e1d7"
       className="bg-background text-on-background"
       maxW="100%"
