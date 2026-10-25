@@ -30,7 +30,9 @@ const initialForm = {
 export default function BingoBots() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === "admin";
+  // Admins y mods (el backend también los deja: /admin/bingo-bots es Admin/Mod).
+  const viewerRole = useSelector((state) => state.currentUser?.role);
+  const viewerIsAdmin = viewerRole === "admin" || viewerRole === "mod";
 
   const [bots, setBots] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -228,7 +230,7 @@ export default function BingoBots() {
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 block">lock</span>
           <h2 className="font-headline-md text-headline-md text-white mb-2">Acceso Restringido</h2>
           <p className="text-on-surface-variant text-sm mb-6">
-            Los bots de Bingo son una palanca de la economía de la casa — solo administradores pueden crearlos o tocarlos.
+            Solo administradores y moderadores pueden crear o manejar los bots.
           </p>
           <button
             onClick={() => navigate('/admin/dashboard')}
