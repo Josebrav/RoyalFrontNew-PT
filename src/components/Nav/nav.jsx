@@ -24,7 +24,7 @@ export default function Navbar() {
       await auth.logOut();
       dispatch(logout());
       Swal.fire({
-        title: "¡Sesión cerrada con éxito!",
+        title: t("nav.logoutOk"),
         icon: "success",
         ...swalThemeConfig,
       }).then(() => {
@@ -33,7 +33,7 @@ export default function Navbar() {
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Hubo un error al cerrar sesión",
+        text: t("nav.logoutError"),
         icon: "error",
         ...swalThemeConfig,
       });
@@ -83,7 +83,7 @@ export default function Navbar() {
                     }`
                   }
                 >
-                  Inicio
+                  {t("nav.inicio")}
                 </NavLink>
 
                 <NavLink
@@ -96,7 +96,7 @@ export default function Navbar() {
                     }`
                   }
                 >
-                  Juegos
+                  {t("nav.juegos")}
                 </NavLink>
 
                 <NavLink
@@ -109,7 +109,7 @@ export default function Navbar() {
                     }`
                   }
                 >
-                  Noticias
+                  {t("nav.noticias")}
                 </NavLink>
               </nav>
             </>
@@ -167,11 +167,11 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => navigate('/royalstore')}
-                title="Cambiar avatar"
+                title={t("nav.cambiarAvatar")}
                 className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
               >
                 <img
-                  alt="Avatar de Usuario"
+                  alt={t("nav.avatarAlt")}
                   className="w-full h-full object-cover object-top"
                   src={avatarSrc}
                   onError={(e) => {
@@ -194,12 +194,12 @@ export default function Navbar() {
               >
                 <span className="flex items-center gap-2 min-w-0 max-w-full">
                   <span className="text-on-surface font-bold text-base truncate">
-                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
+                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : t("nav.usuario")}
                   </span>
                   <RankBadge tier={currentUser.rank} size="md" />
                 </span>
                 <span id="nav-chips-target" className="flex items-center gap-1.5 text-primary text-sm font-bold tracking-wide mt-1">
-                  <img src={chips} alt="Fichas" className="w-4 h-4" />
+                  <img src={chips} alt={t("nav.fichas")} className="w-4 h-4" />
                   {formattedChips}
                 </span>
               </button>
@@ -212,7 +212,7 @@ export default function Navbar() {
           {currentUser?.id ? (
             <button
               onClick={handleLogOut}
-              title="Cerrar Sesión"
+              title={t("nav.cerrarSesion")}
               className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
             >
               <span className="material-symbols-outlined text-[20px]">logout</span>
