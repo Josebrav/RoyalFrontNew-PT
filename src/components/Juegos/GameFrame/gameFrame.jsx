@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
 
 const TAB_ID_KEY = "rg_tab_id";
 
@@ -100,6 +101,17 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
   const hasFixedResolution = !!(nativeWidth && nativeHeight);
   useReloadWhenStale();
   const frameSrc = useMemo(() => withTabId(src), [src]);
+  const iframeRef = useRef(null);
+  const chips = useSelector((state) => state.currentUser?.chips);
+
+  // Saldo nuevo (la página lo vuelve a leer cada pocos segundos mientras se juega, ver App.jsx): se
+  // le avisa al juego, que lo aplica cuando no está en medio de una jugada (RoyalChipsBridge en
+  // Unity). Así, si alguien entra sin fichas y recarga por fuera, puede seguir jugando sin recargar
+  // la página. El saldo no es secreto: se manda sin restringir el origen del juego.
+  useEffect(() => {
+    if (chips === undefined || chips === null) return;
+    iframeRef.current?.contentWindow?.postMessage({ type: "royal:chips", chips: Number(chips) }, "*");
+  }, [chips]);
 
   const toggleFullscreen = useCallback(() => {
     const el = wrapperRef.current;
@@ -197,6 +209,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
               }}
             >
               <iframe
+                ref={iframeRef}
                 src={frameSrc}
                 title={title}
                 scrolling="no"
@@ -205,6 +218,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
             </div>
           ) : (
             <iframe
+              ref={iframeRef}
               src={frameSrc}
               title={title}
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
