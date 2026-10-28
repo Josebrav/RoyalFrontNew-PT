@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback, useMemo } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
@@ -90,7 +90,7 @@ function useReloadWhenStale() {
 // the iframe *element itself* (a black box from CSS's point of view, no cross-origin read needed)
 // with transform: scale() so the whole game always fits without clipping, letterboxed if the
 // screen's aspect ratio doesn't match. Games whose native resolution isn't known yet fall back to
-// the old 100%/scroll behavior, plus the Fullscreen API toggle either way.
+// the old 100%/scroll behavior.
 // onBack (opcional): muestra un boton arriba a la izquierda para volver (ej. de una slot al lobby
 // de Royal Slots, que vive en esta misma pagina).
 export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBack, backLabel = "Volver" }) {
@@ -112,19 +112,6 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
     if (chips === undefined || chips === null) return;
     iframeRef.current?.contentWindow?.postMessage({ type: "royal:chips", chips: Number(chips) }, "*");
   }, [chips]);
-
-  const toggleFullscreen = useCallback(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const isCurrentlyFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-    if (!isCurrentlyFullscreen) {
-      const request = el.requestFullscreen || el.webkitRequestFullscreen;
-      request?.call(el);
-    } else {
-      const exit = document.exitFullscreen || document.webkitExitFullscreen;
-      exit?.call(document);
-    }
-  }, []);
 
   useEffect(() => {
     const handleChange = () => {
@@ -254,31 +241,6 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
               {backLabel}
             </button>
           )}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-            style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              zIndex: 10,
-              width: 36,
-              height: 36,
-              borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.15)",
-              background: "rgba(0,0,0,0.55)",
-              color: "#C9A84C",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-              {isFullscreen ? "fullscreen_exit" : "fullscreen"}
-            </span>
-          </button>
         </Box>
       ) : (
         <Center h="100%">
