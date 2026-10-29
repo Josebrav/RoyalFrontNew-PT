@@ -56,8 +56,9 @@ export default function Navbar() {
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ";
 
   return (
-    <header className={`sticky top-0 z-50 bg-black border-b border-white/5 shadow-sm h-20 flex items-center transition-all duration-300` }>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full gap-2">
+    <header className="hud-nav sticky top-0 z-50 h-20 flex items-center">
+      <span className="hud-nav-sweep" aria-hidden="true" />
+      <div className="relative grid grid-cols-[1fr_auto_1fr] items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full gap-2">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6 justify-self-start min-w-0">
           <Link to="/" className="flex items-center">
@@ -76,11 +77,7 @@ export default function Navbar() {
                   to="/"
                   end
                   className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-body-md text-body-md ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.inicio")}
@@ -89,11 +86,7 @@ export default function Navbar() {
                 <NavLink
                   to="/juegos"
                   className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-body-md text-body-md ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.juegos")}
@@ -102,11 +95,7 @@ export default function Navbar() {
                 <NavLink
                   to="/noticias"
                   className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-body-md text-body-md ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.noticias")}
@@ -120,11 +109,7 @@ export default function Navbar() {
                   to="/"
                   end
                   className={({ isActive }) =>
-                    `font-label-lg text-label-lg transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-label-lg text-label-lg ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.inicio")}
@@ -133,11 +118,7 @@ export default function Navbar() {
                 <NavLink
                   to="/juegos"
                   className={({ isActive }) =>
-                    `font-label-lg text-label-lg transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-label-lg text-label-lg ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.juegos")}
@@ -146,11 +127,7 @@ export default function Navbar() {
                 <NavLink
                   to="/noticias"
                   className={({ isActive }) =>
-                    `font-label-lg text-label-lg transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-label-lg text-label-lg ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.noticias")}
@@ -163,12 +140,13 @@ export default function Navbar() {
         {/* Center Section: User chip (avatar + nick/rank + fichas), centered on the whole bar */}
         <div className="flex items-center justify-self-center">
           {currentUser?.id && (
-            <div className="hidden sm:flex items-center gap-3 bg-[#141414] border border-white/10 rounded-full pl-1 pr-1 py-1 max-w-[18rem] h-16 hover:border-primary/40 transition-colors">
+            <div className="hud-chip-frame hidden sm:block max-w-[18rem]">
+            <div className="hud-chip flex items-center gap-3 pl-2 pr-4 py-1 h-16">
               <button
                 type="button"
                 onClick={() => navigate('/royalstore')}
                 title={t("nav.cambiarAvatar")}
-                className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
+                className="hud-avatar w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
               >
                 <img
                   alt={t("nav.avatarAlt")}
@@ -204,6 +182,7 @@ export default function Navbar() {
                 </span>
               </button>
             </div>
+            </div>
           )}
         </div>
 
@@ -213,7 +192,7 @@ export default function Navbar() {
             <button
               onClick={handleLogOut}
               title={t("nav.cerrarSesion")}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
+              className="hud-icon-btn w-11 h-10 flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
             >
               <span className="material-symbols-outlined text-[20px]">logout</span>
             </button>

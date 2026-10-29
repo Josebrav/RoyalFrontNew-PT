@@ -59,8 +59,8 @@ export default function Sidebar() {
       className={({ isActive }) =>
         `group relative flex items-center justify-center lg:justify-start gap-3 w-12 h-12 lg:w-full lg:h-auto lg:px-3 lg:py-2.5 rounded-lg transition-colors duration-200 ${
           isActive
-            ? "bg-primary/10 text-primary"
-            : "text-on-surface-variant hover:bg-surface-variant/40 hover:text-primary"
+            ? "hud-side-link is-active text-primary"
+            : "hud-side-link text-on-surface-variant hover:text-primary"
         }`
       }
     >
@@ -86,16 +86,16 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 bg-black border-r border-white/5 px-2 lg:px-4 py-6 overflow-y-auto">
+    <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 hud-side px-2 lg:px-4 py-6 overflow-y-auto">
       <div className="flex flex-col gap-1">
-        <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.cuenta")}
         </p>
         {accountItems.map(renderLink)}
       </div>
 
       <div className="flex flex-col gap-1">
-        <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.social")}
         </p>
         {socialItems.map(renderLink)}
@@ -103,7 +103,7 @@ export default function Sidebar() {
 
       {canAccessAdminPanel && (
         <div className="flex flex-col gap-1">
-          <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+          <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
             {t("sidebar.administracion")}
           </p>
           {adminItems.map(renderLink)}
