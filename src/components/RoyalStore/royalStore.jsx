@@ -10,10 +10,8 @@ const RoyalStore = () => {
   // repo), migrar esto a un token corto scopeado vía POST /royalstore/session-token, igual
   // que hace Diamantes/Minas con /games/mines/session-token.
   const token = tokenStore.get() || "";
-  // La URL de S3 sigue apuntando al bucket/carpeta "bazar": es el build de Unity ya
-  // desplegado ahí, renombrar esto rompería el juego hasta que se suba a una ruta nueva.
-  // No es visible para el usuario (va dentro de un iframe, no en la barra de direcciones).
-  const royalStoreURL = `https://baazaar.s3.us-east-2.amazonaws.com/bazar/index.html?jugadorID=${jugadorID}&token=${encodeURIComponent(token)}`;
+  // Build de Unity del Vestidor (va dentro de un iframe, no se ve en la barra de direcciones).
+  const royalStoreURL = `https://baazaar.s3.us-east-2.amazonaws.com/vestidor/index.html?jugadorID=${jugadorID}&token=${encodeURIComponent(token)}`;
 
   return (
     <Box
