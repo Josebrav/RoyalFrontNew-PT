@@ -330,18 +330,18 @@ export default function Home() {
             {/* Secondary promo slides/widgets */}
             <div className="lg:col-span-4 flex flex-col gap-6 h-[320px] lg:h-full">
               <div 
-                onClick={() => handleSoonAlert('Recarga Semanal')}
+                onClick={() => handleSoonAlert('Bono Semanal')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer"
               >
                 <EditableImage
                   contentKey="home.dashboard.banner2"
                   fallbackSrc={sportsBanner}
-                  alt="Banner de Recarga Semanal"
+                  alt="Banner de Bono Semanal"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-black/40 p-6 flex flex-col justify-end text-left">
-                  <h3 className="font-headline-sm text-headline-sm text-white">Recarga Semanal</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-white">Bono Semanal</h3>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Mejora tus fines de semana con un bono del 50%.</p>
                 </div> */}
               </div>

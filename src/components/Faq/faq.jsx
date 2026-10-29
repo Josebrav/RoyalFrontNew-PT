@@ -12,7 +12,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "¿Cómo consigo fichas?",
-    a: "Los primeros 100 usuarios reciben un bono de bienvenida automático. Después de eso, podés comprar paquetes de fichas desde \"Comprar Fichas\", o recibirlas como regalo de otro jugador desde su perfil.",
+    a: "Los primeros 100 usuarios reciben un bono de bienvenida automático. Después de eso, podés comprar paquetes de fichas desde \"Comprar Fichas\".",
   },
   {
     q: "¿Qué es el sistema de rangos (Bronce, Plata, Oro, Platino, Diamante)?",
@@ -27,16 +27,12 @@ const FAQ_ITEMS = [
     a: "Entrá al perfil público de ese jugador (por ejemplo desde el ranking o buscando su nick) y vas a ver las opciones \"Añadir como Amigo\" y \"Enviar Mensaje\" en el panel de acciones.",
   },
   {
-    q: "¿Puedo regalarle fichas a otro jugador?",
-    a: "Sí, desde el perfil de ese jugador con la opción \"Regalar Fichas\". Se descuentan de tu propio saldo al instante y quedan registradas en el historial de movimientos de ambos.",
-  },
-  {
     q: "¿Puedo bloquear a otro usuario?",
     a: "Sí, desde su perfil con \"Bloquear Usuario\". Una vez bloqueado, no va a poder enviarte mensajes ni solicitudes de amistad.",
   },
   {
     q: "¿Dónde veo el historial de mis fichas?",
-    a: "En \"Historial de Movimientos\" (accesible desde el menú y desde Comprar Fichas). Ahí aparecen tus compras, regalos enviados/recibidos y ajustes de un administrador. No incluye las fichas ganadas o perdidas jugando.",
+    a: "En \"Historial de Movimientos\" (accesible desde el menú y desde Comprar Fichas). Ahí aparecen tus compras y los ajustes de un administrador. No incluye las fichas ganadas o perdidas jugando.",
   },
   {
     q: "Olvidé mi contraseña, ¿qué hago?",
