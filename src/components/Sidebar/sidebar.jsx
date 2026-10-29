@@ -86,7 +86,7 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 bg-surface/80 backdrop-blur-md border-r border-outline-variant/30 px-2 lg:px-4 py-6 overflow-y-auto">
+    <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 bg-black border-r border-white/5 px-2 lg:px-4 py-6 overflow-y-auto">
       <div className="flex flex-col gap-1">
         <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.cuenta")}
