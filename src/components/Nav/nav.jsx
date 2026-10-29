@@ -57,7 +57,6 @@ export default function Navbar() {
 
   return (
     <header className="hud-nav sticky top-0 z-50 h-20 flex items-center">
-      <span className="hud-nav-sweep" aria-hidden="true" />
       <div className="relative grid grid-cols-[1fr_auto_1fr] items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full gap-2">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6 justify-self-start min-w-0">

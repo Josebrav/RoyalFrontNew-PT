@@ -293,23 +293,6 @@ body .swal2-icon.swal2-info {
   background: linear-gradient(90deg, transparent, rgba(230, 195, 100, 0.35) 20%, #f5d980 50%, rgba(230, 195, 100, 0.35) 80%, transparent);
   box-shadow: 0 0 8px rgba(245, 217, 128, 0.6), 0 0 18px rgba(201, 168, 76, 0.35);
 }
-/* Destello que recorre la linea */
-.hud-nav-sweep {
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 180px;
-  height: 3px;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, #fff6d0, transparent);
-  filter: blur(1px);
-  opacity: 0.8;
-  animation: hud-sweep 6s ease-in-out infinite;
-}
-@keyframes hud-sweep {
-  0% { transform: translateX(-200px); }
-  60%, 100% { transform: translateX(calc(100vw + 200px)); }
-}
 
 .hud-link {
   position: relative;
@@ -404,6 +387,3 @@ body .swal2-icon.swal2-info {
   background: rgba(230, 195, 100, 0.06);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hud-nav-sweep { animation: none; display: none; }
-}
