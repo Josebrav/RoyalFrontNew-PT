@@ -5,6 +5,7 @@ const TABS = [
   { key: "mines", label: "Minas", to: "/admin/mines-bots" },
   { key: "unity", label: "Juegos Unity", to: "/admin/unity-bots" },
   { key: "domino", label: "Dominó", to: "/admin/domino-bots" },
+  { key: "parchis", label: "Parchís", to: "/admin/parchis-bots" },
 ];
 
 /** Barra de tabs compartida por las 3 páginas de bots — cada una sigue siendo una página propia

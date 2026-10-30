@@ -27,6 +27,7 @@ import RoyalSlots from './components/Juegos/RoyalSlots/royalslots';
 import SugarCalavera from './components/Juegos/SugarCalavera/sugarcalavera';
 import FuriaOlimpo from './components/Juegos/FuriaOlimpo/furiaolimpo';
 import Domino from './components/Juegos/Domino/domino';
+import Parchis from './components/Juegos/Parchis/parchis';
 import GemaOfGold from './components/Juegos/GemaOfGold/gemaofgold';
 import RoyalRuleta from './components/Juegos/RoyalRuleta/royalruleta';
 import API_URL from './api/rutaApi';
@@ -41,6 +42,7 @@ import AdminGameStats from './components/AdminPanel/GameStats/gameStats';
 import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
 import MinesBots from './components/AdminPanel/MinesBots/minesBots';
 import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
+import ParchisBots from './components/AdminPanel/ParchisBots/parchisBots';
 import UnityBots from './components/AdminPanel/UnityBots/unityBots';
 import Trophies from './components/AdminPanel/Trophies/trophies';
 import GameImages from './components/AdminPanel/GameImages/gameImages';
@@ -175,7 +177,8 @@ function App() {
             <Route path="/admin/game-stats" element={<ProtectedRoute><AdminGameStats /></ProtectedRoute>} />
             <Route path="/admin/bingo-bots" element={<ProtectedRoute><BingoBots /></ProtectedRoute>} />
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
-            <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
+            <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
+            <Route path="/admin/parchis-bots" element={<ProtectedRoute><ParchisBots /></ProtectedRoute>} />
             <Route path="/admin/unity-bots" element={<ProtectedRoute><UnityBots /></ProtectedRoute>} />
             <Route path="/admin/trophies" element={<ProtectedRoute><Trophies /></ProtectedRoute>} />
             <Route path="/admin/game-images" element={<ProtectedRoute><GameImages /></ProtectedRoute>} />
@@ -195,6 +198,7 @@ function App() {
             <Route path="/game/sugarcalavera" element={<RequireAuth><SugarCalavera /></RequireAuth>} />
             <Route path="/game/furiaolimpo" element={<RequireAuth><FuriaOlimpo /></RequireAuth>} />
             <Route path="/game/domino" element={<RequireAuth><Domino /></RequireAuth>} />
+            <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
             <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
             <Route path="/game/royalruleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
             <Route path="/royalstore" element={<RoyalStore />} />

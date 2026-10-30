@@ -279,6 +279,7 @@ export const GAMES_CATALOG = [
     category: "mesa",
     status: "soon",
     icon: "flag",
+    playPath: "/game/parchis",
     description:
       "Tirá los dados y llevá tus fichas a casa antes que nadie, en el clásico juego de mesa familiar ahora en RoyalGames.",
   },
