@@ -362,11 +362,6 @@ const Perfil = ({ isPublic = false }) => {
   const rankMeta = getRankMeta(user.rank);
   const profileBanner = user.role === "admin" ? bannerPerfilDorado : user.role === "mod" ? bannerPerfilVerde : bannerPerfil;
   const roleInsignia = user.role === "admin" ? insigniaAdmin : user.role === "mod" ? insigniaMod : null;
-  // Female RoyalStore avatars are rendered taller/closer to the camera than male ones, so in the
-  // profile frame they need to be a touch smaller. We shrink from the TOP only (padding-top
-  // on the square box) so the feet stay pinned to the same floor line (object-bottom) and it's
-  // just the head that comes down. Male avatars are left exactly as-is.
-  const isFemaleAvatar = user.sexo === "M";
   // El progreso (en dólares) es privado: solo se ve en el perfil propio.
   const nextRank = rankStatus?.nextRank ? RANK_META[rankStatus.nextRank] : null;
   const rankProgressPercentage = rankStatus?.nextThreshold
@@ -447,7 +442,7 @@ const Perfil = ({ isPublic = false }) => {
               style={{ left: "21%", bottom: "30.1%", width: "20.9%", transform: "translateX(-50%)" }}
             >
               <div
-                className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible"
+                className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible"
               >
                 {avatarSrc ? (
                   <img
