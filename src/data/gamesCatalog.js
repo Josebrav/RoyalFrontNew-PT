@@ -107,6 +107,17 @@ export const GAMES_CATALOG = [
       "Tragamonedas con temática de calaveritas de azúcar: símbolos dulces, colores vibrantes y multiplicadores que celebran la buena suerte.",
   },
   {
+    slug: "furiaolimpo",
+    name: "Furia del Olimpo",
+    category: "slots",
+    status: "soon",
+    icon: "bolt",
+    players: 0,
+    playPath: "/game/furiaolimpo",
+    description:
+      "Tragamonedas de los dioses griegos: Zeus, Poseidón, Ares y Apolo en el Olimpo. Tres rayos dan tiradas gratis y los dioses se vuelven comodines dorados.",
+  },
+  {
     slug: "bingo",
     name: "Royal Bingo",
     category: "bingo",

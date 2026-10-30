@@ -205,7 +205,7 @@ export default function AdminGameStats() {
                       >
                         <td className="px-4 py-3 font-bold text-white whitespace-nowrap">
                           {g.name}
-                          {g.trackingSince == null && g.plays === 0 && ["santawilds", "sugarcalavera", "gemasofgold", "royal-joker", "royal-pachinka"].includes(g.slug) && (
+                          {g.trackingSince == null && g.plays === 0 && ["santawilds", "sugarcalavera", "furiaolimpo", "gemasofgold", "royal-joker", "royal-pachinka"].includes(g.slug) && (
                             <span className="block text-[10px] font-normal text-on-surface-variant">Registrando desde hoy</span>
                           )}
                         </td>

@@ -23,6 +23,10 @@ export const HUB_SLOTS = {
     title: "Sugar Calavera",
     url: withPlayer("https://sugarcalavera.s3.us-east-1.amazonaws.com/calavera/index.html"),
   },
+  furiaolimpo: {
+    title: "Furia del Olimpo",
+    url: withPlayer("https://furiaolimpo.s3.us-east-2.amazonaws.com/olimpo/index.html"),
+  },
   gemaofgold: {
     title: "Gema of Gold",
     url: withPlayer("https://gemaofgold.s3.us-east-2.amazonaws.com/Gemaofgold/index.html"),

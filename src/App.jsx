@@ -25,6 +25,7 @@ import Bingo from './components/Juegos/Bingo/bingo';
 import SantaWilds from './components/Juegos/SantaWilds/santawilds';
 import RoyalSlots from './components/Juegos/RoyalSlots/royalslots';
 import SugarCalavera from './components/Juegos/SugarCalavera/sugarcalavera';
+import FuriaOlimpo from './components/Juegos/FuriaOlimpo/furiaolimpo';
 import Domino from './components/Juegos/Domino/domino';
 import GemaOfGold from './components/Juegos/GemaOfGold/gemaofgold';
 import RoyalRuleta from './components/Juegos/RoyalRuleta/royalruleta';
@@ -191,7 +192,8 @@ function App() {
             <Route path="/game/bingo" element={<RequireAuth><Bingo /></RequireAuth>} />
             <Route path="/game/santawilds" element={<RequireAuth><SantaWilds /></RequireAuth>} />
             <Route path="/game/royalslots" element={<RequireAuth><RoyalSlots /></RequireAuth>} />
-            <Route path="/game/sugarcalavera" element={<RequireAuth><SugarCalavera /></RequireAuth>} />
+            <Route path="/game/sugarcalavera" element={<RequireAuth><SugarCalavera /></RequireAuth>} />
+            <Route path="/game/furiaolimpo" element={<RequireAuth><FuriaOlimpo /></RequireAuth>} />
             <Route path="/game/domino" element={<RequireAuth><Domino /></RequireAuth>} />
             <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
             <Route path="/game/royalruleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
