@@ -36,6 +36,7 @@ import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportT
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
 import AdminPrizes from './components/AdminPanel/Prizes/prizes';
 import AdminReferrals from './components/AdminPanel/Referrals/referrals';
+import AdminGameStats from './components/AdminPanel/GameStats/gameStats';
 import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
 import MinesBots from './components/AdminPanel/MinesBots/minesBots';
 import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
@@ -169,7 +170,8 @@ function App() {
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
             <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />
-            <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
+            <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
+            <Route path="/admin/game-stats" element={<ProtectedRoute><AdminGameStats /></ProtectedRoute>} />
             <Route path="/admin/bingo-bots" element={<ProtectedRoute><BingoBots /></ProtectedRoute>} />
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
             <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />

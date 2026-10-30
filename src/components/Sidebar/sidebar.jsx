@@ -41,6 +41,7 @@ export default function Sidebar() {
     { to: "/admin/users", icon: "manage_accounts", label: t("sidebar.usuarios"), color: "#a855f7" },
     { to: "/admin/tickets", icon: "support_agent", label: t("sidebar.tickets"), color: "#2dd4bf" },
     ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: t("sidebar.cargas"), color: "#4caf7d" }] : []),
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/game-stats", icon: "query_stats", label: t("sidebar.estadisticasJuegos"), color: "#e6c364" }] : []),
     { to: "/admin/prizes", icon: "emoji_events", label: t("sidebar.premios"), color: "#a855f7" },
     { to: "/admin/referrals", icon: "diversity_3", label: t("sidebar.referidos"), color: "#2dd4bf" },
     { to: "/admin/trophies", icon: "military_tech", label: t("sidebar.trofeos"), color: "#4f8fe0" },
