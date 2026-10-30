@@ -118,6 +118,17 @@ export const GAMES_CATALOG = [
       "Tragamonedas de los dioses griegos: Zeus, Poseidón, Ares y Apolo en el Olimpo. Tres rayos dan tiradas gratis y los dioses se vuelven comodines dorados.",
   },
   {
+    slug: "gildedcobra",
+    name: "Gilded Cobra",
+    category: "slots",
+    status: "soon",
+    icon: "pets",
+    players: 0,
+    playPath: "/game/gildedcobra",
+    description:
+      "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres pirámides dan tiradas gratis y la cobra dorada se vuelve comodín.",
+  },
+  {
     slug: "bingo",
     name: "Royal Bingo",
     category: "bingo",
