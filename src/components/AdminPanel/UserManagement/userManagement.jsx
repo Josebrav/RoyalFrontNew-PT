@@ -10,6 +10,8 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [kycFilter, setKycFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
+  // Jugadores reales y bots (cuentas de BingoBotService) en pestañas separadas.
+  const [accountTab, setAccountTab] = useState('players');
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -34,8 +36,12 @@ const UserManagement = () => {
   }, []);
 
   // Filtrar usuarios
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch = 
+  const players = users.filter((u) => !u.isBot);
+  const bots = users.filter((u) => u.isBot);
+  const tabUsers = accountTab === 'bots' ? bots : players;
+
+  const filteredUsers = tabUsers.filter((user) => {
+    const matchesSearch =
       user.nick?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.id?.toString().includes(searchTerm);
@@ -131,16 +137,42 @@ const UserManagement = () => {
           <div className="flex gap-4">
             <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
               <span className="text-[10px] uppercase tracking-widest text-primary">Jugadores Totales</span>
-              <span className="font-headline-md text-headline-md">{users.length}</span>
+              <span className="font-headline-md text-headline-md">{players.length}</span>
             </div>
             <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
               <span className="text-[10px] uppercase tracking-widest text-primary">Usuarios Activos</span>
               <span className="font-headline-md text-headline-md">
-                {users.filter((u) => !u.banned && !u.inactive).length}
+                {players.filter((u) => !u.banned && !u.inactive).length}
               </span>
             </div>
           </div>
         </header>
+
+        {/* Jugadores / Bots */}
+        <div className="flex gap-2 mb-6" role="tablist">
+          {[
+            { key: 'players', label: 'Jugadores', icon: 'person', count: players.length },
+            { key: 'bots', label: 'Bots', icon: 'smart_toy', count: bots.length },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              role="tab"
+              aria-selected={accountTab === tab.key}
+              onClick={() => setAccountTab(tab.key)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm border transition-colors cursor-pointer ${
+                accountTab === tab.key
+                  ? 'bg-primary text-black border-primary'
+                  : 'bg-surface-container-high text-on-surface border-outline-variant/30 hover:border-primary/40'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[18px]">{tab.icon}</span>
+              {tab.label}
+              <span className={`text-xs px-2 py-0.5 rounded-full ${accountTab === tab.key ? 'bg-black/15' : 'bg-surface-variant/40'}`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
+        </div>
 
         {/* Error Message */}
         {error && (
@@ -341,7 +373,7 @@ const UserManagement = () => {
               {/* Pagination */}
               <div className="px-6 py-4 bg-surface-container-high border-t border-outline-variant/10 flex justify-between items-center">
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Mostrando {filteredUsers.length} de {users.length} registros
+                  Mostrando {filteredUsers.length} de {tabUsers.length} {accountTab === 'bots' ? 'bots' : 'jugadores'}
                 </p>
                 <div className="flex gap-1">
                   <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-outline-variant/30 text-on-surface-variant hover:border-primary hover:text-primary transition-colors">
