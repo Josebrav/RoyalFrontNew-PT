@@ -38,6 +38,7 @@ import { capturePromoFromUrl, getPendingPromo, clearPendingPromo } from './utils
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
+import AdminPresence from './components/AdminPanel/Presence/presence';
 import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
 import AdminPrizes from './components/AdminPanel/Prizes/prizes';
@@ -229,6 +230,7 @@ function App() {
             <Route path="/logout" element={<LogOut />} />
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/online" element={<ProtectedRoute><AdminPresence /></ProtectedRoute>} />
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
             <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />

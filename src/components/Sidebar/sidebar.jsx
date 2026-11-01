@@ -38,6 +38,7 @@ export default function Sidebar() {
   // cliente puntual, pero desde la sección "Actividad" del detalle de ese usuario, no acá.
   const adminItems = [
     { to: "/admin/dashboard", icon: "dashboard", label: t("sidebar.panelAdmin"), color: "#4f8fe0" },
+    { to: "/admin/online", icon: "radar", label: t("sidebar.enLinea"), color: "#4caf7d" },
     { to: "/admin/users", icon: "manage_accounts", label: t("sidebar.usuarios"), color: "#a855f7" },
     { to: "/admin/tickets", icon: "support_agent", label: t("sidebar.tickets"), color: "#2dd4bf" },
     ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: t("sidebar.cargas"), color: "#4caf7d" }] : []),

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAdminOverview } from '../../../redux/actions';
 import { RANK_META } from '../../../utils/rank';
 import CountryStats from './countryStats';
+import UserInsights from './userInsights';
 
 const numberFormat = (n) => new Intl.NumberFormat('es-ES').format(n || 0);
 
@@ -209,6 +210,8 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
+        <UserInsights includeBots={includeBots} viewerIsAdmin={viewerIsAdmin} />
 
         <CountryStats viewerIsAdmin={viewerIsAdmin} />
       </div>
