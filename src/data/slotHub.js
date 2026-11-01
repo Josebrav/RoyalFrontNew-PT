@@ -25,7 +25,7 @@ export const HUB_SLOTS = {
   },
   furiaolimpo: {
     title: "Furia del Olimpo",
-    url: withPlayer("https://furiaolimpo.s3.us-east-2.amazonaws.com/olimpo/index.html"),
+    url: withPlayer("https://furiadelolimpo.s3.us-east-2.amazonaws.com/olimpo/index.html"),
   },
   gildedcobra: {
     title: "Gilded Cobra",

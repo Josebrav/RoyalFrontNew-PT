@@ -110,12 +110,12 @@ export const GAMES_CATALOG = [
     slug: "furiaolimpo",
     name: "Furia del Olimpo",
     category: "slots",
-    status: "soon",
+    status: "active",
     icon: "bolt",
     players: 0,
     playPath: "/game/furiaolimpo",
     description:
-      "Tragamonedas de los dioses griegos: Zeus, Poseidón, Ares y Apolo en el Olimpo. Tres rayos dan tiradas gratis y los dioses se vuelven comodines dorados.",
+      "Tragamonedas de los dioses griegos: Zeus, Poseidón, Ares y Apolo en el Olimpo. Tres Zeus dan tiradas gratis, o compralas directo.",
   },
   {
     slug: "gildedcobra",
