@@ -21,11 +21,11 @@ import {
   fetchBlockStatus,
   blockUser,
   unblockUser,
-  giftChips,
   fetchUserTrophies,
 } from "./../../redux/actions/index";
 import RankBadge from "../ui/RankBadge/rankBadge";
-import { getRankMeta, getNextRank } from "../../utils/rank";
+import { getRankMeta, RANK_META, RANK_BONUS_PERCENT, formatUsd } from "../../utils/rank";
+import useRankStatus from "../../utils/useRankStatus";
 import { swalThemeConfig } from "../../utils/formatters";
 import { getGameByPlayPath } from "../../data/gamesCatalog";
 
@@ -64,6 +64,7 @@ const Perfil = ({ isPublic = false }) => {
   // Ownership is always derived from comparing IDs, never from which route/prop was used to
   // get here, so editing controls can never be exposed while looking at someone else's data.
   const isOwnProfile = !!currentUser?.id && !!user?.id && currentUser.id === user.id;
+  const rankStatus = useRankStatus(isOwnProfile ? currentUser.id : null);
 
   // Declared this early (not further down with the other helpers) because the "Usuario
   // Baneado" branch below returns before reaching a later declaration — a `const` referenced
@@ -324,41 +325,6 @@ const Perfil = ({ isPublic = false }) => {
     }
   };
 
-  const handleGiftChips = async () => {
-    const { value: amount } = await Swal.fire({
-      title: `Regalar fichas a ${capitalize(user.nick)}`,
-      input: "number",
-      inputLabel: "Cantidad de fichas",
-      inputAttributes: { min: 1, step: 1 },
-      showCancelButton: true,
-      confirmButtonText: "Regalar",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#C9A84C",
-      ...swalThemeConfig,
-      inputValidator: (value) => {
-        if (!value || Number(value) < 1) return "Ingresá una cantidad válida.";
-        if (Number(value) > (currentUser?.chips || 0)) return "No tenés fichas suficientes.";
-      },
-    });
-    if (!amount) return;
-    try {
-      await dispatch(giftChips(user.id, Number(amount)));
-      Swal.fire({
-        icon: "success",
-        title: "¡Fichas enviadas!",
-        text: `Le regalaste ${new Intl.NumberFormat('es-ES').format(Number(amount))} fichas a ${capitalize(user.nick)}.`,
-        confirmButtonColor: "#C9A84C",
-      });
-    } catch (error) {
-      Swal.fire({
-        title: "No se pudo completar el regalo",
-        text: error.response?.data?.message || "Inténtalo de nuevo más tarde.",
-        icon: "error",
-        ...swalThemeConfig,
-      });
-    }
-  };
-
   const handleBlockToggle = async () => {
     const isBlocked = !!blockStatus?.blockedByMe;
     if (isBlocked) {
@@ -393,30 +359,17 @@ const Perfil = ({ isPublic = false }) => {
   };
 
   const totalChips = user.chips || 0;
-  const totalChipsDeposited = Number(user.totalChipsDeposited || 0);
   const rankMeta = getRankMeta(user.rank);
   const profileBanner = user.role === "admin" ? bannerPerfilDorado : user.role === "mod" ? bannerPerfilVerde : bannerPerfil;
   const roleInsignia = user.role === "admin" ? insigniaAdmin : user.role === "mod" ? insigniaMod : null;
-  // Female RoyalStore avatars are rendered taller/closer to the camera than male ones, so in the
-  // profile frame they need to be a touch smaller. We shrink from the TOP only (padding-top
-  // on the square box) so the feet stay pinned to the same floor line (object-bottom) and it's
-  // just the head that comes down. Male avatars are left exactly as-is.
-  const isFemaleAvatar = user.sexo === "M";
-  const nextRank = getNextRank(user.rank);
-  const rankProgressPercentage = nextRank
-    ? Math.min(Math.round((totalChipsDeposited / nextRank.threshold) * 100), 100)
+  // El progreso (en dólares) es privado: solo se ve en el perfil propio.
+  const nextRank = rankStatus?.nextRank ? RANK_META[rankStatus.nextRank] : null;
+  const rankProgressPercentage = rankStatus?.nextThreshold
+    ? Math.min(Math.round((rankStatus.points / rankStatus.nextThreshold) * 100), 100)
     : 100;
+  const rankBonusPercent = RANK_BONUS_PERCENT[user.rank] || 0;
 
-  const showRankBenefits = () => {
-    Swal.fire({
-      title: "Beneficios de Rango",
-      text: isOwnProfile
-        ? `Por ser miembro rango ${rankMeta.label}, disfrutas de beneficios exclusivos que mejoran a medida que subes de nivel cargando fichas.`
-        : `${capitalize(user.nick)} es miembro rango ${rankMeta.label}, con beneficios exclusivos que mejoran al subir de nivel cargando fichas.`,
-      icon: "info",
-      confirmButtonColor: "#C9A84C",
-    });
-  };
+  const showRankBenefits = () => navigate("/rangos");
 
   // Get formatted member since date
   const getMemberSince = (createdAt) => {
@@ -486,11 +439,10 @@ const Perfil = ({ isPublic = false }) => {
             {/* Avatar / Photo, positioned inside the banner's frame */}
             <div
               className="absolute group"
-              style={{ left: "21%", bottom: "30.1%", width: isFemaleAvatar ? "20.5%" : "20.9%", transform: "translateX(-50%)" }}
+              style={{ left: "21%", bottom: "30.1%", width: "20.9%", transform: "translateX(-50%)" }}
             >
               <div
                 className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible"
-                style={{ paddingTop: isFemaleAvatar ? "14%" : 0 }}
               >
                 {avatarSrc ? (
                   <img
@@ -639,17 +591,8 @@ const Perfil = ({ isPublic = false }) => {
                   <div className="flex flex-col">
                     <button
                       type="button"
-                      onClick={handleGiftChips}
-                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 first:border-t-0 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
-                    >
-                      <span className="material-symbols-outlined text-primary text-[20px]">redeem</span>
-                      <span className="font-label-lg text-label-lg">Regalar Fichas</span>
-                    </button>
-
-                    <button
-                      type="button"
                       onClick={showRankBenefits}
-                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 first:border-t-0 hover:bg-surface-variant/30 transition-colors cursor-pointer text-on-surface"
                     >
                       <span className="material-symbols-outlined text-primary text-[20px]">workspace_premium</span>
                       <span className="font-label-lg text-label-lg">Ver Puntuación</span>
@@ -726,26 +669,33 @@ const Perfil = ({ isPublic = false }) => {
                   <span className="font-label-md text-label-md text-on-surface-variant uppercase">Rango Actual</span>
                   <RankBadge tier={user.rank} size="sm" />
                 </div>
-                <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
-                  {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
-                </span>
-                <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
-                <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
-                  <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
-                </div>
-                <div className="flex justify-between font-label-md text-label-md">
-                  <span className="text-on-surface-variant">
-                    {new Intl.NumberFormat('es-ES').format(totalChipsDeposited)}
-                    {nextRank ? ` / ${new Intl.NumberFormat('es-ES').format(nextRank.threshold)}` : ""}
-                  </span>
-                  <span className="text-primary">{rankProgressPercentage}%</span>
-                </div>
+                {rankBonusPercent > 0 && (
+                  <p className="text-sm font-bold text-green-400 mb-3">+{rankBonusPercent}% de fichas en cada compra</p>
+                )}
+                {isOwnProfile && rankStatus && (
+                  <>
+                    <span className="font-label-md text-label-md text-on-surface-variant uppercase mb-2 block">
+                      {nextRank ? "Próximo Rango" : "Rango Máximo Alcanzado"}
+                    </span>
+                    <h4 className="font-headline-sm text-headline-sm text-white">{nextRank ? nextRank.label : rankMeta.label}</h4>
+                    <div className="w-full bg-surface-container-lowest h-2 rounded-full mb-2 border border-outline-variant/10 overflow-hidden">
+                      <div className="royal-gold-gradient h-full" style={{ width: `${rankProgressPercentage}%` }}></div>
+                    </div>
+                    <div className="flex justify-between font-label-md text-label-md">
+                      <span className="text-on-surface-variant">
+                        {formatUsd(rankStatus.points)}
+                        {rankStatus.nextThreshold ? ` / ${formatUsd(rankStatus.nextThreshold)}` : ""}
+                      </span>
+                      <span className="text-primary">{rankProgressPercentage}%</span>
+                    </div>
+                  </>
+                )}
                 <button
                   onClick={showRankBenefits}
                   className="w-full mt-6 py-3 border border-primary/20 rounded-lg font-label-lg text-label-lg text-primary hover:bg-primary/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-sm">workspace_premium</span>
-                  Ver Beneficios de Rango
+                  Ver Sistema de Rangos
                 </button>
               </div>
             </div>

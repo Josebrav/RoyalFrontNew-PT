@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import API_URL from "../../api/rutaApi";
 import { swalThemeConfig } from "../../utils/formatters";
 import RankBadge from "../ui/RankBadge/rankBadge";
+import { useAuth } from "../../context/oauthContext";
 import {
   fetchFriends,
   fetchIncomingRequests,
@@ -57,6 +58,7 @@ function UserRow({ user, children }) {
 export default function Friends() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const auth = useAuth();
   const currentUser = useSelector((state) => state.currentUser);
   const { list, incoming, outgoing } = useSelector((state) => state.friends);
 
@@ -69,6 +71,10 @@ export default function Friends() {
       dispatch(fetchOutgoingRequests());
     }
   }, [dispatch, currentUser?.id]);
+
+  // Mientras se restaura la sesión (al recargar tarda un instante) no se decide nada: si no, se
+  // mostraba "Debes iniciar sesión" aunque el usuario sí estuviera logueado.
+  if (auth.loading) return null;
 
   if (!currentUser?.id) {
     return (

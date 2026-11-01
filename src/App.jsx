@@ -12,6 +12,7 @@ import BuyChips from './components/Buychips/buyChips';
 import LogOut from './components/Logout/logout';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
+import RankSystem from './components/RankSystem/rankSystem';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
@@ -24,7 +25,16 @@ import Bingo from './components/Juegos/Bingo/bingo';
 import SantaWilds from './components/Juegos/SantaWilds/santawilds';
 import RoyalSlots from './components/Juegos/RoyalSlots/royalslots';
 import SugarCalavera from './components/Juegos/SugarCalavera/sugarcalavera';
+import FuriaOlimpo from './components/Juegos/FuriaOlimpo/furiaolimpo';
+import GildedCobra from './components/Juegos/GildedCobra/gildedcobra';
+import Domino from './components/Juegos/Domino/domino';
+import Parchis from './components/Juegos/Parchis/parchis';
+import GemaOfGold from './components/Juegos/GemaOfGold/gemaofgold';
+import RoyalRuleta from './components/Juegos/RoyalRuleta/royalruleta';
 import API_URL from './api/rutaApi';
+import Swal from 'sweetalert2';
+import { tokenStore } from './api/tokenStore';
+import { capturePromoFromUrl, getPendingPromo, clearPendingPromo } from './utils/promoLink';
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
@@ -32,8 +42,12 @@ import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportT
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
 import AdminPrizes from './components/AdminPanel/Prizes/prizes';
 import AdminReferrals from './components/AdminPanel/Referrals/referrals';
+import AdminGameStats from './components/AdminPanel/GameStats/gameStats';
+import AdminPromos from './components/AdminPanel/Promos/promos';
 import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
 import MinesBots from './components/AdminPanel/MinesBots/minesBots';
+import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
+import ParchisBots from './components/AdminPanel/ParchisBots/parchisBots';
 import UnityBots from './components/AdminPanel/UnityBots/unityBots';
 import Trophies from './components/AdminPanel/Trophies/trophies';
 import GameImages from './components/AdminPanel/GameImages/gameImages';
@@ -86,6 +100,60 @@ function App() {
       .catch(() => {});
   }, [currentUser?.id, currentUser?.firstChips]);
 
+  // Enlace promocional (ej. ?promo=FACEBOOK en un posteo): se guarda al entrar; a quien todavia no
+  // tiene sesion se le avisa cuantas fichas recibe al registrarse.
+  useEffect(() => {
+    const code = capturePromoFromUrl();
+    if (!code || tokenStore.get()) return;
+    axios.get(`${API_URL}/promo-codes/info/${encodeURIComponent(code)}`)
+      .then(({ data }) => {
+        Swal.fire({
+          icon: 'success',
+          title: `¡${new Intl.NumberFormat('es-ES').format(data.amount)} fichas de regalo!`,
+          text: data.newAccountsOnly
+            ? 'Creá tu cuenta y las fichas se acreditan solas apenas te registrás.'
+            : 'Iniciá sesión o creá tu cuenta y las fichas se acreditan solas.',
+          confirmButtonText: '¡Genial!',
+          confirmButtonColor: '#c9a84c',
+          background: '#1a1a1a',
+          color: '#fff',
+        });
+      })
+      .catch(() => clearPendingPromo());
+  }, []);
+
+  // Con sesion y un codigo pendiente: se cobra una sola vez (el servidor decide si corresponde).
+  const promoTriedRef = useRef(false);
+  useEffect(() => {
+    const code = getPendingPromo();
+    if (!currentUser?.id || !code || promoTriedRef.current) return;
+    promoTriedRef.current = true;
+    axios.post(`${API_URL}/promo-codes/redeem`, { code })
+      .then(({ data }) => {
+        clearPendingPromo();
+        if (currentUser.email) dispatch(getUserByEmail(currentUser.email)).catch(() => {});
+        Swal.fire({
+          icon: 'success',
+          title: '¡Bienvenido a RoyalGames!',
+          text: `Recibiste ${new Intl.NumberFormat('es-ES').format(data.amount)} fichas de regalo.`,
+          confirmButtonText: '¡A jugar!',
+          confirmButtonColor: '#c9a84c',
+          background: '#1a1a1a',
+          color: '#fff',
+        });
+      })
+      .catch((err) => {
+        // 4xx = no corresponde (cuenta vieja, ya cobrado, misma conexion...): se descarta y se avisa.
+        // Error de red/servidor: queda guardado para intentar en la proxima carga.
+        const status = err.response?.status;
+        if (status && status < 500 && status !== 429) {
+          clearPendingPromo();
+          const message = err.response?.data?.message;
+          if (message) Swal.fire({ icon: 'info', title: 'Promoción', text: Array.isArray(message) ? message[0] : message, background: '#1a1a1a', color: '#fff', confirmButtonColor: '#c9a84c' });
+        }
+      });
+  }, [currentUser?.id]);
+
   // Lightweight presence signal: lets the admin panel + "jugadores conectados" widget
   // approximate "online now" (and what page/game someone is on) by marking lastSeen
   // every couple of minutes while the app is open, and immediately on navigation.
@@ -131,7 +199,7 @@ function App() {
 
   return (
     <Container
-      bg="#16130d"
+      bg="#303030"
       color="#e9e1d7"
       className="bg-background text-on-background"
       maxW="100%"
@@ -165,12 +233,17 @@ function App() {
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
             <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />
             <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
+            <Route path="/admin/game-stats" element={<ProtectedRoute><AdminGameStats /></ProtectedRoute>} />
+            <Route path="/admin/promos" element={<ProtectedRoute><AdminPromos /></ProtectedRoute>} />
             <Route path="/admin/bingo-bots" element={<ProtectedRoute><BingoBots /></ProtectedRoute>} />
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
+            <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
+            <Route path="/admin/parchis-bots" element={<ProtectedRoute><ParchisBots /></ProtectedRoute>} />
             <Route path="/admin/unity-bots" element={<ProtectedRoute><UnityBots /></ProtectedRoute>} />
             <Route path="/admin/trophies" element={<ProtectedRoute><Trophies /></ProtectedRoute>} />
             <Route path="/admin/game-images" element={<ProtectedRoute><GameImages /></ProtectedRoute>} />
             <Route path="/noticias" element={<News />} />
+            <Route path="/rangos" element={<RankSystem />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
             <Route path="/privacidad" element={<Privacidad />} />
@@ -183,6 +256,12 @@ function App() {
             <Route path="/game/santawilds" element={<RequireAuth><SantaWilds /></RequireAuth>} />
             <Route path="/game/royalslots" element={<RequireAuth><RoyalSlots /></RequireAuth>} />
             <Route path="/game/sugarcalavera" element={<RequireAuth><SugarCalavera /></RequireAuth>} />
+            <Route path="/game/furiaolimpo" element={<RequireAuth><FuriaOlimpo /></RequireAuth>} />
+            <Route path="/game/gildedcobra" element={<RequireAuth><GildedCobra /></RequireAuth>} />
+            <Route path="/game/domino" element={<RequireAuth><Domino /></RequireAuth>} />
+            <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
+            <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
+            <Route path="/game/royalruleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
             <Route path="/royalstore" element={<RoyalStore />} />
             <Route path="/amigos" element={<Friends />} />
             <Route path="/mensajes" element={<Messages />} />

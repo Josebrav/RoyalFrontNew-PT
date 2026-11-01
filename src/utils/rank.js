@@ -1,17 +1,36 @@
 /**
- * Rank tiers are driven by lifetime deposited chips (backend field `totalChipsDeposited`),
- * using the app's fixed 1000 chips = $1 USD rate. Keep these thresholds in sync with
- * UsersService.RANK_THRESHOLDS in the backend.
+ * Sistema de rangos (espejo de RoyalGamesBackend/src/common/constants/rank-system.ts, que es quien
+ * decide de verdad): se sube solo comprando fichas, contando lo cargado en dólares (1 € = 1 US$,
+ * $1.500 ARS = 1 US$). Cada rango da un % fijo de fichas extra en todas las compras y se mantiene
+ * cargando al menos MONTHLY_MAINTENANCE_USD por mes; si no, baja un rango.
  */
 export const RANK_ORDER = ["bronze", "silver", "gold", "platinum", "diamond"];
 
+/** Dólares acumulados para llegar a cada rango. */
 export const RANK_THRESHOLDS = {
   bronze: 0,
-  silver: 1000,
-  gold: 5000,
-  platinum: 10000,
-  diamond: 50000,
+  silver: 10,
+  gold: 100,
+  platinum: 1_000,
+  diamond: 5_000,
 };
+
+/** Fichas extra (%) en cada compra según el rango. */
+export const RANK_BONUS_PERCENT = {
+  bronze: 0,
+  silver: 10,
+  gold: 25,
+  platinum: 50,
+  diamond: 100,
+};
+
+export const MONTHLY_MAINTENANCE_USD = 10;
+export const ARS_PER_USD = 1_500;
+
+export const formatUsd = (n) =>
+  `US$${new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2 }).format(Number(n) || 0)}`;
+export const formatArsEquivalent = (usd) =>
+  `$${new Intl.NumberFormat("es-ES").format(Math.round((Number(usd) || 0) * ARS_PER_USD))} ARS`;
 
 export const RANK_META = {
   bronze: {
@@ -47,7 +66,7 @@ export const getRankMeta = (tier) => RANK_META[tier] || RANK_META.bronze;
  * Returns { label, threshold } for the tier above `tier`, or null if already at the top.
  */
 export const getNextRank = (tier) => {
-  const index = RANK_ORDER.indexOf(tier);
+  const index = RANK_ORDER.indexOf(tier || "bronze");
   if (index === -1 || index === RANK_ORDER.length - 1) {
     return null;
   }

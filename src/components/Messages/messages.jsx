@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
 import RankBadge from "../ui/RankBadge/rankBadge";
+import { useAuth } from "../../context/oauthContext";
 import { fetchConversations, fetchThread, sendMessage } from "../../redux/actions/index";
 
 // Mientras hay una conversación abierta se sondea seguido, para que el otro vea el mensaje sin
@@ -49,6 +50,7 @@ export default function Messages() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { nick } = useParams();
+  const auth = useAuth();
   const currentUser = useSelector((state) => state.currentUser);
   const { conversations, threads } = useSelector((state) => state.messages);
 
@@ -120,6 +122,10 @@ export default function Messages() {
     const el = threadContainerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [activeMessages.length]);
+
+  // Mientras se restaura la sesión (al recargar tarda un instante) no se decide nada: si no, se
+  // mostraba "Debes iniciar sesión" aunque el usuario sí estuviera logueado.
+  if (auth.loading) return null;
 
   if (!currentUser?.id) {
     return (

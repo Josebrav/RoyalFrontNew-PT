@@ -21,7 +21,7 @@ const CONTENT = {
       },
       {
         title: "4. Una cuenta por persona",
-        content: "Cada jugador debe usar una sola cuenta. Crear cuentas múltiples para abusar de bonos de bienvenida, del sistema de regalo de fichas entre usuarios o de los rankings de premios está prohibido y puede derivar en la suspensión de todas las cuentas involucradas.",
+        content: "Cada jugador debe usar una sola cuenta. Crear cuentas múltiples para abusar de bonos de bienvenida o de los rankings de premios está prohibido y puede derivar en la suspensión de todas las cuentas involucradas.",
       },
       {
         title: "5. Convivencia entre jugadores",
@@ -56,7 +56,7 @@ const CONTENT = {
       },
       {
         title: "4. One account per person",
-        content: "Each player must use a single account. Creating multiple accounts to abuse welcome bonuses, the chip-gifting system between users, or the prize rankings is prohibited and can lead to the suspension of all accounts involved.",
+        content: "Each player must use a single account. Creating multiple accounts to abuse welcome bonuses or the prize rankings is prohibited and can lead to the suspension of all accounts involved.",
       },
       {
         title: "5. Getting along with other players",
@@ -91,7 +91,7 @@ const CONTENT = {
       },
       {
         title: "4. Uma conta por pessoa",
-        content: "Cada jogador deve usar apenas uma conta. Criar múltiplas contas para abusar de bônus de boas-vindas, do sistema de presente de fichas entre usuários ou dos rankings de prêmios é proibido e pode resultar na suspensão de todas as contas envolvidas.",
+        content: "Cada jogador deve usar apenas uma conta. Criar múltiplas contas para abusar de bônus de boas-vindas ou dos rankings de prêmios é proibido e pode resultar na suspensão de todas as contas envolvidas.",
       },
       {
         title: "5. Convivência entre jogadores",

@@ -13,6 +13,8 @@ const UNITY_BOT_GAMES = [
   { slug: "royalslots", label: "Royal Slots" },
   { slug: "santawilds", label: "Santa Wilds" },
   { slug: "sugarcalavera", label: "Sugar Calavera" },
+  { slug: "furiaolimpo", label: "Furia del Olimpo" },
+  { slug: "gildedcobra", label: "Gilded Cobra" },
 ];
 
 const numberFormat = (n) => new Intl.NumberFormat("es-ES").format(n || 0);

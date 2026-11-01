@@ -3,18 +3,22 @@ import minasImage from "../assets/minas2.png";
 import pachinkaImage from "../assets/rpachinka2.png";
 import bingoImage from "../assets/bingoproxi.png";
 import ruletaImage from "../assets/ruleta.png";
+import gemaOfGoldImage from "../assets/gemaOfGold.png";
+import dominoImage from "../assets/domino.png";
 
 // `chipClassName` es la misma paleta pero como píldora (fondo + borde translúcidos), para donde
 // la categoría necesita notarse de un vistazo (ej. la grilla de "Juegos Populares" del Home) en
 // vez de un simple texto de color — `className` (solo texto) sigue igual para no tocar los demás
 // usos ya existentes (GamesCatalog, GameDetail, etc.).
+// accent/accentTo: colores de la categoría para paneles de cada juego (ej. "Top Ganadores"), así no
+// todo el sitio es dorado sobre negro. El dorado queda para la marca y los botones de jugar.
 export const CATEGORY_META = {
-  bingo: { label: "Bingo", className: "text-[#c9a84c]", chipClassName: "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/40" },
-  casino: { label: "Casino", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40" },
-  cartas: { label: "Cartas", className: "text-[#4f8fe0]", chipClassName: "bg-[#4f8fe0]/15 text-[#4f8fe0] border border-[#4f8fe0]/40" },
-  otros: { label: "Otros", className: "text-[#4caf7d]", chipClassName: "bg-[#4caf7d]/15 text-[#4caf7d] border border-[#4caf7d]/40" },
-  slots: { label: "Slots", className: "text-[#a855f7]", chipClassName: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/40" },
-  mesa: { label: "Mesa", className: "text-[#2dd4bf]", chipClassName: "bg-[#2dd4bf]/15 text-[#2dd4bf] border border-[#2dd4bf]/40" },
+  bingo: { label: "Bingo", className: "text-[#c9a84c]", chipClassName: "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/40", accent: "#f97316", accentTo: "#c2410c" },
+  casino: { label: "Casino", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40", accent: "#ef4444", accentTo: "#9f1239" },
+  cartas: { label: "Cartas", className: "text-[#4f8fe0]", chipClassName: "bg-[#4f8fe0]/15 text-[#4f8fe0] border border-[#4f8fe0]/40", accent: "#3b82f6", accentTo: "#1e3a8a" },
+  otros: { label: "Otros", className: "text-[#4caf7d]", chipClassName: "bg-[#4caf7d]/15 text-[#4caf7d] border border-[#4caf7d]/40", accent: "#22c55e", accentTo: "#0f766e" },
+  slots: { label: "Slots", className: "text-[#a855f7]", chipClassName: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/40", accent: "#a855f7", accentTo: "#4c1d95" },
+  mesa: { label: "Mesa", className: "text-[#2dd4bf]", chipClassName: "bg-[#2dd4bf]/15 text-[#2dd4bf] border border-[#2dd4bf]/40", accent: "#14b8a6", accentTo: "#155e75" },
 };
 
 export const CATEGORY_ORDER = ["bingo", "casino", "cartas", "otros", "slots", "mesa"];
@@ -74,6 +78,9 @@ export const GAMES_CATALOG = [
     icon: "diamond",
     players: 1650,
     playPath: "/game/royalslots",
+    // Sigue activo y jugable (/juegos, GameDetail, etc.) — solo se lo saca de la grilla de
+    // "Juegos Populares" del Home para hacerle lugar a Domino y Gema of Gold (tope de 8 tarjetas).
+    showOnHome: false,
     description:
       "La tragamonedas clásica de RoyalGames: rodillos cargados de símbolos dorados, multiplicadores y la chance de llevarte el premio mayor en cualquier giro.",
   },
@@ -98,6 +105,28 @@ export const GAMES_CATALOG = [
     playPath: "/game/sugarcalavera",
     description:
       "Tragamonedas con temática de calaveritas de azúcar: símbolos dulces, colores vibrantes y multiplicadores que celebran la buena suerte.",
+  },
+  {
+    slug: "furiaolimpo",
+    name: "Furia del Olimpo",
+    category: "slots",
+    status: "active",
+    icon: "bolt",
+    players: 0,
+    playPath: "/game/furiaolimpo",
+    description:
+      "Tragamonedas de los dioses griegos: Zeus, Poseidón, Ares y Apolo en el Olimpo. Tres Zeus dan tiradas gratis, o compralas directo.",
+  },
+  {
+    slug: "gildedcobra",
+    name: "Gilded Cobra",
+    category: "slots",
+    status: "soon",
+    icon: "pets",
+    players: 0,
+    playPath: "/game/gildedcobra",
+    description:
+      "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres pirámides dan tiradas gratis y la cobra dorada se vuelve comodín.",
   },
   {
     slug: "bingo",
@@ -133,9 +162,11 @@ export const GAMES_CATALOG = [
     slug: "royal-ruleta",
     name: "Royal Ruleta (x500)",
     category: "casino",
-    status: "soon",
+    status: "active",
     image: ruletaImage,
     icon: "donut_large",
+    players: 1120,
+    playPath: "/game/royalruleta",
     description:
       "Ruleta europea con multiplicador especial de hasta x500. Apuesta a tu número, color o docena favorita y deja girar la rueda.",
   },
@@ -230,11 +261,14 @@ export const GAMES_CATALOG = [
       "La pasión del fútbol convertida en tragamonedas: símbolos de gol, penales de bonificación y la emoción del clásico en cada tirada.",
   },
   {
-    slug: "gemas-of-gold",
-    name: "GemasOfGold",
+    slug: "gema-of-gold",
+    name: "Gema of Gold",
     category: "slots",
-    status: "soon",
+    status: "active",
+    image: gemaOfGoldImage,
     icon: "diamond",
+    players: 980,
+    playPath: "/game/gemaofgold",
     description:
       "Gemas brillantes y cascadas de oro: una tragamonedas clásica con multiplicadores en cadena para los amantes de lo simple y lo dorado.",
   },
@@ -242,8 +276,11 @@ export const GAMES_CATALOG = [
     slug: "domino",
     name: "Dominó",
     category: "mesa",
-    status: "soon",
+    status: "active",
+    image: dominoImage,
     icon: "view_module",
+    players: 860,
+    playPath: "/game/domino",
     description:
       "El clásico de fichas de toda la vida, ahora online: encadená tus números y dejá a tus rivales sin jugadas.",
   },
@@ -253,6 +290,7 @@ export const GAMES_CATALOG = [
     category: "mesa",
     status: "soon",
     icon: "flag",
+    playPath: "/game/parchis",
     description:
       "Tirá los dados y llevá tus fichas a casa antes que nadie, en el clásico juego de mesa familiar ahora en RoyalGames.",
   },

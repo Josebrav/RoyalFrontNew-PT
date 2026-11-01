@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
 import { fetchConversations } from "../../redux/actions/index";
+import { t } from "../../i18n/strings";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
@@ -22,29 +23,31 @@ export default function Sidebar() {
   // juegos: azul/verde/violeta/teal) — el texto y el estado activo/hover quedan exactamente
   // como antes, así cada fila se distingue de un vistazo sin cambiar la estructura del panel.
   const accountItems = [
-    { to: "/chips", icon: "paid", label: "Comprar Fichas", color: "#4caf7d" },
-    { to: "/chips?tab=history", icon: "receipt_long", label: "Historial de Movimientos", color: "#4f8fe0" },
+    { to: "/chips", icon: "paid", label: t("sidebar.comprarFichas"), color: "#4caf7d" },
+    { to: "/chips?tab=history", icon: "receipt_long", label: t("sidebar.historial"), color: "#4f8fe0" },
   ];
 
   const socialItems = [
-    { to: "/amigos", icon: "group", label: "Amigos", color: "#a855f7" },
-    { to: "/mensajes", icon: "forum", label: "Mensajes", badge: unreadTotal, color: "#2dd4bf" },
-    { to: "/ayuda", icon: "support_agent", label: "Ayuda", color: "#4caf7d" },
+    { to: "/amigos", icon: "group", label: t("sidebar.amigos"), color: "#a855f7" },
+    { to: "/mensajes", icon: "forum", label: t("sidebar.mensajes"), badge: unreadTotal, color: "#2dd4bf" },
+    { to: "/ayuda", icon: "support_agent", label: t("sidebar.ayuda"), color: "#4caf7d" },
   ];
 
   // "Cargas" es el listado global de depósitos de toda la plataforma (un resumen de dinero) —
   // queda admin-only, igual que el backend. Los mods igual pueden ver los depósitos de UN
   // cliente puntual, pero desde la sección "Actividad" del detalle de ese usuario, no acá.
   const adminItems = [
-    { to: "/admin/dashboard", icon: "dashboard", label: "Panel Admin", color: "#4f8fe0" },
-    { to: "/admin/users", icon: "manage_accounts", label: "Usuarios", color: "#a855f7" },
-    { to: "/admin/tickets", icon: "support_agent", label: "Tickets", color: "#2dd4bf" },
-    ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: "Cargas", color: "#4caf7d" }] : []),
-    { to: "/admin/prizes", icon: "emoji_events", label: "Premios", color: "#a855f7" },
-    { to: "/admin/referrals", icon: "diversity_3", label: "Referidos", color: "#2dd4bf" },
-    { to: "/admin/trophies", icon: "military_tech", label: "Trofeos", color: "#4f8fe0" },
-    { to: "/admin/game-images", icon: "photo_library", label: "Imágenes de Juegos", color: "#4caf7d" },
-    ...(currentUser?.role === "admin" || currentUser?.role === "mod" ? [{ to: "/admin/bingo-bots", icon: "smart_toy", label: "Bots", color: "#a855f7" }] : []),
+    { to: "/admin/dashboard", icon: "dashboard", label: t("sidebar.panelAdmin"), color: "#4f8fe0" },
+    { to: "/admin/users", icon: "manage_accounts", label: t("sidebar.usuarios"), color: "#a855f7" },
+    { to: "/admin/tickets", icon: "support_agent", label: t("sidebar.tickets"), color: "#2dd4bf" },
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: t("sidebar.cargas"), color: "#4caf7d" }] : []),
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/game-stats", icon: "query_stats", label: t("sidebar.estadisticasJuegos"), color: "#e6c364" }] : []),
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/promos", icon: "campaign", label: t("sidebar.promociones"), color: "#2dd4bf" }] : []),
+    { to: "/admin/prizes", icon: "emoji_events", label: t("sidebar.premios"), color: "#a855f7" },
+    { to: "/admin/referrals", icon: "diversity_3", label: t("sidebar.referidos"), color: "#2dd4bf" },
+    { to: "/admin/trophies", icon: "military_tech", label: t("sidebar.trofeos"), color: "#4f8fe0" },
+    { to: "/admin/game-images", icon: "photo_library", label: t("sidebar.imagenesJuegos"), color: "#4caf7d" },
+    ...(currentUser?.role === "admin" || currentUser?.role === "mod" ? [{ to: "/admin/bingo-bots", icon: "smart_toy", label: t("sidebar.bots"), color: "#a855f7" }] : []),
   ];
 
   if (!currentUser?.id || location.pathname.includes("/game")) {
@@ -58,8 +61,8 @@ export default function Sidebar() {
       className={({ isActive }) =>
         `group relative flex items-center justify-center lg:justify-start gap-3 w-12 h-12 lg:w-full lg:h-auto lg:px-3 lg:py-2.5 rounded-lg transition-colors duration-200 ${
           isActive
-            ? "bg-primary/10 text-primary"
-            : "text-on-surface-variant hover:bg-surface-variant/40 hover:text-primary"
+            ? "hud-side-link is-active text-primary"
+            : "hud-side-link text-on-surface-variant hover:text-primary"
         }`
       }
     >
@@ -85,25 +88,25 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 bg-surface/80 backdrop-blur-md border-r border-outline-variant/30 px-2 lg:px-4 py-6 overflow-y-auto">
+    <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 hud-side px-2 lg:px-4 py-6 overflow-y-auto">
       <div className="flex flex-col gap-1">
-        <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
-          Cuenta
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+          {t("sidebar.cuenta")}
         </p>
         {accountItems.map(renderLink)}
       </div>
 
       <div className="flex flex-col gap-1">
-        <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
-          Social
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+          {t("sidebar.social")}
         </p>
         {socialItems.map(renderLink)}
       </div>
 
       {canAccessAdminPanel && (
         <div className="flex flex-col gap-1">
-          <p className="hidden lg:block px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
-            Administración
+          <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+            {t("sidebar.administracion")}
           </p>
           {adminItems.map(renderLink)}
         </div>

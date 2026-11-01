@@ -24,7 +24,7 @@ export default function Navbar() {
       await auth.logOut();
       dispatch(logout());
       Swal.fire({
-        title: "¡Sesión cerrada con éxito!",
+        title: t("nav.logoutOk"),
         icon: "success",
         ...swalThemeConfig,
       }).then(() => {
@@ -33,7 +33,7 @@ export default function Navbar() {
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Hubo un error al cerrar sesión",
+        text: t("nav.logoutError"),
         icon: "error",
         ...swalThemeConfig,
       });
@@ -56,8 +56,8 @@ export default function Navbar() {
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuCpCcNDDLhupT0iOwy1efwVKGf6ATUKCy6U7q50kyjk86DZ0ESSWDYB3IrG_VbQ2nLajCDmLvXOct59w89ERq7kJydta4x2rtj18hF3ffoEPNHFxRiAJHXOp4-joRLAss2GIpXRWXEpfCcn17eLUjcdKtMQDo4p-lNCzppHIIyPmM_WXToorkNt3NbXKLAfPkWDm4ln0gxkOhUv8fxWHOTdBFnPxsnTABAi2RPFBg9hCCwRzQGJ6YIBJ6Bvk8_pA9vPVUZpUJk60PQ";
 
   return (
-    <header className={`sticky top-0 z-50 bg-surface-container/90 backdrop-blur-md border-b border-outline-variant/30 shadow-sm h-20 flex items-center transition-all duration-300` }>
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full gap-2">
+    <header className="hud-nav sticky top-0 z-50 h-20 flex items-center">
+      <div className="relative grid grid-cols-[1fr_auto_1fr] items-center h-16 pl-0 pr-4 md:pr-margin-desktop w-full gap-2">
         {/* Left Section: Logo & Nav Links */}
         <div className="flex items-center gap-6 justify-self-start min-w-0">
           <Link to="/" className="flex items-center">
@@ -76,40 +76,28 @@ export default function Navbar() {
                   to="/"
                   end
                   className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-body-md text-body-md ${isActive ? "is-active" : ""}`
                   }
                 >
-                  Inicio
+                  {t("nav.inicio")}
                 </NavLink>
 
                 <NavLink
                   to="/juegos"
                   className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-body-md text-body-md ${isActive ? "is-active" : ""}`
                   }
                 >
-                  Juegos
+                  {t("nav.juegos")}
                 </NavLink>
 
                 <NavLink
                   to="/noticias"
                   className={({ isActive }) =>
-                    `font-body-md text-body-md transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-body-md text-body-md ${isActive ? "is-active" : ""}`
                   }
                 >
-                  Noticias
+                  {t("nav.noticias")}
                 </NavLink>
               </nav>
             </>
@@ -120,11 +108,7 @@ export default function Navbar() {
                   to="/"
                   end
                   className={({ isActive }) =>
-                    `font-label-lg text-label-lg transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-label-lg text-label-lg ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.inicio")}
@@ -133,11 +117,7 @@ export default function Navbar() {
                 <NavLink
                   to="/juegos"
                   className={({ isActive }) =>
-                    `font-label-lg text-label-lg transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-label-lg text-label-lg ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.juegos")}
@@ -146,11 +126,7 @@ export default function Navbar() {
                 <NavLink
                   to="/noticias"
                   className={({ isActive }) =>
-                    `font-label-lg text-label-lg transition-colors duration-200 ${
-                      isActive
-                        ? "text-primary font-bold border-b-2 border-primary pb-1"
-                        : "text-on-surface-variant hover:text-primary"
-                    }`
+                    `hud-link font-label-lg text-label-lg ${isActive ? "is-active" : ""}`
                   }
                 >
                   {t("nav.noticias")}
@@ -163,15 +139,16 @@ export default function Navbar() {
         {/* Center Section: User chip (avatar + nick/rank + fichas), centered on the whole bar */}
         <div className="flex items-center justify-self-center">
           {currentUser?.id && (
-            <div className="hidden sm:flex items-center gap-3 bg-surface-container-high border border-primary/20 rounded-full pl-1 pr-1 py-1 max-w-[18rem] h-16 hover:border-primary/40 transition-colors">
+            <div className="hud-chip-frame hidden sm:block max-w-[18rem]">
+            <div className="hud-chip flex items-center gap-3 pl-2 pr-4 py-1 h-16">
               <button
                 type="button"
                 onClick={() => navigate('/royalstore')}
-                title="Cambiar avatar"
-                className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/60 flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
+                title={t("nav.cambiarAvatar")}
+                className="hud-avatar w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
               >
                 <img
-                  alt="Avatar de Usuario"
+                  alt={t("nav.avatarAlt")}
                   className="w-full h-full object-cover object-top"
                   src={avatarSrc}
                   onError={(e) => {
@@ -194,15 +171,16 @@ export default function Navbar() {
               >
                 <span className="flex items-center gap-2 min-w-0 max-w-full">
                   <span className="text-on-surface font-bold text-base truncate">
-                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : "Usuario"}
+                    {currentUser.nick ? currentUser.nick.charAt(0).toUpperCase() + currentUser.nick.slice(1) : t("nav.usuario")}
                   </span>
                   <RankBadge tier={currentUser.rank} size="md" />
                 </span>
                 <span id="nav-chips-target" className="flex items-center gap-1.5 text-primary text-sm font-bold tracking-wide mt-1">
-                  <img src={chips} alt="Fichas" className="w-4 h-4" />
+                  <img src={chips} alt={t("nav.fichas")} className="w-4 h-4" />
                   {formattedChips}
                 </span>
               </button>
+            </div>
             </div>
           )}
         </div>
@@ -212,8 +190,8 @@ export default function Navbar() {
           {currentUser?.id ? (
             <button
               onClick={handleLogOut}
-              title="Cerrar Sesión"
-              className="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
+              title={t("nav.cerrarSesion")}
+              className="hud-icon-btn w-11 h-10 flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors bg-transparent border-0 cursor-pointer flex-shrink-0"
             >
               <span className="material-symbols-outlined text-[20px]">logout</span>
             </button>

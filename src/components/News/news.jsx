@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { fetchNews, createNewsArticle, updateNewsArticle, deleteNewsArticle } from "../../redux/actions";
@@ -187,6 +188,33 @@ export default function News() {
     dispatch(fetchNews());
   }, [dispatch]);
 
+  // Enlace directo a una noticia (/noticias?articulo=<id>): abre su página, la lleva a la vista y
+  // la resalta un momento.
+  const [searchParams] = useSearchParams();
+  const linkedId = searchParams.get("articulo");
+  const [highlightedId, setHighlightedId] = useState(null);
+  // Las noticias se muestran cerradas (título + comienzo del texto); "Ver más" las despliega.
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
+  const toggleExpanded = (id) =>
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const handledLinkRef = useRef(null);
+  useEffect(() => {
+    if (!linkedId || handledLinkRef.current === linkedId) return;
+    const index = novedades.findIndex((n) => n.id === linkedId);
+    if (index === -1) return;
+    handledLinkRef.current = linkedId;
+    setCurrentPage(Math.floor(index / itemsPerPage) + 1);
+    setHighlightedId(linkedId);
+    setExpandedIds((prev) => new Set(prev).add(linkedId));
+    setTimeout(() => document.getElementById(`noticia-${linkedId}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+    setTimeout(() => setHighlightedId(null), 4000);
+  }, [linkedId, novedades]);
+
   const totalPages = Math.max(1, Math.ceil(novedades.length / itemsPerPage));
   const startIdx = (currentPage - 1) * itemsPerPage;
   const novedadesPagina = novedades.slice(startIdx, startIdx + itemsPerPage);
@@ -264,7 +292,10 @@ export default function News() {
           {novedadesPagina.map((novedad) => (
             <div
               key={novedad.id}
-              className="glass-card rounded-xl p-5 flex gap-4 border-l-4 border-primary relative"
+              id={`noticia-${novedad.id}`}
+              className={`glass-card rounded-xl p-5 flex gap-4 border-l-4 border-primary relative transition-shadow duration-500 ${
+                highlightedId === novedad.id ? "ring-2 ring-primary shadow-[0_0_24px_rgba(230,195,100,0.45)]" : ""
+              }`}
             >
               {novedad.imageUrl ? (
                 <img
@@ -284,7 +315,34 @@ export default function News() {
                     {novedad.tag}
                   </span>
                 </div>
-                <p className="text-on-surface-variant text-sm leading-relaxed whitespace-pre-line">{novedad.texto}</p>
+                {(() => {
+                  const isExpanded = expandedIds.has(novedad.id);
+                  const isLong = novedad.texto.length > 160 || novedad.texto.includes("\n");
+                  return (
+                    <>
+                      <p
+                        className={`text-on-surface-variant text-sm leading-relaxed ${
+                          isExpanded ? "whitespace-pre-line" : "line-clamp-2"
+                        }`}
+                      >
+                        {novedad.texto}
+                      </p>
+                      {isLong && (
+                        <button
+                          type="button"
+                          onClick={() => toggleExpanded(novedad.id)}
+                          aria-expanded={isExpanded}
+                          className="mt-2 text-xs font-bold text-primary hover:underline cursor-pointer bg-transparent border-0 p-0 flex items-center gap-1"
+                        >
+                          {isExpanded ? "Ver menos" : "Ver más"}
+                          <span className="material-symbols-outlined text-[16px]">
+                            {isExpanded ? "expand_less" : "expand_more"}
+                          </span>
+                        </button>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
               {canManage && (
                 <div className="flex flex-col gap-1.5 flex-shrink-0">

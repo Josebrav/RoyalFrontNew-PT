@@ -25,6 +25,7 @@ import { fetchUserProfile, getUserByEmail } from "../../redux/actions";
 import API_URL from "../../api/rutaApi";
 import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
+import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
 const SIMULATED_ONLINE_MAX = 34;
@@ -73,7 +74,7 @@ export default function Home() {
     axios.get(`${API_URL}/daily-bonus/status`).then(({ data }) => setDailyBonusStatus(data)).catch(() => {});
   }, [currentUser?.id]);
 
-  const handleDailyBonusClaimed = ({ amount, error }) => {
+  const handleDailyBonusClaimed = ({ error }) => {
     if (error) {
       setDailyBonusStatus((prev) => (prev ? { ...prev, canClaim: false } : prev));
       Swal.fire({ title: "Bono Diario", text: error, icon: "error", ...swalThemeConfig });
@@ -83,12 +84,6 @@ export default function Home() {
     if (currentUser?.email) {
       dispatch(getUserByEmail(currentUser.email));
     }
-    Swal.fire({
-      title: "Bono Diario",
-      text: `¡Ganaste ${new Intl.NumberFormat("es-ES").format(amount)} fichas!`,
-      icon: "success",
-      ...swalThemeConfig,
-    });
   };
 
   // Real recent wins (chips actually won in games) for the guest landing page ticker.
@@ -335,18 +330,18 @@ export default function Home() {
             {/* Secondary promo slides/widgets */}
             <div className="lg:col-span-4 flex flex-col gap-6 h-[320px] lg:h-full">
               <div 
-                onClick={() => handleSoonAlert('Recarga Semanal')}
+                onClick={() => handleSoonAlert('Bono Semanal')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer"
               >
                 <EditableImage
                   contentKey="home.dashboard.banner2"
                   fallbackSrc={sportsBanner}
-                  alt="Banner de Recarga Semanal"
+                  alt="Banner de Bono Semanal"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-black/40 p-6 flex flex-col justify-end text-left">
-                  <h3 className="font-headline-sm text-headline-sm text-white">Recarga Semanal</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-white">Bono Semanal</h3>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Mejora tus fines de semana con un bono del 50%.</p>
                 </div> */}
               </div>
@@ -398,7 +393,7 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {GAMES_CATALOG.filter((game) => game.status === "active").map((game) => (
+                {GAMES_CATALOG.filter((game) => game.status === "active" && game.showOnHome !== false).map((game) => (
                   <div
                     key={game.slug}
                     className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1"
@@ -480,6 +475,14 @@ export default function Home() {
                       </div>
                     ))
                   )}
+                <button
+                  type="button"
+                  onClick={() => navigate(newsArticlePath(POINTS_AND_TOURNAMENTS_NEWS_ID))}
+                  className="w-full text-center text-xs font-bold text-emerald-400 hover:underline cursor-pointer bg-transparent border-0 pt-1 flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">emoji_events</span>
+                  ¿Cómo funcionan los puntos y torneos?
+                </button>
                 </div>
               </div>
 

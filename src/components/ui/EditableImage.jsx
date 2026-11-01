@@ -12,7 +12,9 @@ const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 // every current call site, which are all banner/card containers that are already `relative`),
 // so it doesn't add an extra wrapping div that would fight with the `className` prop's own
 // absolute-positioning needs.
-export default function EditableImage({ contentKey, fallbackSrc, fallbackIcon = "image", alt = "", className = "", recommendedSize }) {
+// placeholder: qué mostrar si no hay imagen (por defecto, un ícono). allowLink: false oculta el botón
+// de "Editar link" donde no tiene sentido (ej. las imágenes de los paquetes de fichas).
+export default function EditableImage({ contentKey, fallbackSrc, fallbackIcon = "image", alt = "", className = "", recommendedSize, placeholder, allowLink = true }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.currentUser);
@@ -89,6 +91,8 @@ export default function EditableImage({ contentKey, fallbackSrc, fallbackIcon = 
           onClick={handleImageClick}
           className={`${className} ${linkTo ? "cursor-pointer" : ""}`}
         />
+      ) : placeholder ? (
+        <div className={className}>{placeholder}</div>
       ) : (
         // Sin imagen en la CMS y sin fallback local (ej. un juego nuevo sin cover todavía) — un
         // <img src={undefined}> se ve roto y muestra el alt como texto crudo. Este placeholder
@@ -99,14 +103,16 @@ export default function EditableImage({ contentKey, fallbackSrc, fallbackIcon = 
       )}
       {canEdit && (
         <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={handleEditLink}
-            title="Editar link de destino"
-            className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 text-primary flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[16px]">link</span>
-          </button>
+          {allowLink && (
+            <button
+              type="button"
+              onClick={handleEditLink}
+              title="Editar link de destino"
+              className="w-8 h-8 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 text-primary flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">link</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={handleEdit}

@@ -1,5 +1,87 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
+
+const TAB_ID_KEY = "rg_tab_id";
+
+// Identificador de esta pestaña, estable al recargarla (sessionStorage) y distinto en cada
+// pestaña. El juego lo manda al servidor para que un bono le pertenezca a la pestaña que lo
+// disparó: el mismo jugador con el juego abierto en dos pantallas no ve el bono de una en la otra.
+let fallbackTabId = null;
+
+function getTabId() {
+  try {
+    let id = sessionStorage.getItem(TAB_ID_KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem(TAB_ID_KEY, id);
+    }
+    return id;
+  } catch {
+    // Sin sessionStorage (bloqueado): id fijo mientras viva la página, así no cambia la URL del
+    // juego entre renders. Solo se pierde el "retomar al recargar".
+    if (!fallbackTabId) fallbackTabId = crypto.randomUUID();
+    return fallbackTabId;
+  }
+}
+
+function withTabId(src) {
+  if (!src) return src;
+  return `${src}${src.includes("?") ? "&" : "?"}tabId=${encodeURIComponent(getTabId())}`;
+}
+
+const HEARTBEAT_MS = 15 * 1000;
+// Pestañas en segundo plano reciben timers como mucho una vez por minuto, y el celular puede
+// pausarlas unos minutos sin que pase nada raro — por eso el umbral es holgado: un hueco así
+// solo se explica por una suspensión real (compu dormida, celular bloqueado mucho rato).
+const SUSPEND_GAP_MS = 30 * 60 * 1000;
+const STALE_AFTER_MS = 6 * 60 * 60 * 1000;
+const LONG_AWAY_MS = 30 * 60 * 1000;
+
+// Un juego que quedó abierto de un día para el otro (compu suspendida, pestaña olvidada) suele
+// volver roto: socket muerto, sesión vencida, estado a medias. Se recarga la página al volver,
+// pero NUNCA mientras la pestaña sigue a la vista y la compu despierta: el juego vive en un
+// iframe de otro origen y no podemos ver los clics de adentro, así que "visible y sin
+// suspensión" es lo que tomamos como que el usuario puede estar jugando — aunque lleve 6 horas.
+function useReloadWhenStale() {
+  useEffect(() => {
+    const openedAt = Date.now();
+    let lastBeat = openedAt;
+    let hiddenSince = document.visibilityState === "hidden" ? openedAt : null;
+    let reloadPending = false;
+
+    const reload = () => window.location.reload();
+
+    const beat = setInterval(() => {
+      const now = Date.now();
+      if (now - lastBeat > SUSPEND_GAP_MS) {
+        if (document.visibilityState === "visible") return reload();
+        reloadPending = true;
+      }
+      lastBeat = now;
+    }, HEARTBEAT_MS);
+
+    const onVisibilityChange = () => {
+      const now = Date.now();
+      if (document.visibilityState === "hidden") {
+        hiddenSince = now;
+        return;
+      }
+      const suspended = now - lastBeat > SUSPEND_GAP_MS;
+      const longAwayFromOldGame =
+        hiddenSince !== null && now - hiddenSince >= LONG_AWAY_MS && now - openedAt >= STALE_AFTER_MS;
+      hiddenSince = null;
+      lastBeat = now;
+      if (reloadPending || suspended || longAwayFromOldGame) reload();
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      clearInterval(beat);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
+}
 
 // Shared wrapper for the externally-hosted game iframes (Minas, Royal Joker, Royal Pachinka,
 // Bingo). We don't control those games' internal HTML/canvas, so we can't detect or resize their
@@ -8,26 +90,28 @@ import { Box, Spinner, Center } from "@chakra-ui/react";
 // the iframe *element itself* (a black box from CSS's point of view, no cross-origin read needed)
 // with transform: scale() so the whole game always fits without clipping, letterboxed if the
 // screen's aspect ratio doesn't match. Games whose native resolution isn't known yet fall back to
-// the old 100%/scroll behavior, plus the Fullscreen API toggle either way.
-export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
+// the old 100%/scroll behavior.
+// onBack (opcional): muestra un boton arriba a la izquierda para volver (ej. de una slot al lobby
+// de Royal Slots, que vive en esta misma pagina).
+export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBack, backLabel = "Volver" }) {
   const wrapperRef = useRef(null);
   const scaleContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scale, setScale] = useState(1);
   const hasFixedResolution = !!(nativeWidth && nativeHeight);
+  useReloadWhenStale();
+  const frameSrc = useMemo(() => withTabId(src), [src]);
+  const iframeRef = useRef(null);
+  const chips = useSelector((state) => state.currentUser?.chips);
 
-  const toggleFullscreen = useCallback(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const isCurrentlyFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-    if (!isCurrentlyFullscreen) {
-      const request = el.requestFullscreen || el.webkitRequestFullscreen;
-      request?.call(el);
-    } else {
-      const exit = document.exitFullscreen || document.webkitExitFullscreen;
-      exit?.call(document);
-    }
-  }, []);
+  // Saldo nuevo (la página lo vuelve a leer cada pocos segundos mientras se juega, ver App.jsx): se
+  // le avisa al juego, que lo aplica cuando no está en medio de una jugada (RoyalChipsBridge en
+  // Unity). Así, si alguien entra sin fichas y recarga por fuera, puede seguir jugando sin recargar
+  // la página. El saldo no es secreto: se manda sin restringir el origen del juego.
+  useEffect(() => {
+    if (chips === undefined || chips === null) return;
+    iframeRef.current?.contentWindow?.postMessage({ type: "royal:chips", chips: Number(chips) }, "*");
+  }, [chips]);
 
   useEffect(() => {
     const handleChange = () => {
@@ -112,7 +196,8 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
               }}
             >
               <iframe
-                src={src}
+                ref={iframeRef}
+                src={frameSrc}
                 title={title}
                 scrolling="no"
                 style={{ width: "100%", height: "100%", border: "none", display: "block", overflow: "hidden" }}
@@ -120,36 +205,42 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
             </div>
           ) : (
             <iframe
-              src={src}
+              ref={iframeRef}
+              src={frameSrc}
               title={title}
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
           )}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-            style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              zIndex: 10,
-              width: 36,
-              height: 36,
-              borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.15)",
-              background: "rgba(0,0,0,0.55)",
-              color: "#C9A84C",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-              {isFullscreen ? "fullscreen_exit" : "fullscreen"}
-            </span>
-          </button>
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              title={backLabel}
+              style={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                zIndex: 10,
+                height: 36,
+                padding: "0 12px 0 8px",
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(0,0,0,0.55)",
+                color: "#C9A84C",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                fontWeight: 700,
+                fontSize: 13,
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                arrow_back
+              </span>
+              {backLabel}
+            </button>
+          )}
         </Box>
       ) : (
         <Center h="100%">

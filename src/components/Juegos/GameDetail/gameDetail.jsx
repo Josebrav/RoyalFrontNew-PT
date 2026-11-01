@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../../data/newsLinks";
 import Swal from "sweetalert2";
 import { CATEGORY_META, getGameBySlug } from "../../../data/gamesCatalog";
 import { swalThemeConfig } from "../../../utils/formatters";
@@ -12,14 +13,20 @@ export default function GameDetail() {
   const navigate = useNavigate();
   const game = getGameBySlug(slug);
   const [topPlayers, setTopPlayers] = useState([]);
+  // Royal Slots muestra el mismo ranking que su lobby en el juego: solo sus slots, por semana
+  // (lunes a domingo) o mes calendario, igual que los torneos. El resto: total del juego.
+  const isRoyalSlots = game?.slug === "royalslots";
+  const [rankingPeriod, setRankingPeriod] = useState("weekly");
 
   useEffect(() => {
     if (!game || game.status !== "active") return;
-    axios
-      .get(`${API_URL}/leaderboard/top-winners/${game.slug}?limit=5`)
-      .then(({ data }) => setTopPlayers(data))
-      .catch(() => {});
-  }, [game]);
+    const request = isRoyalSlots
+      ? axios
+          .get(`${API_URL}/leaderboard/${rankingPeriod}?scope=royalslots&limit=5`)
+          .then(({ data }) => data.map((row) => ({ id: row.userId, nick: row.nick, totalWon: row.chips })))
+      : axios.get(`${API_URL}/leaderboard/top-winners/${game.slug}?limit=5`).then(({ data }) => data);
+    request.then(setTopPlayers).catch(() => {});
+  }, [game, isRoyalSlots, rankingPeriod]);
 
   if (!game) {
     return (
@@ -37,6 +44,9 @@ export default function GameDetail() {
 
   const isActive = game.status === "active";
   const categoryMeta = CATEGORY_META[game.category];
+  // Color de la categoría para el panel de ranking (no todo dorado; el dorado queda para "Jugar").
+  const accent = categoryMeta?.accent || "#a855f7";
+  const accentTo = categoryMeta?.accentTo || "#4c1d95";
 
   const handlePlay = () => {
     if (isActive) {
@@ -93,36 +103,83 @@ export default function GameDetail() {
           </div>
 
           {isActive && (
-            <div className="bg-surface-container-high rounded-xl border border-primary/30 overflow-hidden gold-glow">
-              <div className="gold-gradient p-4 flex justify-between items-center">
-                <h3 className="text-on-primary font-bold text-headline-sm font-headline-sm">
+            <div
+              className="bg-surface-container-high rounded-xl border overflow-hidden"
+              style={{ borderColor: `${accent}55`, boxShadow: `0 0 20px ${accent}26` }}
+            >
+              <div
+                className="p-4 flex justify-between items-center"
+                style={{ background: `linear-gradient(90deg, ${accent}, ${accentTo})` }}
+              >
+                <h3 className="text-white font-bold text-headline-sm font-headline-sm">
                   Top Ganadores de {game.name}
                 </h3>
-                <span className="bg-black/20 text-on-primary px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
+                <span className="bg-black/25 text-white px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
               </div>
               <div className="p-6 space-y-3">
+                {isRoyalSlots && (
+                  <div className="flex gap-2 mb-1">
+                    {[
+                      ["weekly", "Semanal"],
+                      ["monthly", "Mensual"],
+                    ].map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setRankingPeriod(key)}
+                        aria-pressed={rankingPeriod === key}
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold border cursor-pointer transition-colors ${
+                          rankingPeriod === key
+                            ? "text-white"
+                            : "bg-transparent text-on-surface-variant border-outline-variant/30 hover:text-white"
+                        }`}
+                        style={rankingPeriod === key ? { background: accent, borderColor: accent } : undefined}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {topPlayers.length === 0 ? (
                   <p className="text-on-surface-variant text-sm text-center py-4">
-                    Todavía no hay ganadores registrados en este juego. ¡Sé el primero!
+                    {isRoyalSlots
+                      ? `Todavía no hay ganadores ${rankingPeriod === "weekly" ? "esta semana" : "este mes"}. ¡Sé el primero!`
+                      : "Todavía no hay ganadores registrados en este juego. ¡Sé el primero!"}
                   </p>
                 ) : (
                   topPlayers.map((player, index) => (
                     <div
                       key={player.id}
-                      className={`flex items-center justify-between p-3 rounded ${index === 0 ? "bg-surface border-l-4 border-primary" : "bg-surface/50"}`}
+                      className={`flex items-center justify-between p-3 rounded ${index === 0 ? "bg-surface border-l-4" : "bg-surface/50"}`}
+                      style={index === 0 ? { borderLeftColor: accent } : undefined}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                        <span
+                          className={`font-bold flex-shrink-0 ${index === 0 ? "" : "text-on-surface-variant"}`}
+                          style={index === 0 ? { color: accent } : undefined}
+                        >
                           {index + 1}
                         </span>
                         <span className="font-bold text-white truncate">{player.nick}</span>
                       </div>
-                      <span className={`font-bold flex-shrink-0 ${index === 0 ? "text-primary" : "text-on-surface-variant"}`}>
+                      <span
+                        className={`font-bold flex-shrink-0 ${index === 0 ? "" : "text-on-surface-variant"}`}
+                        style={index === 0 ? { color: accent } : undefined}
+                      >
                         {new Intl.NumberFormat('es-ES').format(player.totalWon)}
                       </span>
                     </div>
                   ))
                 )}
+                <button
+                  type="button"
+                  onClick={() => navigate(newsArticlePath(POINTS_AND_TOURNAMENTS_NEWS_ID))}
+                  className="w-full text-center text-xs font-bold hover:underline cursor-pointer bg-transparent border-0 pt-1 flex items-center justify-center gap-1"
+                  style={{ color: accent }}
+                >
+                  <span className="material-symbols-outlined text-[16px]">emoji_events</span>
+                  ¿Cómo funcionan los puntos y torneos?
+                </button>
               </div>
             </div>
           )}

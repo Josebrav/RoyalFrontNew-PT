@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import GameFrame from "../GameFrame/gameFrame";
+import useChatToken from "../../../utils/useChatToken";
 import API_URL from "../../../api/rutaApi";
 import { authService } from "../../../services/authService";
 
@@ -40,12 +41,14 @@ const Diamantes = () => {
     };
   }, [currentUser?.id]);
 
-  // URL del juego con el jugadorID y el token de sesión
-  const gameURL = `https://minasroyal.s3.us-east-2.amazonaws.com/minas22/index.html?jugadorID=${jugadorID}&sessionToken=${sessionToken}`;
+  const chat = useChatToken(currentUser?.id);
+
+  // URL del juego con el jugadorID, el token de sesión y el del chat
+  const gameURL = `https://minasroyal.s3.us-east-2.amazonaws.com/minas22/index.html?jugadorID=${jugadorID}&sessionToken=${sessionToken}&chatToken=${encodeURIComponent(chat.token)}`;
 
   return (
     <GameFrame
-      src={jugadorID && sessionToken ? gameURL : null}
+      src={jugadorID && sessionToken && chat.ready ? gameURL : null}
       title="Juego Minas"
       nativeWidth={1920}
       nativeHeight={1080}
