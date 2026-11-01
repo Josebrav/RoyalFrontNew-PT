@@ -94,14 +94,14 @@ export default function SupportTicketsAdmin() {
                 >
                   <div className="flex items-center justify-between w-full gap-2">
                     <span className="text-white font-bold text-sm truncate">{ticket.subject}</span>
-                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${STATUS_META[ticket.status].className}`}>
+                    <span className={`text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${STATUS_META[ticket.status].className}`}>
                       {STATUS_META[ticket.status].label}
                     </span>
                   </div>
                   <span className="text-on-surface-variant text-xs flex items-center gap-1.5">
                     {ticket.userNick}
                     {ticket.isGuest && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-outline-variant/20 text-on-surface-variant">
+                      <span className="text-[0.5625rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-outline-variant/20 text-on-surface-variant">
                         Invitado
                       </span>
                     )}
@@ -131,7 +131,7 @@ export default function SupportTicketsAdmin() {
                   {ticketDetail.messages.map((m) => (
                     <div key={m.id} className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm ${SENDER_META[m.senderRole].align}`}>
                       {SENDER_META[m.senderRole].label && (
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-black/60 mb-1">{SENDER_META[m.senderRole].label}</p>
+                        <p className="text-[0.625rem] font-bold uppercase tracking-wider text-black/60 mb-1">{SENDER_META[m.senderRole].label}</p>
                       )}
                       {m.content}
                     </div>

@@ -38,12 +38,12 @@ function GameRow({ game, compact }) {
           {game.name}
         </p>
         {isActive ? (
-          <span className="flex items-center gap-1 text-[11px] text-on-surface-variant mt-1">
+          <span className="flex items-center gap-1 text-[0.6875rem] text-on-surface-variant mt-1">
             <span className="material-symbols-outlined text-[13px]">person</span>
             {new Intl.NumberFormat("es-ES").format(game.players)}
           </span>
         ) : (
-          <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider text-on-surface-variant/70 border border-outline-variant/30 rounded-full px-2 py-0.5">
+          <span className="inline-block mt-1 text-[0.5625rem] font-bold uppercase tracking-wider text-on-surface-variant/70 border border-outline-variant/30 rounded-full px-2 py-0.5">
             {t("catalog.proximamente")}
           </span>
         )}

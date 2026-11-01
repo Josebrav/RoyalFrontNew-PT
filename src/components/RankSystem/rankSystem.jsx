@@ -156,23 +156,23 @@ export default function RankSystem() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <RankBadge tier={tier} size="sm" />
-                    {isCurrent && <span className="text-[10px] font-bold uppercase text-primary">Tu rango</span>}
+                    {isCurrent && <span className="text-[0.625rem] font-bold uppercase text-primary">Tu rango</span>}
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Se alcanza con</p>
+                    <p className="text-[0.625rem] uppercase tracking-wider text-on-surface-variant font-bold">Se alcanza con</p>
                     <p className="text-lg font-black text-white tabular-nums">
                       {RANK_THRESHOLDS[tier] === 0 ? "Al registrarte" : formatUsd(RANK_THRESHOLDS[tier])}
                     </p>
                     {RANK_THRESHOLDS[tier] > 0 && (
-                      <p className="text-[11px] text-on-surface-variant">≈ {formatArsEquivalent(RANK_THRESHOLDS[tier])}</p>
+                      <p className="text-[0.6875rem] text-on-surface-variant">≈ {formatArsEquivalent(RANK_THRESHOLDS[tier])}</p>
                     )}
                   </div>
                   <div className="mt-auto">
-                    <p className="text-[10px] uppercase tracking-wider text-on-surface-variant font-bold">Fichas extra</p>
+                    <p className="text-[0.625rem] uppercase tracking-wider text-on-surface-variant font-bold">Fichas extra</p>
                     <p className={`text-2xl font-black ${RANK_BONUS_PERCENT[tier] > 0 ? "text-green-400" : "text-on-surface-variant"}`}>
                       {RANK_BONUS_PERCENT[tier] > 0 ? `+${RANK_BONUS_PERCENT[tier]}%` : "—"}
                     </p>
-                    <p className="text-[11px] text-on-surface-variant">
+                    <p className="text-[0.6875rem] text-on-surface-variant">
                       {RANK_BONUS_PERCENT[tier] > 0 ? "en cada compra" : "rango inicial"}
                     </p>
                   </div>

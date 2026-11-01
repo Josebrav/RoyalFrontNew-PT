@@ -76,7 +76,7 @@ export default function Sidebar() {
         {label}
       </span>
       {!!badge && (
-        <span className="hidden lg:inline-flex ml-auto bg-primary text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
+        <span className="hidden lg:inline-flex ml-auto bg-primary text-black text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
           {badge}
         </span>
       )}
@@ -90,14 +90,14 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 hud-side px-2 lg:px-4 py-6 overflow-y-auto">
       <div className="flex flex-col gap-1">
-        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[0.625rem] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.cuenta")}
         </p>
         {accountItems.map(renderLink)}
       </div>
 
       <div className="flex flex-col gap-1">
-        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[0.625rem] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.social")}
         </p>
         {socialItems.map(renderLink)}
@@ -105,7 +105,7 @@ export default function Sidebar() {
 
       {canAccessAdminPanel && (
         <div className="flex flex-col gap-1">
-          <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+          <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[0.625rem] font-bold uppercase tracking-widest text-on-surface-variant/70">
             {t("sidebar.administracion")}
           </p>
           {adminItems.map(renderLink)}

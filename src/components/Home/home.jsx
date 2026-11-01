@@ -295,15 +295,15 @@ export default function Home() {
         {/* <div className="sticky top-16 z-40 bg-surface-container-low border-b border-outline-variant/10 px-4 md:px-margin-desktop py-2 flex items-center justify-between">
           <div className="flex gap-4 md:gap-8 overflow-x-auto no-scrollbar py-1">
             <div className="flex flex-col text-left">
-              <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Balance Real</span>
+              <span className="text-on-surface-variant text-[0.625rem] uppercase font-bold tracking-widest">Balance Real</span>
               <span className="text-on-surface font-bold text-label-lg font-label-lg">{formattedChipsValue}</span>
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Crédito de Bono</span>
+              <span className="text-on-surface-variant text-[0.625rem] uppercase font-bold tracking-widest">Crédito de Bono</span>
               <span className="text-primary font-bold text-label-lg font-label-lg">$250.00</span>
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Nivel VIP</span>
+              <span className="text-on-surface-variant text-[0.625rem] uppercase font-bold tracking-widest">Nivel VIP</span>
               <span className="text-secondary font-bold text-label-lg font-label-lg">{vipLevel}</span>
             </div>
           </div>
@@ -409,7 +409,7 @@ export default function Home() {
                       />
                     </div>
                     <div className="p-3 text-left">
-                      <span className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 ${CATEGORY_META[game.category].chipClassName}`}>
+                      <span className={`inline-block text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 ${CATEGORY_META[game.category].chipClassName}`}>
                         {t(`catalog.category.${game.category}`)}
                       </span>
                       <h4 className="font-bold text-label-lg font-label-lg truncate text-white">{game.name}</h4>
@@ -520,7 +520,7 @@ export default function Home() {
                               <p className={`font-bold text-white text-sm truncate ${isRealPlayer ? "group-hover:text-sky-400 group-hover:underline" : ""}`}>
                                 {player.nick}
                               </p>
-                              <p className="text-[11px] text-on-surface-variant truncate">
+                              <p className="text-[0.6875rem] text-on-surface-variant truncate">
                                 {activeGame ? <span className="text-sky-400">{t("home.dashboard.jugandoA")} {activeGame.name}</span> : t("home.dashboard.enElSitio")}
                               </p>
                             </div>
@@ -528,7 +528,7 @@ export default function Home() {
                           {activeGame && (
                             <button
                               onClick={() => handlePlayGame(activeGame.playPath, activeGame.name)}
-                              className="px-3 py-1.5 rounded bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[11px] font-bold uppercase flex-shrink-0 cursor-pointer border-0 hover:brightness-110 transition-all"
+                              className="px-3 py-1.5 rounded bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[0.6875rem] font-bold uppercase flex-shrink-0 cursor-pointer border-0 hover:brightness-110 transition-all"
                             >
                               {t("home.dashboard.jugarBtn")}
                             </button>
@@ -751,7 +751,7 @@ export default function Home() {
       <nav className="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container dark:bg-surface-container border-t border-outline-variant/30 shadow-lg flex justify-around items-center h-16 px-4 md:hidden">
         <button
           onClick={() => scrollToSection("hero-shader-canvas")}
-          className="text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
+          className="text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">home</span>
           <span>{t("home.bottomNavInicio")}</span>
@@ -759,7 +759,7 @@ export default function Home() {
 
         <button
           onClick={() => navigate("/juegos")}
-          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
+          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">casino</span>
           <span>{t("home.bottomNavJuegos")}</span>
@@ -767,13 +767,13 @@ export default function Home() {
 
         <button
           onClick={() => navigate("/juegos")}
-          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
+          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">search</span>
           <span>{t("home.bottomNavBuscar")}</span>
         </button>
 
-        <Login className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 p-0 font-normal cursor-pointer">
+        <Login className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 p-0 font-normal cursor-pointer">
           <span className="material-symbols-outlined">login</span>
           <span>{t("home.bottomNavAcceder")}</span>
         </Login>

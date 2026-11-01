@@ -20,6 +20,15 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 
+    <script>
+      // Celular en "modo escritorio": pantalla angosta y tactil pero pagina dibujada a ancho de PC.
+      // Agranda la base de texto (ver index.css, html.desktop-on-phone).
+      try {
+        if (matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 768 && innerWidth >= 900) {
+          document.documentElement.classList.add("desktop-on-phone");
+        }
+      } catch (e) {}
+    </script>
     <title>RoyalGames</title>
   </head>
   <body>

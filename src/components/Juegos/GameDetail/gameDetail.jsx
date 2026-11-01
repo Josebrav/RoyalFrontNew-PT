@@ -83,7 +83,7 @@ export default function GameDetail() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 p-6 md:p-8">
-          <span className={`text-[11px] font-black uppercase tracking-widest ${categoryMeta.className}`}>
+          <span className={`text-[0.6875rem] font-black uppercase tracking-widest ${categoryMeta.className}`}>
             {categoryMeta.label}
           </span>
           <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tighter">{game.name}</h1>
@@ -189,7 +189,7 @@ export default function GameDetail() {
           <div className="glass-card p-6 rounded-xl space-y-4">
             {isActive && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-on-surface-variant uppercase tracking-wider text-[11px]">Jugando ahora</span>
+                <span className="text-on-surface-variant uppercase tracking-wider text-[0.6875rem]">Jugando ahora</span>
                 <span className="flex items-center gap-1 text-white font-bold">
                   <span className="material-symbols-outlined text-[16px] text-primary">person</span>
                   {new Intl.NumberFormat("es-ES").format(game.players)}
@@ -210,7 +210,7 @@ export default function GameDetail() {
               {isActive ? "Jugar" : "Próximamente"}
             </button>
             {isActive && (
-              <p className="text-on-surface-variant text-[11px] text-center">
+              <p className="text-on-surface-variant text-[0.6875rem] text-center">
                 Se abrirá en una pestaña nueva.
               </p>
             )}

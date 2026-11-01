@@ -1,7 +1,7 @@
 import { getRankMeta } from "../../../utils/rank";
 
 const SIZE_CLASSES = {
-  sm: "px-2 py-0.5 text-[11px] gap-1",
+  sm: "px-2 py-0.5 text-[0.6875rem] gap-1",
   md: "px-3 py-1 text-label-md gap-2",
 };
 

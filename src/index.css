@@ -14,6 +14,15 @@ html, body, #root {
   box-sizing: border-box;
 }
 
+/* Celular: base de texto un 12% mas grande. Tailwind y Chakra miden en rem, asi que todo lo
+   que use rem (textos, botones, espacios) crece junto y en proporcion. */
+@media (max-width: 767px) {
+  html { font-size: 18px; }
+}
+/* Celular en "modo escritorio": el navegador dibuja la pagina a ~980px y la achica para que
+   entre en la pantalla, asi que todo se ve diminuto. index.html marca ese caso. */
+html.desktop-on-phone { font-size: 21px; }
+
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }

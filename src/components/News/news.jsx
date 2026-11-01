@@ -99,7 +99,7 @@ function NewsFormModal({ article, onClose, onSaved }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Título</label>
+          <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Título</label>
           <input
             type="text"
             value={form.titulo}
@@ -111,7 +111,7 @@ function NewsFormModal({ article, onClose, onSaved }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Categoría</label>
+          <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Categoría</label>
           <select
             value={form.tag}
             onChange={(e) => setForm((prev) => ({ ...prev, tag: e.target.value }))}
@@ -125,7 +125,7 @@ function NewsFormModal({ article, onClose, onSaved }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Texto</label>
+          <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Texto</label>
           <textarea
             rows={4}
             value={form.texto}
@@ -137,7 +137,7 @@ function NewsFormModal({ article, onClose, onSaved }) {
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">
+          <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">
             Imagen de Portada (opcional) — recomendado 1200×630px, JPG/PNG/WEBP hasta 5MB
           </label>
           {article?.imageUrl && !form.image && (
@@ -311,7 +311,7 @@ export default function News() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <h3 className="font-bold text-white">{novedad.titulo}</h3>
-                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${TAG_META[novedad.tag] || ""}`}>
+                  <span className={`text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${TAG_META[novedad.tag] || ""}`}>
                     {novedad.tag}
                   </span>
                 </div>

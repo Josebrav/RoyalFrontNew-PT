@@ -130,7 +130,7 @@ export default function AdminPromos() {
                     <tr key={p.id} className="hover:bg-surface-variant/20">
                       <td className="px-4 py-3">
                         <div className="font-bold text-white">{p.code}</div>
-                        <div className="text-[11px] text-on-surface-variant break-all">{linkFor(p.code)}</div>
+                        <div className="text-[0.6875rem] text-on-surface-variant break-all">{linkFor(p.code)}</div>
                       </td>
                       <td className="px-4 py-3 font-bold text-primary tabular-nums">{fmt(p.rewardAmount)}</td>
                       <td className="px-4 py-3 text-on-surface-variant text-xs">

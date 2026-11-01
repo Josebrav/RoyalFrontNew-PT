@@ -59,7 +59,7 @@ function ActivityAccordion({ title, badge, fetchFn, children: renderContent, def
         <span className="font-semibold text-on-surface text-sm">{title}</span>
         <div className="flex items-center gap-2 flex-shrink-0">
           {badge != null && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+            <span className="text-[0.625rem] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
               {badge}
             </span>
           )}
@@ -403,13 +403,13 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
-              <p className="text-[10px] uppercase tracking-widest text-primary mb-1">Fichas</p>
+              <p className="text-[0.625rem] uppercase tracking-widest text-primary mb-1">Fichas</p>
               <p className="font-headline-md text-headline-md text-on-surface">
                 {new Intl.NumberFormat('es-ES').format(user.chips || 0)}
               </p>
             </div>
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
-              <p className="text-[10px] uppercase tracking-widest text-primary mb-1">Rol</p>
+              <p className="text-[0.625rem] uppercase tracking-widest text-primary mb-1">Rol</p>
               <p className="font-headline-md text-headline-md text-on-surface capitalize">{user.role}</p>
             </div>
           </div>
@@ -624,9 +624,9 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 {({ summary, rounds }) => (
                   <>
                     <div className="grid grid-cols-3 gap-2 mb-3 text-center">
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Rondas</p><p className="text-on-surface font-bold text-sm">{summary.totalRounds}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Apostado</p><p className="text-on-surface font-bold text-sm">{fmtChips(summary.totalWagered)}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Rondas</p><p className="text-on-surface font-bold text-sm">{summary.totalRounds}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Apostado</p><p className="text-on-surface font-bold text-sm">{fmtChips(summary.totalWagered)}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
                     </div>
                     {rounds.length === 0 ? <EmptyRow /> : (
                       <div className="space-y-1.5 max-h-56 overflow-y-auto">
@@ -655,9 +655,9 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 {({ summary, winnings, giftsSent, giftsReceived }) => (
                   <>
                     <div className="grid grid-cols-3 gap-2 mb-3 text-center">
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Cartones dados</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedSent}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Cartones recibidos</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedReceived}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Cartones dados</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedSent}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Cartones recibidos</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedReceived}</p></div>
                     </div>
                     {winnings.length === 0 && giftsSent.length === 0 && giftsReceived.length === 0 ? <EmptyRow /> : (
                       <div className="space-y-1.5 max-h-56 overflow-y-auto">
@@ -696,7 +696,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                           <p className="text-on-surface truncate">{p.paymentPlatform} · {fmtChips(p.chips)} fichas</p>
                           <p className="text-on-surface-variant">{fmtDate(p.createdAt)}</p>
                         </div>
-                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        <span className={`text-[0.625rem] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
                           p.status === 'approved' ? 'text-green-500 bg-green-500/10' : p.status === 'pending' ? 'text-yellow-500 bg-yellow-500/10' : 'text-error bg-error/10'
                         }`}>
                           {p.status}
@@ -732,7 +732,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                     <div className="space-y-3">
                       {panelGrants.length > 0 && (
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Fichas cargadas/quitadas desde el panel</p>
+                          <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1">Fichas cargadas/quitadas desde el panel</p>
                           <div className="space-y-1.5 max-h-40 overflow-y-auto">
                             {panelGrants.map((g) => (
                               <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
@@ -745,7 +745,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                       )}
                       {selfGifts.length > 0 && (
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Fichas que se regaló él/ella mismo/a jugando</p>
+                          <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1">Fichas que se regaló él/ella mismo/a jugando</p>
                           <div className="space-y-1.5 max-h-40 overflow-y-auto">
                             {selfGifts.map((g) => (
                               <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
@@ -758,7 +758,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                       )}
                       {cardGifts.length > 0 && (
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Cartones de bingo que regaló</p>
+                          <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1">Cartones de bingo que regaló</p>
                           <div className="space-y-1.5 max-h-40 overflow-y-auto">
                             {cardGifts.map((g) => (
                               <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
@@ -786,7 +786,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
             </p>
             <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 space-y-3">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Correo Electrónico</label>
+                <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Correo Electrónico</label>
                 <div className="flex gap-3">
                   <input
                     type="email"
@@ -806,7 +806,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Nueva Contraseña</label>
+                <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Nueva Contraseña</label>
                 <div className="flex gap-3">
                   <input
                     type="text"

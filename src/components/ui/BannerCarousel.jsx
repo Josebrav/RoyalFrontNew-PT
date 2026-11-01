@@ -217,7 +217,7 @@ export default function BannerCarousel({ fallbackSrc, className }) {
                       title="Editar link de destino"
                       className="w-full flex items-center justify-between gap-1 px-2 py-1 bg-surface-container-high hover:bg-surface-container-highest transition-colors cursor-pointer border-0 text-left"
                     >
-                      <span className="text-[11px] text-on-surface-variant truncate" title={slide.linkTo || ""}>
+                      <span className="text-[0.6875rem] text-on-surface-variant truncate" title={slide.linkTo || ""}>
                         {slide.linkTo ? `→ ${slide.linkTo}` : "Sin link"}
                       </span>
                       <span className="material-symbols-outlined text-[14px] text-on-surface-variant shrink-0">edit</span>
