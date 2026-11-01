@@ -2,7 +2,7 @@
 // sumar una librería de íconos entera solo para 2 logos. Mismo href en todo el sitio (footer,
 // noticias, contacto) - si cambian de cuenta, actualizar SOCIAL_LINKS alcanza.
 export const SOCIAL_LINKS = {
-  facebook: "https://www.facebook.com/profile.php?id=61595016246618",
+  facebook: "https://www.facebook.com/profile.php?id=61596256760727",
   instagram: "https://www.instagram.com/royalgamesoficial/",
 };
 
