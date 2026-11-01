@@ -7,11 +7,13 @@ const PAGE_LABELS = {
   "/perfil": "Su perfil",
   "/amigos": "Amigos",
   "/mensajes": "Mensajes",
-  "/ayuda": "Ayuda",
   "/chips": "Comprar fichas",
   "/royalstore": "Vestidor",
   "/noticias": "Noticias",
-  "/ranking": "Ranking",
+  "/rangos": "Rangos",
+  "/ayuda": "Ayuda",
+  "/contacto": "Contacto",
+  "/preguntas-frecuentes": "Preguntas frecuentes",
 };
 
 /**
@@ -25,6 +27,9 @@ export function activityLabel(path) {
   if (path.startsWith("/game/")) return { label: path.slice(6), isGame: true };
   if (PAGE_LABELS[path]) return { label: PAGE_LABELS[path], isGame: false };
   if (path.startsWith("/perfil/")) return { label: `Viendo perfil de ${decodeURIComponent(path.slice(8))}`, isGame: false };
+  if (path.startsWith("/mensajes/")) return { label: `Chateando con ${decodeURIComponent(path.slice(10))}`, isGame: false };
+  if (path.startsWith("/juegos/")) return { label: "Viendo un juego", isGame: false };
+  if (path.startsWith("/ayuda/")) return { label: "Ayuda (ticket)", isGame: false };
   if (path.startsWith("/admin")) return { label: "Panel de admin", isGame: false };
   return { label: path, isGame: false };
 }
