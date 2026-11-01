@@ -851,14 +851,17 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 {user.banned ? 'Desbanear' : 'Banear'}
               </button>
             </div>
-            <button
-              onClick={handleDeleteUser}
-              disabled={loading}
-              className="w-full px-4 py-3 bg-error text-white rounded-lg font-semibold hover:bg-error/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined">delete_forever</span>
-              Eliminar Usuario Definitivamente
-            </button>
+            {/* Eliminar la cuenta es solo para admins (el servidor tambien lo rechaza a los mods). */}
+            {viewerIsAdmin && (
+              <button
+                onClick={handleDeleteUser}
+                disabled={loading}
+                className="w-full px-4 py-3 bg-error text-white rounded-lg font-semibold hover:bg-error/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined">delete_forever</span>
+                Eliminar Usuario Definitivamente
+              </button>
+            )}
           </div>
         </div>
 
