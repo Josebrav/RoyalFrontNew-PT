@@ -25,6 +25,8 @@ import { fetchUserProfile, getUserByEmail } from "../../redux/actions";
 import API_URL from "../../api/rutaApi";
 import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
+import { LOCALE } from "../../i18n/locale";
+import SeoIntro from "./seoIntro";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
@@ -618,6 +620,7 @@ export default function Home() {
             />
             <EditableText
               contentKey="home.heroTagline"
+              as="h1"
               className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight mb-6"
               translations={{ en: "The best games site", pt: "A melhor página de jogos" }}
             >
@@ -746,6 +749,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {LOCALE === "es" && <SeoIntro />}
 
       {/* BottomNavBar (Mobile Only for Guest) */}
       <nav className="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container dark:bg-surface-container border-t border-outline-variant/30 shadow-lg flex justify-around items-center h-16 px-4 md:hidden">

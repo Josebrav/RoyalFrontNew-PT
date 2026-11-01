@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../../data/newsLinks";
@@ -12,6 +13,7 @@ export default function GameDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const game = getGameBySlug(slug);
+  const isLoggedIn = !!useSelector((state) => state.currentUser?.id);
   const [topPlayers, setTopPlayers] = useState([]);
   // Royal Slots muestra el mismo ranking que su lobby en el juego: solo sus slots, por semana
   // (lunes a domingo) o mes calendario, igual que los torneos. El resto: total del juego.
@@ -49,6 +51,11 @@ export default function GameDetail() {
   const accentTo = categoryMeta?.accentTo || "#4c1d95";
 
   const handlePlay = () => {
+    // La ficha es publica (para buscadores); para jugar hace falta cuenta.
+    if (isActive && !isLoggedIn) {
+      window.dispatchEvent(new Event("open-register-modal"));
+      return;
+    }
     if (isActive) {
       window.open(game.playPath, "_blank", "noopener,noreferrer");
       return;

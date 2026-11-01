@@ -39,6 +39,7 @@ import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
 import AdminPresence from './components/AdminPanel/Presence/presence';
+import useSeo from './utils/useSeo';
 import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
 import AdminPrizes from './components/AdminPanel/Prizes/prizes';
@@ -73,6 +74,7 @@ function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
   const { currentUser } = useSelector((state) => state);
   const location = useLocation();
+  useSeo();
   const dispatch = useDispatch();
 
   // Site-wide editable text/image overrides (Inicio, Nosotros, etc.) — public, needed even
@@ -225,7 +227,7 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} />
             <Route path="/juegos" element={<RequireAuth><GameGrid /></RequireAuth>} />
-            <Route path="/juegos/:slug" element={<RequireAuth><GameDetail /></RequireAuth>} />
+            <Route path="/juegos/:slug" element={<GameDetail />} />
             <Route path="/chips" element={<BuyChips />} />
             <Route path="/logout" element={<LogOut />} />
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
