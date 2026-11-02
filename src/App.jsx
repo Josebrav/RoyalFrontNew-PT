@@ -13,6 +13,7 @@ import LogOut from './components/Logout/logout';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import RankSystem from './components/RankSystem/rankSystem';
+import RankUpNotice from './components/RankUpNotice/rankUpNotice';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
@@ -282,6 +283,7 @@ function App() {
           {!location.pathname.includes('/game') && <Footer />}
           </div>
         </div>
+        <RankUpNotice />
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
