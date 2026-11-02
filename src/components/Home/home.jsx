@@ -27,6 +27,7 @@ import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
 import { LOCALE } from "../../i18n/locale";
 import SeoIntro from "./seoIntro";
+import { AdBanner, AdLeaderboard, AdNative } from "../ui/Ads/AdUnit";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
@@ -542,6 +543,8 @@ export default function Home() {
                 </div>
               </div>
 
+              <AdBanner size="300x250" />
+
               {/* Tarjeta de Giro Diario VIP oculta a pedido (ver handleClaimDailySpin,
                   DailySpinModal y GET /daily-spin/status, todo intacto por si se retoma) */}
             </aside>
@@ -549,9 +552,13 @@ export default function Home() {
 
           {/* Games Catalog by Category — a todo el ancho (no metido en la columna de 8/12 de
               arriba), para aprovechar el espacio libre que deja el aside más corto al lado. */}
+          <AdNative className="pt-8" />
+
           <div className="pt-8 border-t border-outline-variant/10">
             <GamesCatalog compact />
           </div>
+
+          <AdLeaderboard className="pt-8" />
         </main>
 
         {/* BottomNavBar (Mobile Only) */}
@@ -679,6 +686,8 @@ export default function Home() {
       {/* Games Catalog by Category */}
       <GamesCatalog />
 
+      <AdLeaderboard className="px-4 pb-8" />
+
       {/* Por qué jugar con nosotros */}
       <section className="py-32 px-6 border-t border-white/5">
         <div className="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-3 gap-20">
@@ -749,6 +758,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <AdNative className="max-w-4xl mx-auto px-6 pb-4" />
 
       {LOCALE === "es" && <SeoIntro />}
 

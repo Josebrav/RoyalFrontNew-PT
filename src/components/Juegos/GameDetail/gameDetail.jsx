@@ -8,6 +8,7 @@ import { CATEGORY_META, getGameBySlug } from "../../../data/gamesCatalog";
 import { swalThemeConfig } from "../../../utils/formatters";
 import API_URL from "../../../api/rutaApi";
 import EditableImage from "../../ui/EditableImage";
+import { AdLeaderboard } from "../../ui/Ads/AdUnit";
 
 export default function GameDetail() {
   const { slug } = useParams();
@@ -224,6 +225,7 @@ export default function GameDetail() {
           </div>
         </div>
       </div>
+      <AdLeaderboard className="mt-8" />
     </main>
   );
 }
