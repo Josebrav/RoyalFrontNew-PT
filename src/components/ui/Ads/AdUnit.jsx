@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-// Anuncios de Adsterra. Cada anuncio va dentro de su propio iframe aislado (sandbox sin
-// allow-same-origin): el codigo del anunciante no puede leer la sesion ni el resto de la pagina, y
-// su document.write (que en una SPA ya cargada no funciona) escribe en su propio documento.
-// Los clics se abren en otra pestana (allow-popups), nunca cambian la pagina del jugador.
+// Anuncios de Adsterra. Cada anuncio va dentro de su propio iframe: su document.write (que en una
+// SPA ya cargada no funciona) escribe en su propio documento y sus variables globales (atOptions) no
+// chocan entre anuncios. Lleva allow-same-origin porque el script de Adsterra usa localStorage y sin
+// eso falla y no muestra nada (01/11/2026, autorizado por el dueno sabiendo que asi el script tiene
+// el mismo acceso que la pagina). Los clics se abren en otra pestana (allow-popups).
 
 const AD_HOST = "https://bicea.org";
 
@@ -17,7 +18,7 @@ export const BANNERS = {
 };
 const NATIVE_KEY = "e70a54965645f5b354edc7e47fcc359a";
 
-const SANDBOX = "allow-scripts allow-popups allow-popups-to-escape-sandbox";
+const SANDBOX = "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox";
 const BASE_STYLE = "<style>html,body{margin:0;padding:0;background:transparent;overflow:hidden}</style>";
 
 function bannerDoc({ key, width, height }) {
