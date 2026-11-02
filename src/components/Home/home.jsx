@@ -27,7 +27,7 @@ import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
 import { LOCALE } from "../../i18n/locale";
 import SeoIntro from "./seoIntro";
-import { AdBanner, AdLeaderboard, AdNative } from "../ui/Ads/AdUnit";
+import { AdBanner, AdLeaderboard } from "../ui/Ads/AdUnit";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
@@ -552,8 +552,6 @@ export default function Home() {
 
           {/* Games Catalog by Category — a todo el ancho (no metido en la columna de 8/12 de
               arriba), para aprovechar el espacio libre que deja el aside más corto al lado. */}
-          <AdNative className="pt-8" />
-
           <div className="pt-8 border-t border-outline-variant/10">
             <GamesCatalog compact />
           </div>
@@ -758,8 +756,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      <AdNative className="max-w-4xl mx-auto px-6 pb-4" />
 
       {LOCALE === "es" && <SeoIntro />}
 
