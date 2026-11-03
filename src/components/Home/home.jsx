@@ -27,7 +27,6 @@ import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
 import { LOCALE } from "../../i18n/locale";
 import SeoIntro from "./seoIntro";
-import { AdBanner, AdLeaderboard } from "../ui/Ads/AdUnit";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
@@ -543,8 +542,6 @@ export default function Home() {
                 </div>
               </div>
 
-              <AdBanner size="300x250" />
-
               {/* Tarjeta de Giro Diario VIP oculta a pedido (ver handleClaimDailySpin,
                   DailySpinModal y GET /daily-spin/status, todo intacto por si se retoma) */}
             </aside>
@@ -556,7 +553,6 @@ export default function Home() {
             <GamesCatalog compact />
           </div>
 
-          <AdLeaderboard className="pt-8" />
         </main>
 
         {/* BottomNavBar (Mobile Only) */}
@@ -683,8 +679,6 @@ export default function Home() {
 
       {/* Games Catalog by Category */}
       <GamesCatalog />
-
-      <AdLeaderboard className="px-4 pb-8" />
 
       {/* Por qué jugar con nosotros */}
       <section className="py-32 px-6 border-t border-white/5">

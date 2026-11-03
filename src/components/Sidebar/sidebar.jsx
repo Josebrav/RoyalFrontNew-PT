@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
 import { fetchConversations } from "../../redux/actions/index";
 import { t } from "../../i18n/strings";
-import { AdBanner } from "../ui/Ads/AdUnit";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
@@ -115,9 +114,6 @@ export default function Sidebar() {
         </div>
       )}
 
-      {!location.pathname.startsWith("/game/") && !location.pathname.startsWith("/admin") && (
-        <AdBanner size={window.innerHeight >= 1000 ? "160x600" : "160x300"} className="hidden lg:flex mt-auto pt-4" />
-      )}
     </aside>
   );
 }

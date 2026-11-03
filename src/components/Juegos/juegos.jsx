@@ -5,7 +5,6 @@ import FavoriteButton from "./FavoriteButton";
 import { fetchFavoriteGames } from "../../redux/actions";
 import { GAMES_CATALOG, CATEGORY_META, CATEGORY_ORDER } from "../../data/gamesCatalog";
 import EditableImage from "../ui/EditableImage";
-import { AdLeaderboard } from "../ui/Ads/AdUnit";
 
 export default function GameGrid() {
   const navigate = useNavigate();
@@ -35,8 +34,6 @@ export default function GameGrid() {
       <p className="text-on-surface-variant text-sm mb-6 text-center md:text-left">
         Explorá nuestro catálogo completo. Tocá un juego para ver sus detalles.
       </p>
-
-      <AdLeaderboard className="mb-6" />
 
       {availableCategories.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-8">
