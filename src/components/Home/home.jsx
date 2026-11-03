@@ -350,18 +350,18 @@ export default function Home() {
               </div>
 
               <div 
-                onClick={() => handleSoonAlert('Premios Pragmatic')}
+                onClick={() => handleSoonAlert('Premios')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-primary/40 group cursor-pointer gold-glow"
               >
                 <EditableImage
                   contentKey="home.dashboard.banner3"
                   fallbackSrc={bannercelu}
-                  alt="Banner de Premios Pragmatic"
+                  alt="Banner de Premios"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent p-6 flex flex-col justify-end text-left">
-                  <h3 className="font-headline-sm text-headline-sm text-primary">Premios de Pragmatic</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-primary">Premios</h3>
                   <p className="text-white text-body-sm font-body-sm">Ganancias diarias en todos tus favoritos.</p>
                 </div> */}
               </div>
