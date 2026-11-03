@@ -14,6 +14,8 @@ import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import RankSystem from './components/RankSystem/rankSystem';
 import RankUpNotice from './components/RankUpNotice/rankUpNotice';
+import OfferBanner from './components/OfferBanner/offerBanner';
+import AdminOffers from './components/AdminPanel/Offers/offers';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
@@ -240,6 +242,7 @@ function App() {
             <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/admin/game-stats" element={<ProtectedRoute><AdminGameStats /></ProtectedRoute>} />
             <Route path="/admin/promos" element={<ProtectedRoute><AdminPromos /></ProtectedRoute>} />
+            <Route path="/admin/ofertas" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
             <Route path="/admin/bingo-bots" element={<ProtectedRoute><BingoBots /></ProtectedRoute>} />
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
             <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
@@ -284,6 +287,7 @@ function App() {
           </div>
         </div>
         <RankUpNotice />
+        <OfferBanner />
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"

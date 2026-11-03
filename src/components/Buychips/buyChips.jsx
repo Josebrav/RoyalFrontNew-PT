@@ -191,9 +191,18 @@ export default function BuyChips() {
   const formatChips = (amount) => new Intl.NumberFormat("es-ES").format(amount);
 
   const visibleChipOptions = CHIP_CATALOG[catalogCurrency];
+  // Oferta vigente (panel -> Ofertas) en la moneda de este jugador, si la tiene. Fichas y precio los
+  // decide el backend a partir del packageId, igual que con los paquetes de siempre.
+  const [currentOffer, setCurrentOffer] = useState(null);
   useEffect(() => {
-    if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
-  }, [catalogCurrency, paymentMethod]); // eslint-disable-line react-hooks/exhaustive-deps
+    axios.get(`${API_URL}/chip-offers/current`).then(({ data }) => setCurrentOffer(data?.offer ?? null)).catch(() => {});
+  }, []);
+  const offerItem = currentOffer?.items.find((item) => item.currency === catalogCurrency);
+  const offerChip = offerItem ? { id: offerItem.packageId, currency: offerItem.currency, price: offerItem.price, chips: offerItem.chips } : null;
+  useEffect(() => {
+    if (offerChip) setSelectedChip(offerChip);
+    else if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
+  }, [catalogCurrency, paymentMethod, offerChip?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -546,6 +555,27 @@ export default function BuyChips() {
                   <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                     3. Selecciona un Paquete de Fichas
                   </label>
+                  {offerChip && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedChip(offerChip)}
+                      aria-pressed={selectedChip?.id === offerChip.id}
+                      className={`w-full mb-3 flex items-center gap-4 p-3 rounded-xl border-2 text-left cursor-pointer transition-all ${
+                        selectedChip?.id === offerChip.id
+                          ? "border-primary bg-primary/15 shadow-[0_0_22px_rgba(230,195,100,0.55)]"
+                          : "border-outline-variant/30 hover:border-primary/50"
+                      }`}
+                    >
+                      <img src={currentOffer.imageUrl} alt="" className="w-28 h-16 object-cover rounded-lg shrink-0" />
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-xs font-bold text-primary uppercase tracking-wider">Oferta</span>
+                        <span className="block text-white font-bold truncate">{currentOffer.title}</span>
+                        <span className="block text-sm text-on-surface-variant">
+                          {formatChips(offerChip.chips)} fichas por {symbol} {formatPrice(offerChip)}
+                        </span>
+                      </span>
+                    </button>
+                  )}
                   <div
                     className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3"
                     style={{ "--pkg-cols": visibleChipOptions.length }}
