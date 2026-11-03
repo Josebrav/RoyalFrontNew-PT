@@ -121,12 +121,12 @@ export const GAMES_CATALOG = [
     slug: "gildedcobra",
     name: "Gilded Cobra",
     category: "slots",
-    status: "soon",
+    status: "active",
     icon: "pets",
     players: 0,
     playPath: "/game/gildedcobra",
     description:
-      "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres pirámides dan tiradas gratis y la cobra dorada se vuelve comodín.",
+      "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres scatter dan tiradas gratis y el bonus de los huevos suma multiplicadores.",
   },
   {
     slug: "bingo",
@@ -223,15 +223,6 @@ export const GAMES_CATALOG = [
     icon: "extension",
     description:
       "Armá tríos y escaleras antes que tus rivales en este clásico de mesa sudamericano, ahora online contra otros jugadores de RoyalGames.",
-  },
-  {
-    slug: "gilded-cobra",
-    name: "Gilded Cobra",
-    category: "slots",
-    status: "soon",
-    icon: "whatshot",
-    description:
-      "Tragamonedas con temática egipcia: cobras doradas, símbolos ancestrales y multiplicadores que se enroscan a tu favor.",
   },
   {
     slug: "pearl-empires",

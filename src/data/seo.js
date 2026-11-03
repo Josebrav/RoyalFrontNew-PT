@@ -73,6 +73,10 @@ export const GAME_SEO = {
     title: "Furia del Olimpo: tragamonedas de dioses griegos gratis | RoyalJuegos",
     description: "Furia del Olimpo, la tragamonedas de Zeus y los dioses del Olimpo con tiradas gratis y compra de bono. Jugá gratis online.",
   },
+  gildedcobra: {
+    title: "Gilded Cobra: tragamonedas del antiguo Egipto gratis | RoyalJuegos",
+    description: "Gilded Cobra, la tragamonedas del antiguo Egipto con 720 formas de ganar, tiradas gratis y bono de huevos. Jugá gratis online.",
+  },
   "gema-of-gold": {
     title: "Gema of Gold: tragamonedas de gemas gratis | RoyalJuegos",
     description: "Gema of Gold, la tragamonedas de gemas y oro con premios y bonos. Jugá gratis online con fichas de regalo.",
