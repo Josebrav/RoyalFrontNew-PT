@@ -14,7 +14,7 @@ import dominoImage from "../assets/domino.png";
 // todo el sitio es dorado sobre negro. El dorado queda para la marca y los botones de jugar.
 export const CATEGORY_META = {
   bingo: { label: "Bingo", className: "text-[#c9a84c]", chipClassName: "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/40", accent: "#f97316", accentTo: "#c2410c" },
-  casino: { label: "Casino", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40", accent: "#ef4444", accentTo: "#9f1239" },
+  casino: { label: "Clásicos", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40", accent: "#ef4444", accentTo: "#9f1239" },
   cartas: { label: "Cartas", className: "text-[#4f8fe0]", chipClassName: "bg-[#4f8fe0]/15 text-[#4f8fe0] border border-[#4f8fe0]/40", accent: "#3b82f6", accentTo: "#1e3a8a" },
   otros: { label: "Otros", className: "text-[#4caf7d]", chipClassName: "bg-[#4caf7d]/15 text-[#4caf7d] border border-[#4caf7d]/40", accent: "#22c55e", accentTo: "#0f766e" },
   slots: { label: "Slots", className: "text-[#a855f7]", chipClassName: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/40", accent: "#a855f7", accentTo: "#4c1d95" },

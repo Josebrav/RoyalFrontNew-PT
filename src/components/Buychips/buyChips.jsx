@@ -797,7 +797,7 @@ export default function BuyChips() {
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-left">
                   <div>
                     <h3 className="font-headline-sm text-headline-sm text-white mb-1">Registro de Auditoría Financiera</h3>
-                    <p className="text-body-sm text-on-surface-variant">Tus últimos depósitos y movimientos de fichas en el casino.</p>
+                    <p className="text-body-sm text-on-surface-variant">Tus últimos depósitos y movimientos de fichas en Royal Juegos.</p>
                   </div>
                   <div className="sm:w-56">
                     <select

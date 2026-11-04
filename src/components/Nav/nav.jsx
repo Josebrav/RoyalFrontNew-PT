@@ -66,10 +66,6 @@ export default function Navbar() {
            
           {currentUser?.id ? (
             <>
-              {/* Mobile Logo Only when Logged In */}
-              <h1 className="md:hidden text-headline-md font-headline-md font-bold text-primary tracking-tighter cursor-pointer" onClick={() => navigate('/')}>
-                RGAMES
-              </h1>
               <nav className="hidden lg:flex gap-6 items-center">
                
                 <NavLink
