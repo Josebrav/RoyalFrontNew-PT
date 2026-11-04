@@ -191,9 +191,18 @@ export default function BuyChips() {
   const formatChips = (amount) => new Intl.NumberFormat("es-ES").format(amount);
 
   const visibleChipOptions = CHIP_CATALOG[catalogCurrency];
+  // Oferta vigente (panel -> Ofertas) en la moneda de este jugador, si la tiene. Fichas y precio los
+  // decide el backend a partir del packageId, igual que con los paquetes de siempre.
+  const [currentOffer, setCurrentOffer] = useState(null);
   useEffect(() => {
-    if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
-  }, [catalogCurrency, paymentMethod]); // eslint-disable-line react-hooks/exhaustive-deps
+    axios.get(`${API_URL}/chip-offers/current`).then(({ data }) => setCurrentOffer(data?.offer ?? null)).catch(() => {});
+  }, []);
+  const offerItem = currentOffer?.items.find((item) => item.currency === catalogCurrency);
+  const offerChip = offerItem ? { id: offerItem.packageId, currency: offerItem.currency, price: offerItem.price, chips: offerItem.chips } : null;
+  useEffect(() => {
+    if (offerChip) setSelectedChip(offerChip);
+    else if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
+  }, [catalogCurrency, paymentMethod, offerChip?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -415,7 +424,7 @@ export default function BuyChips() {
                         <span className="material-symbols-outlined text-primary">public</span>
                         <span className="min-w-0">
                           <span className="block text-sm font-bold text-white">{regionConfig.label}</span>
-                          <span className="block text-[11px] text-on-surface-variant">
+                          <span className="block text-[0.6875rem] text-on-surface-variant">
                             Opciones de compra disponibles según desde dónde te conectás.
                           </span>
                         </span>
@@ -441,7 +450,7 @@ export default function BuyChips() {
                     </div>
                     )}
                     {viewerIsAdmin && detectedRegion && (
-                      <p className="mt-1.5 text-[11px] text-on-surface-variant">
+                      <p className="mt-1.5 text-[0.6875rem] text-on-surface-variant">
                         Tu conexión: {PAYMENT_REGIONS[detectedRegion].label}. Como admin podés elegir otro país para probar; los jugadores solo ven el suyo.
                       </p>
                     )}
@@ -475,7 +484,7 @@ export default function BuyChips() {
                           </span>
                           <span className="min-w-0">
                             <span className="block text-xs font-bold text-white">Mercado Pago</span>
-                            <span className="block text-[10px] text-on-surface-variant">Pagás en {mercadoPago.currency}</span>
+                            <span className="block text-[0.625rem] text-on-surface-variant">Pagás en {mercadoPago.currency}</span>
                           </span>
                         </button>
                       )}
@@ -496,7 +505,7 @@ export default function BuyChips() {
                           </span>
                           <span className="min-w-0">
                             <span className="block text-xs font-bold text-white">PayPal</span>
-                            <span className="block text-[10px] text-on-surface-variant">Pagás en {paypalCurrency} · cuenta o tarjeta</span>
+                            <span className="block text-[0.625rem] text-on-surface-variant">Pagás en {paypalCurrency} · cuenta o tarjeta</span>
                           </span>
                         </button>
                       )}
@@ -508,15 +517,15 @@ export default function BuyChips() {
                     <p className="text-xs font-bold text-primary mb-2 uppercase tracking-wider">Tu cuenta</p>
                     <div className="grid grid-cols-2 gap-2">
                     <div className="glass-card px-3 py-2 rounded-xl">
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Mi Balance</p>
+                      <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Mi Balance</p>
                       <p className="text-sm font-bold text-white leading-tight break-all">
                         {new Intl.NumberFormat('es-ES').format(currentUser?.chips || 0)}
                       </p>
-                      <p className="text-[10px] text-green-400">Disponible para jugar</p>
+                      <p className="text-[0.625rem] text-green-400">Disponible para jugar</p>
                     </div>
                     <div className="glass-card px-3 py-2 rounded-xl">
                       <div className="flex items-center justify-between gap-1">
-                        <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Rango</p>
+                        <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Rango</p>
                         <RankBadge tier={rankStatus?.rank || currentUser?.rank} size="sm" />
                       </div>
                       {nextRank ? (
@@ -524,15 +533,15 @@ export default function BuyChips() {
                           <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-full h-1.5 w-full overflow-hidden mt-2">
                             <div className="royal-gold-gradient h-full rounded-full" style={{ width: `${rankProgressPercentage}%` }}></div>
                           </div>
-                          <p className="mt-1 text-[10px] text-on-surface-variant">{rankProgressPercentage}% hacia {nextRank.label}</p>
+                          <p className="mt-1 text-[0.625rem] text-on-surface-variant">{rankProgressPercentage}% hacia {nextRank.label}</p>
                         </>
                       ) : (
-                        <p className="mt-2 text-[10px] text-primary">Rango máximo alcanzado</p>
+                        <p className="mt-2 text-[0.625rem] text-primary">Rango máximo alcanzado</p>
                       )}
                       <button
                         type="button"
                         onClick={() => navigate("/rangos")}
-                        className="mt-1 text-[10px] font-bold text-primary underline cursor-pointer bg-transparent border-0 p-0"
+                        className="mt-1 text-[0.625rem] font-bold text-primary underline cursor-pointer bg-transparent border-0 p-0"
                       >
                         {rankBonusPercent > 0 ? `+${rankBonusPercent}% fichas por tu rango` : "¿Cómo subo de rango?"}
                       </button>
@@ -546,6 +555,27 @@ export default function BuyChips() {
                   <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                     3. Selecciona un Paquete de Fichas
                   </label>
+                  {offerChip && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedChip(offerChip)}
+                      aria-pressed={selectedChip?.id === offerChip.id}
+                      className={`w-full mb-3 flex items-center gap-4 p-3 rounded-xl border-2 text-left cursor-pointer transition-all ${
+                        selectedChip?.id === offerChip.id
+                          ? "border-primary bg-primary/15 shadow-[0_0_22px_rgba(230,195,100,0.55)]"
+                          : "border-outline-variant/30 hover:border-primary/50"
+                      }`}
+                    >
+                      <img src={currentOffer.imageUrl} alt="" className="w-28 h-16 object-cover rounded-lg shrink-0" />
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-xs font-bold text-primary uppercase tracking-wider">Oferta</span>
+                        <span className="block text-white font-bold truncate">{currentOffer.title}</span>
+                        <span className="block text-sm text-on-surface-variant">
+                          {formatChips(offerChip.chips)} fichas por {symbol} {formatPrice(offerChip)}
+                        </span>
+                      </span>
+                    </button>
+                  )}
                   <div
                     className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3"
                     style={{ "--pkg-cols": visibleChipOptions.length }}
@@ -608,12 +638,12 @@ export default function BuyChips() {
                           </div>
                           <div className="w-full rounded-xl border-2 border-yellow-400 bg-gradient-to-b from-yellow-100 to-yellow-200 px-1 py-1.5 leading-tight">
                               <p className="text-base font-black text-yellow-700">+{promoPercentOf(chip)}%</p>
-                              <p className="text-[10px] font-black text-yellow-700 uppercase tracking-wider">Bonus</p>
-                              <p className="text-[9px] text-neutral-600 mt-0.5">Recibís</p>
-                              <p className={`font-black text-neutral-900 whitespace-nowrap ${formatChips(chip.chips).length > 11 ? "text-[10px]" : "text-xs"}`}>
+                              <p className="text-[0.625rem] font-black text-yellow-700 uppercase tracking-wider">Bonus</p>
+                              <p className="text-[0.5625rem] text-neutral-600 mt-0.5">Recibís</p>
+                              <p className={`font-black text-neutral-900 whitespace-nowrap ${formatChips(chip.chips).length > 11 ? "text-[0.625rem]" : "text-xs"}`}>
                                 {formatChips(chip.chips)}
                               </p>
-                              <p className="text-[9px] text-neutral-600">fichas</p>
+                              <p className="text-[0.5625rem] text-neutral-600">fichas</p>
                             </div>
                         </div>
                       );
@@ -625,12 +655,12 @@ export default function BuyChips() {
                 <div className="glass-card rounded-2xl border border-outline-variant/20 bg-[#12121A]/60 p-4 flex flex-col lg:flex-row lg:items-center gap-4">
                   <div className="flex-1 min-w-0 flex flex-wrap items-end gap-x-8 gap-y-2">
                     <div>
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Paquete</p>
+                      <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Paquete</p>
                       <p className="text-sm text-white font-bold">{selectedChip ? formatChips(selectedChip.chips) : "0"} fichas</p>
                     </div>
                     {rankBonusPercent > 0 && selectedChip && (
                       <div>
-                        <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">
+                        <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">
                           Bono {RANK_META[rankStatus?.rank]?.label || "de rango"} +{rankBonusPercent}%
                         </p>
                         <p className="text-sm text-green-400 font-bold">
@@ -639,17 +669,17 @@ export default function BuyChips() {
                       </div>
                     )}
                     <div>
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Moneda</p>
+                      <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Moneda</p>
                       <p className="text-sm text-primary font-bold">{currency}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Total a pagar</p>
+                      <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Total a pagar</p>
                       <p className="text-3xl font-black text-primary leading-none">
                         {symbol} {selectedChip ? formatPrice(selectedChip) : "0"}
                       </p>
                     </div>
                     {availableMethods.includes(paymentMethod) && (
-                      <p className="basis-full text-[11px] text-on-surface-variant leading-snug">
+                      <p className="basis-full text-[0.6875rem] text-on-surface-variant leading-snug">
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>
@@ -767,7 +797,7 @@ export default function BuyChips() {
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-left">
                   <div>
                     <h3 className="font-headline-sm text-headline-sm text-white mb-1">Registro de Auditoría Financiera</h3>
-                    <p className="text-body-sm text-on-surface-variant">Tus últimos depósitos y movimientos de fichas en el casino.</p>
+                    <p className="text-body-sm text-on-surface-variant">Tus últimos depósitos y movimientos de fichas en Royal Juegos.</p>
                   </div>
                   <div className="sm:w-56">
                     <select
@@ -854,7 +884,7 @@ export default function BuyChips() {
                                   {item.type === "deposit" ? (
                                     <>
                                       + {symbol} {new Intl.NumberFormat('es-ES').format(parseFloat(item.price).toFixed(2))}
-                                      <span className="block text-[11px] font-normal text-on-surface-variant">
+                                      <span className="block text-[0.6875rem] font-normal text-on-surface-variant">
                                         {new Intl.NumberFormat('es-ES').format(item.chips)} fichas
                                       </span>
                                     </>
@@ -865,7 +895,7 @@ export default function BuyChips() {
                                   )}
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusMeta.className}`}>
+                                  <span className={`px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${statusMeta.className}`}>
                                     {statusMeta.label}
                                   </span>
                                 </td>

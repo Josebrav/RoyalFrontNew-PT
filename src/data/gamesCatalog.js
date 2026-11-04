@@ -14,7 +14,7 @@ import dominoImage from "../assets/domino.png";
 // todo el sitio es dorado sobre negro. El dorado queda para la marca y los botones de jugar.
 export const CATEGORY_META = {
   bingo: { label: "Bingo", className: "text-[#c9a84c]", chipClassName: "bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/40", accent: "#f97316", accentTo: "#c2410c" },
-  casino: { label: "Casino", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40", accent: "#ef4444", accentTo: "#9f1239" },
+  casino: { label: "Clásicos", className: "text-[#e05252]", chipClassName: "bg-[#e05252]/15 text-[#e05252] border border-[#e05252]/40", accent: "#ef4444", accentTo: "#9f1239" },
   cartas: { label: "Cartas", className: "text-[#4f8fe0]", chipClassName: "bg-[#4f8fe0]/15 text-[#4f8fe0] border border-[#4f8fe0]/40", accent: "#3b82f6", accentTo: "#1e3a8a" },
   otros: { label: "Otros", className: "text-[#4caf7d]", chipClassName: "bg-[#4caf7d]/15 text-[#4caf7d] border border-[#4caf7d]/40", accent: "#22c55e", accentTo: "#0f766e" },
   slots: { label: "Slots", className: "text-[#a855f7]", chipClassName: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/40", accent: "#a855f7", accentTo: "#4c1d95" },
@@ -121,12 +121,12 @@ export const GAMES_CATALOG = [
     slug: "gildedcobra",
     name: "Gilded Cobra",
     category: "slots",
-    status: "soon",
+    status: "active",
     icon: "pets",
     players: 0,
     playPath: "/game/gildedcobra",
     description:
-      "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres pirámides dan tiradas gratis y la cobra dorada se vuelve comodín.",
+      "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres scatter dan tiradas gratis y el bonus de los huevos suma multiplicadores.",
   },
   {
     slug: "bingo",
@@ -223,15 +223,6 @@ export const GAMES_CATALOG = [
     icon: "extension",
     description:
       "Armá tríos y escaleras antes que tus rivales en este clásico de mesa sudamericano, ahora online contra otros jugadores de RoyalGames.",
-  },
-  {
-    slug: "gilded-cobra",
-    name: "Gilded Cobra",
-    category: "slots",
-    status: "soon",
-    icon: "whatshot",
-    description:
-      "Tragamonedas con temática egipcia: cobras doradas, símbolos ancestrales y multiplicadores que se enroscan a tu favor.",
   },
   {
     slug: "pearl-empires",

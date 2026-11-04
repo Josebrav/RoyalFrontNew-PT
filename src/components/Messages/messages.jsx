@@ -180,7 +180,7 @@ export default function Messages() {
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-white font-bold truncate">{c.partnerNick}</span>
                     {c.unreadCount > 0 && (
-                      <span className="bg-primary text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      <span className="bg-primary text-black text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                         {c.unreadCount}
                       </span>
                     )}
@@ -240,7 +240,7 @@ export default function Messages() {
                         >
                           {m.content}
                         </div>
-                        <span className="text-[10px] text-on-surface-variant/70 mt-1 px-1">
+                        <span className="text-[0.625rem] text-on-surface-variant/70 mt-1 px-1">
                           {formatMessageTimestamp(m.createdAt)}
                         </span>
                       </div>

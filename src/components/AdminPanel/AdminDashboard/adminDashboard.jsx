@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchAdminOverview } from '../../../redux/actions';
 import { RANK_META } from '../../../utils/rank';
 import CountryStats from './countryStats';
+import UserInsights from './userInsights';
 
 const numberFormat = (n) => new Intl.NumberFormat('es-ES').format(n || 0);
 
@@ -89,7 +90,7 @@ const AdminDashboard = () => {
                   {kpi.icon}
                 </span>
               </div>
-              <p className="text-on-surface-variant font-label-md uppercase tracking-wider text-[10px]">
+              <p className="text-on-surface-variant font-label-md uppercase tracking-wider text-[0.625rem]">
                 {kpi.title}
               </p>
               <h3 className="font-headline-md text-headline-md text-on-surface mt-1">
@@ -105,12 +106,12 @@ const AdminDashboard = () => {
             <h4 className="font-headline-sm text-headline-sm text-on-surface mb-4">Depósitos de Hoy</h4>
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Transacciones</p>
+                <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Transacciones</p>
                 <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayCount)}</p>
               </div>
               {viewerIsAdmin && (
                 <div className="text-right">
-                  <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Fichas Depositadas</p>
+                  <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Fichas Depositadas</p>
                   <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.depositsTodayChips)}</p>
                 </div>
               )}
@@ -120,15 +121,15 @@ const AdminDashboard = () => {
             <h4 className="font-headline-sm text-headline-sm text-on-surface mb-4">Equipo</h4>
             <div className="flex justify-between items-end">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Admins</p>
+                <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Admins</p>
                 <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.adminCount)}</p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Mods</p>
+                <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Mods</p>
                 <p className="font-headline-md text-headline-md text-primary">{numberFormat(overview.modCount)}</p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant">Inactivos</p>
+                <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Inactivos</p>
                 <p className="font-headline-md text-headline-md text-on-surface">{numberFormat(overview.inactiveUsers)}</p>
               </div>
             </div>
@@ -162,7 +163,7 @@ const AdminDashboard = () => {
                           <span className="text-primary font-bold">{numberFormat(payment.chips)} fichas</span>
                           {' '}vía {payment.paymentPlatform}
                         </p>
-                        <p className="text-[11px] text-on-surface-variant mt-1">{timeAgo(payment.createdAt)}</p>
+                        <p className="text-[0.6875rem] text-on-surface-variant mt-1">{timeAgo(payment.createdAt)}</p>
                       </div>
                     </div>
                   ))
@@ -198,7 +199,7 @@ const AdminDashboard = () => {
                     <span className="font-bold text-primary w-5 flex-shrink-0">{index + 1}</span>
                     <span className="font-bold text-on-surface truncate">{player.nick}</span>
                     {RANK_META[player.rank] && (
-                      <span className={`text-[10px] font-bold uppercase flex-shrink-0 ${RANK_META[player.rank].className}`}>
+                      <span className={`text-[0.625rem] font-bold uppercase flex-shrink-0 ${RANK_META[player.rank].className}`}>
                         {RANK_META[player.rank].label}
                       </span>
                     )}
@@ -209,6 +210,8 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
+        <UserInsights includeBots={includeBots} viewerIsAdmin={viewerIsAdmin} />
 
         <CountryStats viewerIsAdmin={viewerIsAdmin} />
       </div>

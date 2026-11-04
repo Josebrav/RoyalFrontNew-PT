@@ -23,7 +23,7 @@ const FAKE_NICK_POOL = [
     "SofiaLucky7", "JuanPerezVIP", "GabrielaOro", "MateoChips", "ValeSuerte",
     "AndresBet", "CamilaGold", "PabloJackpot", "IsabelaWin", "SantiagoRoyal",
     "DanielaSlots", "FelipeAce", "ValentinaX", "RicardoKing", "PaolaFlash",
-    "EmilianoBig", "RenataStar", "TomasCasino", "MartinaVIP", "LeoDiamante",
+    "EmilianoBig", "RenataStar", "TomasSuerte", "MartinaVIP", "LeoDiamante",
     "AbrilFortune", "BrunoTop", "JulietaMagic", "NicolasPro", "CamiRuleta",
     "AndreaChips77", "SebasWins", "FranciscaLuck", "MaxiRoyal", "ConstanzaGold",
     "AgustinBet21", "LauraSpin", "IgnacioAce", "ValeriaJoker", "RodrigoWin",

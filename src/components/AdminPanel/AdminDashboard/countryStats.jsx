@@ -63,7 +63,7 @@ function BarList({ title, subtitle, rows, valueOf, format = numberFormat }) {
   return (
     <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4">
       <p className="font-bold text-on-surface text-sm">{title}</p>
-      <p className="text-[11px] text-on-surface-variant mb-3">{subtitle}</p>
+      <p className="text-[0.6875rem] text-on-surface-variant mb-3">{subtitle}</p>
       {visible.length === 0 ? (
         <p className="text-on-surface-variant text-xs py-4">Sin datos en este período.</p>
       ) : (
@@ -108,7 +108,7 @@ function SignupsChart({ daily, days }) {
     <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 mb-4">
       <div className="flex justify-between items-baseline mb-3">
         <p className="font-bold text-on-surface text-sm">Registros por día</p>
-        <p className="text-[11px] text-on-surface-variant">máx. {numberFormat(max)} en un día</p>
+        <p className="text-[0.6875rem] text-on-surface-variant">máx. {numberFormat(max)} en un día</p>
       </div>
       <div className="flex items-end gap-[2px] h-24">
         {series.map((d) => (
@@ -120,7 +120,7 @@ function SignupsChart({ daily, days }) {
           />
         ))}
       </div>
-      <div className="flex justify-between text-[10px] text-on-surface-variant mt-1">
+      <div className="flex justify-between text-[0.625rem] text-on-surface-variant mt-1">
         <span>{series[0]?.day.split('-').reverse().slice(0, 2).join('/')}</span>
         <span>Hoy</span>
       </div>
@@ -171,7 +171,7 @@ export default function CountryStats({ viewerIsAdmin }) {
       <div className="p-6 border-b border-outline-variant/10 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h4 className="font-headline-sm text-headline-sm text-on-surface">Estadísticas por País</h4>
-          <p className="text-[11px] text-on-surface-variant mt-1">
+          <p className="text-[0.6875rem] text-on-surface-variant mt-1">
             País detectado por la conexión del usuario (no el que escribe en su perfil).
           </p>
         </div>
@@ -217,7 +217,7 @@ export default function CountryStats({ viewerIsAdmin }) {
                 <div key={k.title} className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 flex items-center gap-3">
                   <span className="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">{k.icon}</span>
                   <div className="min-w-0">
-                    <p className="text-on-surface-variant uppercase tracking-wider text-[10px] truncate">{k.title}</p>
+                    <p className="text-on-surface-variant uppercase tracking-wider text-[0.625rem] truncate">{k.title}</p>
                     <p className="font-bold text-on-surface text-lg tabular-nums">{numberFormat(k.value)}</p>
                   </div>
                 </div>
@@ -233,13 +233,13 @@ export default function CountryStats({ viewerIsAdmin }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="text-[11px] uppercase tracking-wider text-on-surface-variant">Ordenar por</span>
+              <span className="text-[0.6875rem] uppercase tracking-wider text-on-surface-variant">Ordenar por</span>
               {Object.entries(SORTS).map(([key, s]) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setSortKey(key)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-full text-[0.6875rem] font-bold border transition-colors cursor-pointer ${
                     sortKey === key
                       ? 'border-primary bg-primary/15 text-primary'
                       : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
@@ -252,7 +252,7 @@ export default function CountryStats({ viewerIsAdmin }) {
 
             <div className="overflow-x-auto rounded-xl border border-outline-variant/10">
               <table className="w-full text-sm whitespace-nowrap">
-                <thead className="bg-surface-container-high text-[10px] uppercase tracking-wider text-on-surface-variant">
+                <thead className="bg-surface-container-high text-[0.625rem] uppercase tracking-wider text-on-surface-variant">
                   <tr>
                     <th className="text-left px-4 py-3">País</th>
                     <th className="text-right px-3 py-3">Usuarios</th>
@@ -306,7 +306,7 @@ export default function CountryStats({ viewerIsAdmin }) {
                 </tbody>
               </table>
             </div>
-            <p className="text-[11px] text-on-surface-variant mt-3">
+            <p className="text-[0.6875rem] text-on-surface-variant mt-3">
               Activos = entraron a la página en el período. Jugadores/Premios = cuántos cobraron premios en juegos y cuántas veces.
               {viewerIsAdmin && ' Compradores = usuarios del país que alguna vez compraron fichas; Depósitos y Recaudado son del período.'}
               {data.totals.unknownUsers > 0 &&

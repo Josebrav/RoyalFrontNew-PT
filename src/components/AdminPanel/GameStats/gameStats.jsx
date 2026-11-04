@@ -73,7 +73,7 @@ function RtpChart({ daily, target }) {
 function Stat({ label, value, className = "" }) {
   return (
     <div className="flex flex-col">
-      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant">{label}</span>
+      <span className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">{label}</span>
       <span className={`font-bold tabular-nums ${className}`}>{value}</span>
     </div>
   );
@@ -169,7 +169,7 @@ export default function AdminGameStats() {
               ["RTP general", pct(totals.rtp), rtpTone(totals.rtp, null)],
             ].map(([label, value, cls]) => (
               <div key={label} className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-                <span className="text-[10px] uppercase tracking-widest text-primary">{label}</span>
+                <span className="text-[0.625rem] uppercase tracking-widest text-primary">{label}</span>
                 <span className={`font-headline-md text-headline-md tabular-nums ${cls}`}>{value}</span>
               </div>
             ))}
@@ -206,7 +206,7 @@ export default function AdminGameStats() {
                         <td className="px-4 py-3 font-bold text-white whitespace-nowrap">
                           {g.name}
                           {g.trackingSince == null && g.plays === 0 && ["santawilds", "sugarcalavera", "furiaolimpo", "gildedcobra", "gemasofgold", "royal-joker", "royal-pachinka"].includes(g.slug) && (
-                            <span className="block text-[10px] font-normal text-on-surface-variant">Registrando desde hoy</span>
+                            <span className="block text-[0.625rem] font-normal text-on-surface-variant">Registrando desde hoy</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">{fmt(g.plays)}</td>
@@ -232,14 +232,14 @@ export default function AdminGameStats() {
                             </div>
                             <div className="grid md:grid-cols-[2fr_1fr] gap-6">
                               <div>
-                                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">
+                                <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-2">
                                   RTP por día <span className="text-[#e6c364]">●</span> real · <span className="text-[#ef4444]">- -</span> 100%
                                   {g.targetRtp != null && <> · <span className="text-[#4caf7d]">··</span> objetivo</>}
                                 </p>
                                 <RtpChart daily={g.daily} target={g.targetRtp} />
                               </div>
                               <div>
-                                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Jugadores que más ganaron</p>
+                                <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-2">Jugadores que más ganaron</p>
                                 {g.topWinners.length === 0 ? (
                                   <p className="text-xs text-on-surface-variant">Sin datos.</p>
                                 ) : (

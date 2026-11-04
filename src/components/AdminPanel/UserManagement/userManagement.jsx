@@ -56,7 +56,7 @@ const UserManagement = () => {
   const getKycBadge = (user) => {
     const label = user.role === 'admin' ? 'Admin' : user.role === 'mod' ? 'Mod' : 'Usuario';
     return (
-      <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full border border-primary/30 uppercase">
+      <span className="bg-primary/10 text-primary text-[0.625rem] font-bold px-2 py-1 rounded-full border border-primary/30 uppercase">
         {label}
       </span>
     );
@@ -65,20 +65,20 @@ const UserManagement = () => {
   const getStatusBadge = (user) => {
     if (user.banned) {
       return (
-        <span className="bg-error/10 text-error text-[10px] font-bold px-2 py-1 rounded-full border border-error/30 uppercase">
+        <span className="bg-error/10 text-error text-[0.625rem] font-bold px-2 py-1 rounded-full border border-error/30 uppercase">
           Bloqueado
         </span>
       );
     }
     if (user.inactive) {
       return (
-        <span className="bg-gray-500/10 text-gray-500 text-[10px] font-bold px-2 py-1 rounded-full border border-gray-500/30 uppercase">
+        <span className="bg-gray-500/10 text-gray-500 text-[0.625rem] font-bold px-2 py-1 rounded-full border border-gray-500/30 uppercase">
           Inactivo
         </span>
       );
     }
     return (
-      <span className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full border border-green-500/30 uppercase">
+      <span className="bg-green-500/10 text-green-500 text-[0.625rem] font-bold px-2 py-1 rounded-full border border-green-500/30 uppercase">
         Activo
       </span>
     );
@@ -136,11 +136,11 @@ const UserManagement = () => {
           </div>
           <div className="flex gap-4">
             <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest text-primary">Jugadores Totales</span>
+              <span className="text-[0.625rem] uppercase tracking-widest text-primary">Jugadores Totales</span>
               <span className="font-headline-md text-headline-md">{players.length}</span>
             </div>
             <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest text-primary">Usuarios Activos</span>
+              <span className="text-[0.625rem] uppercase tracking-widest text-primary">Usuarios Activos</span>
               <span className="font-headline-md text-headline-md">
                 {players.filter((u) => !u.banned && !u.inactive).length}
               </span>
@@ -320,7 +320,7 @@ const UserManagement = () => {
                             </div>
                             <div className="min-w-0">
                               <p className="font-label-lg text-label-lg text-on-surface">{user.nick}</p>
-                              <p className="text-[10px] text-on-surface-variant tracking-tighter break-all flex items-center gap-1">
+                              <p className="text-[0.625rem] text-on-surface-variant tracking-tighter break-all flex items-center gap-1">
                                 ID: {user.id}
                                 <button
                                   type="button"
@@ -339,10 +339,10 @@ const UserManagement = () => {
                         </td>
                         <td className="px-6 py-5">
                           <p className="font-body-sm text-body-sm text-on-surface">{user.email}</p>
-                          <p className="text-[10px] text-on-surface-variant">Sexo: {user.sexo || 'N/A'}</p>
+                          <p className="text-[0.625rem] text-on-surface-variant">Sexo: {user.sexo || 'N/A'}</p>
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <p className="text-[10px] text-on-surface-variant">{user.country || 'N/A'}</p>
+                          <p className="text-[0.625rem] text-on-surface-variant">{user.country || 'N/A'}</p>
                         </td>
                         <td className="px-6 py-5">
                           <p className="font-label-lg text-label-lg text-primary">

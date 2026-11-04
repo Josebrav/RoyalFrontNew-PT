@@ -252,7 +252,7 @@ export default function Support() {
                 }`}
               >
                 <span className="text-white font-bold text-sm truncate w-full">{ticket.subject}</span>
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${STATUS_META[ticket.status].className}`}>
+                <span className={`text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${STATUS_META[ticket.status].className}`}>
                   {STATUS_META[ticket.status].label}
                 </span>
               </button>
@@ -315,7 +315,7 @@ export default function Support() {
                 <div className="min-w-0 flex-1">
                   <p className="text-white font-bold truncate">{ticketDetail.ticket.subject}</p>
                 </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${STATUS_META[ticketDetail.ticket.status].className}`}>
+                <span className={`text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${STATUS_META[ticketDetail.ticket.status].className}`}>
                   {STATUS_META[ticketDetail.ticket.status].label}
                 </span>
               </div>
@@ -327,11 +327,11 @@ export default function Support() {
                     <div key={m.id} className={`flex flex-col max-w-[75%] ${isMine ? "ml-auto items-end" : "items-start"}`}>
                       <div className={`px-4 py-2 rounded-2xl text-sm ${SENDER_META[m.senderRole].align}`}>
                         {SENDER_META[m.senderRole].label && (
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1">{SENDER_META[m.senderRole].label}</p>
+                          <p className="text-[0.625rem] font-bold uppercase tracking-wider text-primary mb-1">{SENDER_META[m.senderRole].label}</p>
                         )}
                         {m.content}
                       </div>
-                      <span className="text-[10px] text-on-surface-variant/70 mt-1 px-1">
+                      <span className="text-[0.625rem] text-on-surface-variant/70 mt-1 px-1">
                         {formatMessageTimestamp(m.createdAt)}
                       </span>
                     </div>

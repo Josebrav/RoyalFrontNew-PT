@@ -13,6 +13,9 @@ import LogOut from './components/Logout/logout';
 import GameGrid from './components/Juegos/juegos';
 import News from './components/News/news';
 import RankSystem from './components/RankSystem/rankSystem';
+import RankUpNotice from './components/RankUpNotice/rankUpNotice';
+import OfferBanner from './components/OfferBanner/offerBanner';
+import AdminOffers from './components/AdminPanel/Offers/offers';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
@@ -38,6 +41,8 @@ import { capturePromoFromUrl, getPendingPromo, clearPendingPromo } from './utils
 import AboutUs from './components/AboutUs/aboutUs';
 import UserManagement from './components/AdminPanel/UserManagement/userManagement';
 import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
+import AdminPresence from './components/AdminPanel/Presence/presence';
+import useSeo from './utils/useSeo';
 import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
 import AdminDeposits from './components/AdminPanel/Deposits/deposits';
 import AdminPrizes from './components/AdminPanel/Prizes/prizes';
@@ -72,6 +77,7 @@ function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
   const { currentUser } = useSelector((state) => state);
   const location = useLocation();
+  useSeo();
   const dispatch = useDispatch();
 
   // Site-wide editable text/image overrides (Inicio, Nosotros, etc.) — public, needed even
@@ -224,17 +230,19 @@ function App() {
             <Route path="/perfil" element={<Perfil />} />
             <Route path="/perfil/:userNick" element={<Perfil isPublic={true} />} />
             <Route path="/juegos" element={<RequireAuth><GameGrid /></RequireAuth>} />
-            <Route path="/juegos/:slug" element={<RequireAuth><GameDetail /></RequireAuth>} />
+            <Route path="/juegos/:slug" element={<GameDetail />} />
             <Route path="/chips" element={<BuyChips />} />
             <Route path="/logout" element={<LogOut />} />
             <Route path="/admin/users" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/online" element={<ProtectedRoute><AdminPresence /></ProtectedRoute>} />
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
             <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />
             <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/admin/game-stats" element={<ProtectedRoute><AdminGameStats /></ProtectedRoute>} />
             <Route path="/admin/promos" element={<ProtectedRoute><AdminPromos /></ProtectedRoute>} />
+            <Route path="/admin/ofertas" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
             <Route path="/admin/bingo-bots" element={<ProtectedRoute><BingoBots /></ProtectedRoute>} />
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
             <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
@@ -278,6 +286,8 @@ function App() {
           {!location.pathname.includes('/game') && <Footer />}
           </div>
         </div>
+        <RankUpNotice />
+        <OfferBanner />
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"

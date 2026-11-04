@@ -69,7 +69,7 @@ function PrizePeriodCard({ period }) {
           {preview && <p className="text-on-surface-variant text-xs mt-1">Período: {preview.periodKey}</p>}
         </div>
         {preview?.alreadyAwarded && (
-          <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400">
+          <span className="px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-wider bg-green-500/10 text-green-400">
             Ya otorgado
           </span>
         )}

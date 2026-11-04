@@ -172,7 +172,7 @@ export default function UnityBots() {
                               />
                               <button
                                 onClick={() => handleEditAmounts(bot, game.slug)}
-                                className="text-[10px] text-on-surface-variant hover:text-primary underline cursor-pointer bg-transparent border-0"
+                                className="text-[0.625rem] text-on-surface-variant hover:text-primary underline cursor-pointer bg-transparent border-0"
                               >
                                 {numberFormat(cfg.minAmount)}–{numberFormat(cfg.maxAmount)}
                               </button>

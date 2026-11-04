@@ -57,11 +57,11 @@ export default function AdminReferrals() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest text-primary">Total Referidos</span>
+            <span className="text-[0.625rem] uppercase tracking-widest text-primary">Total Referidos</span>
             <span className="font-headline-md text-headline-md">{referrals.length}</span>
           </div>
           <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest text-primary">Con Carga Realizada</span>
+            <span className="text-[0.625rem] uppercase tracking-widest text-primary">Con Carga Realizada</span>
             <span className="font-headline-md text-headline-md">{converted.length}</span>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function AdminReferrals() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          className={`px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${
                             r.firstDepositAt ? "bg-green-500/10 text-green-400" : "bg-amber-500/10 text-amber-400"
                           }`}
                         >

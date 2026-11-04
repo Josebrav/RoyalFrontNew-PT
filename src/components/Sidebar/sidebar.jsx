@@ -38,11 +38,13 @@ export default function Sidebar() {
   // cliente puntual, pero desde la sección "Actividad" del detalle de ese usuario, no acá.
   const adminItems = [
     { to: "/admin/dashboard", icon: "dashboard", label: t("sidebar.panelAdmin"), color: "#4f8fe0" },
+    { to: "/admin/online", icon: "radar", label: t("sidebar.enLinea"), color: "#4caf7d" },
     { to: "/admin/users", icon: "manage_accounts", label: t("sidebar.usuarios"), color: "#a855f7" },
     { to: "/admin/tickets", icon: "support_agent", label: t("sidebar.tickets"), color: "#2dd4bf" },
     ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: t("sidebar.cargas"), color: "#4caf7d" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/game-stats", icon: "query_stats", label: t("sidebar.estadisticasJuegos"), color: "#e6c364" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/promos", icon: "campaign", label: t("sidebar.promociones"), color: "#2dd4bf" }] : []),
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/ofertas", icon: "sell", label: t("sidebar.ofertas"), color: "#e6c364" }] : []),
     { to: "/admin/prizes", icon: "emoji_events", label: t("sidebar.premios"), color: "#a855f7" },
     { to: "/admin/referrals", icon: "diversity_3", label: t("sidebar.referidos"), color: "#2dd4bf" },
     { to: "/admin/trophies", icon: "military_tech", label: t("sidebar.trofeos"), color: "#4f8fe0" },
@@ -76,7 +78,7 @@ export default function Sidebar() {
         {label}
       </span>
       {!!badge && (
-        <span className="hidden lg:inline-flex ml-auto bg-primary text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
+        <span className="hidden lg:inline-flex ml-auto bg-primary text-black text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
           {badge}
         </span>
       )}
@@ -90,14 +92,14 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex fixed left-0 top-20 bottom-0 z-40 w-16 lg:w-56 flex-col gap-6 hud-side px-2 lg:px-4 py-6 overflow-y-auto">
       <div className="flex flex-col gap-1">
-        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[0.625rem] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.cuenta")}
         </p>
         {accountItems.map(renderLink)}
       </div>
 
       <div className="flex flex-col gap-1">
-        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+        <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[0.625rem] font-bold uppercase tracking-widest text-on-surface-variant/70">
           {t("sidebar.social")}
         </p>
         {socialItems.map(renderLink)}
@@ -105,12 +107,13 @@ export default function Sidebar() {
 
       {canAccessAdminPanel && (
         <div className="flex flex-col gap-1">
-          <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+          <p className="hud-side-label hidden lg:flex px-3 mb-1 text-[0.625rem] font-bold uppercase tracking-widest text-on-surface-variant/70">
             {t("sidebar.administracion")}
           </p>
           {adminItems.map(renderLink)}
         </div>
       )}
+
     </aside>
   );
 }

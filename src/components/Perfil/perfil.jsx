@@ -416,7 +416,7 @@ const Perfil = ({ isPublic = false }) => {
                 const isOnline = isOwnProfile || (user.lastSeen && Date.now() - new Date(user.lastSeen).getTime() < 5 * 60 * 1000);
                 const activeGame = isOnline && !isOwnProfile ? getGameByPlayPath(user.currentActivity) : null;
                 return (
-                  <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 text-[10px] sm:text-[11px] font-bold whitespace-nowrap">
+                  <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 text-[0.625rem] sm:text-[0.6875rem] font-bold whitespace-nowrap">
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-500"}`} />
                     <span className={isOnline ? (activeGame ? "text-primary" : "text-green-500") : "text-on-surface-variant"}>
                       {activeGame ? `Jugando a ${activeGame.name}` : isOnline ? "Conectado" : "Desconectado"}
@@ -544,7 +544,7 @@ const Perfil = ({ isPublic = false }) => {
               {(user.description || isOwnProfile) && (
                 <div className="hidden md:block mt-1 max-w-xl w-full glass-card rounded-xl px-4 py-3 text-left">
                   {bioMeta && (
-                    <p className="text-primary text-[10px] font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
+                    <p className="text-primary text-[0.625rem] font-bold uppercase tracking-wider mb-1">{bioMeta}</p>
                   )}
                   <p className="text-on-surface text-xs leading-relaxed whitespace-pre-line line-clamp-3">
                     {user.description
