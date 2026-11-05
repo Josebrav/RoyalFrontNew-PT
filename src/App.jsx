@@ -55,6 +55,7 @@ import Faq from './components/Faq/faq';
 import Privacidad from './components/Legal/privacidad';
 import Cumplimiento from './components/Legal/cumplimiento';
 import Careers from './components/Careers/careers';
+import GlobalChat from './components/GlobalChat/globalChat';
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -203,6 +204,7 @@ function App() {
           {!location.pathname.includes('/game') && <Footer />}
           </div>
         </div>
+        <GlobalChat />
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
