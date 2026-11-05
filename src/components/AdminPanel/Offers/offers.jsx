@@ -139,7 +139,7 @@ export default function AdminOffers() {
         </div>
 
         <div>
-          <label htmlFor="offer-image" className={labelClass}>Banner a pantalla completa</label>
+          <label htmlFor="offer-image" className={labelClass}>Banner de la oferta</label>
           <input
             id="offer-image"
             type="file"
