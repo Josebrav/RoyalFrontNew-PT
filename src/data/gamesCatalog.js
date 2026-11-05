@@ -160,7 +160,7 @@ export const GAMES_CATALOG = [
   },
   {
     slug: "royal-ruleta",
-    name: "Royal Ruleta (x500)",
+    name: "Royal Ruleta",
     category: "casino",
     status: "active",
     image: ruletaImage,
@@ -168,7 +168,7 @@ export const GAMES_CATALOG = [
     players: 1120,
     playPath: "/game/royalruleta",
     description:
-      "Ruleta europea con multiplicador especial de hasta x500. Apuesta a tu número, color o docena favorita y deja girar la rueda.",
+      "Ruleta europea con mesas compartidas. Apuesta a tu número, color o docena favorita y deja girar la rueda.",
   },
   {
     slug: "crazy-time-royal",

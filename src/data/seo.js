@@ -47,7 +47,7 @@ export const GAME_SEO = {
   },
   "royal-ruleta": {
     title: "Ruleta online gratis | RoyalJuegos",
-    description: "Ruleta online gratis con mesas compartidas y pagos de hasta x500. Apostá con fichas de regalo y jugá con otros jugadores en vivo.",
+    description: "Ruleta online gratis con mesas compartidas. Apostá con fichas de regalo y jugá con otros jugadores en vivo.",
   },
   domino: {
     title: "Dominó online gratis contra jugadores reales | RoyalJuegos",
