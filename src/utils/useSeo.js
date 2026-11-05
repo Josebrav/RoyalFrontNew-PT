@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { LOCALE } from "../i18n/locale";
-import { SITE_URL, seoForPath } from "../data/seo";
+import { SITE_NAME, SITE_URL, seoForPath } from "../data/seo";
 
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);
@@ -35,11 +35,12 @@ export default function useSeo() {
       // vista previa apuntando a royaljuegos.com, para que Google no los tome como copias.
       document.head.querySelector('link[rel="canonical"]')?.remove();
       document.head.querySelector('meta[property="og:url"]')?.remove();
-      document.title = "RoyalGames";
+      document.title = SITE_NAME;
       return;
     }
     const seo = seoForPath(pathname);
-    document.title = seo.title;
+    // La pestana muestra solo la marca; el titulo largo queda para la vista previa al compartir.
+    document.title = SITE_NAME;
     setMeta("name", "description", seo.description);
     setMeta("property", "og:title", seo.title);
     setMeta("property", "og:description", seo.description);

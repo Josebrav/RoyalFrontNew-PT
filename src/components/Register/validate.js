@@ -12,6 +12,9 @@ export const validateNickFormat = (nick) => {
     if (nick.length > 20) {
         return t("register.err.nickTooLong");
     }
+    if (nick.includes("@")) {
+        return t("register.err.nickIsEmail");
+    }
     return null; // Indica que no hay error
 };
 
