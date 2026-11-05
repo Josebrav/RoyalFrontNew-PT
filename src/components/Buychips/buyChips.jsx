@@ -568,7 +568,7 @@ export default function BuyChips() {
                             <span className="material-symbols-outlined text-[18px] text-white">qr_code_2</span>
                           </span>
                           <span className="min-w-0">
-                            <span className="block text-xs font-bold text-white">Pix ou cartão</span>
+                            <span className="block text-xs font-bold text-white">Pix</span>
                             <span className="block text-[0.625rem] text-on-surface-variant">Pague em reais (R$)</span>
                           </span>
                         </button>
@@ -774,7 +774,7 @@ export default function BuyChips() {
                     </div>
                     {availableMethods.includes(paymentMethod) && (
                       <p className="basis-full text-[0.6875rem] text-on-surface-variant leading-snug">
-                        {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix ou cartão. As fichas são creditadas assim que o pagamento é confirmado."}
+                        {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix. As fichas são creditadas assim que o pagamento é confirmado."}
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>
@@ -876,7 +876,7 @@ export default function BuyChips() {
                           className="w-full bg-[#32BCAD] hover:bg-[#2AA396] py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                         >
                           <span className="material-symbols-outlined">qr_code_2</span>
-                          Pagar com Pix ou cartão
+                          Pagar com Pix
                         </button>
                       )}
 
