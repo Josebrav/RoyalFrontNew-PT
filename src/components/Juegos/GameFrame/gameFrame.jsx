@@ -139,7 +139,11 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
   // El primer token va en la URL; los siguientes se mandan por mensaje (cambiar la URL recargaría el
   // juego en medio de una partida).
   const [gameToken, setGameToken] = useState({ value: "", ready: false });
+  // El token renovado más nuevo: si el juego cambia de URL (RoyalSlots al pasar de una tragamonedas a
+  // otra) arranca con este y no con el primero, que puede estar por vencer.
+  const latestTokenRef = useRef("");
   useEffect(() => {
+    latestTokenRef.current = "";
     let cancelled = false;
     setGameToken({ value: "", ready: false });
     fetchGameToken().then((value) => {
@@ -156,12 +160,17 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
     if (!origin) return undefined;
     const timer = setInterval(async () => {
       const value = await fetchGameToken();
-      if (value) iframeRef.current?.contentWindow?.postMessage({ type: "royal:game-token", token: value }, origin);
+      if (!value) return;
+      latestTokenRef.current = value;
+      iframeRef.current?.contentWindow?.postMessage({ type: "royal:game-token", token: value }, origin);
     }, GAME_TOKEN_REFRESH_MS);
     return () => clearInterval(timer);
   }, [userId, src]);
 
-  const frameSrc = useMemo(() => withGameToken(withTabId(src), gameToken.value), [src, gameToken.value]);
+  const frameSrc = useMemo(
+    () => withGameToken(withTabId(src), latestTokenRef.current || gameToken.value),
+    [src, gameToken.value]
+  );
 
   // Saldo nuevo (la página lo vuelve a leer cada pocos segundos mientras se juega, ver App.jsx): se
   // le avisa al juego, que lo aplica cuando no está en medio de una jugada (RoyalChipsBridge en
