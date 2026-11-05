@@ -115,6 +115,40 @@ export default function AdminOffers() {
     load();
   };
 
+  // Ocultar la oferta a un jugador: no la ve ni se le aplica al comprar.
+  const setExcluded = async (offer, nick, excluded) => {
+    try {
+      await axios.patch(`${API_URL}/admin/chip-offers/${offer.id}/excluded`, { nick, excluded });
+      load();
+    } catch (err) {
+      const message = err.response?.data?.message;
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo cambiar",
+        text: Array.isArray(message) ? message[0] : message || "Probá de nuevo en un momento.",
+        background: "#1a1a1a",
+        color: "#fff",
+        confirmButtonColor: "#c9a84c",
+      });
+    }
+  };
+
+  const askExclude = async (offer) => {
+    const { value: nick } = await Swal.fire({
+      title: `Ocultar "${offer.title}" a un jugador`,
+      input: "text",
+      inputPlaceholder: "Nick del jugador",
+      showCancelButton: true,
+      confirmButtonText: "Ocultar",
+      cancelButtonText: "Cancelar",
+      background: "#1a1a1a",
+      color: "#fff",
+      confirmButtonColor: "#c9a84c",
+      inputValidator: (value) => (!value?.trim() ? "Escribí un nick" : undefined),
+    });
+    if (nick) setExcluded(offer, nick.trim(), true);
+  };
+
   if (!viewerIsAdmin) return null;
 
   const inputClass = "w-full bg-surface-container border border-outline-variant/30 rounded-lg px-3 py-2 text-white";
@@ -260,14 +294,38 @@ export default function AdminOffers() {
                 <p className="text-sm">
                   {offer.multiplier ? `Express: x${offer.multiplier} en cualquier compra` : offer.items.map((item) => `${fmt(item.chips)} fichas por ${fmt(item.price)} ${item.currency}`).join(" · ")}
                 </p>
+                {offer.excludedNicks?.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="text-on-surface-variant">Oculta a:</span>
+                    {offer.excludedNicks.map((nick) => (
+                      <button
+                        key={nick}
+                        onClick={() => setExcluded(offer, nick, false)}
+                        title="Volver a mostrársela"
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-variant hover:bg-primary/20 cursor-pointer"
+                      >
+                        {nick}
+                        <span className="material-symbols-outlined text-[16px]">close</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               {canEnd && (
-                <button
-                  onClick={() => endOffer(offer)}
-                  className="px-4 py-2 rounded-lg border border-outline-variant/40 hover:bg-surface-variant cursor-pointer"
-                >
-                  Terminar
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => askExclude(offer)}
+                    className="px-4 py-2 rounded-lg border border-outline-variant/40 hover:bg-surface-variant cursor-pointer"
+                  >
+                    Ocultar a un jugador
+                  </button>
+                  <button
+                    onClick={() => endOffer(offer)}
+                    className="px-4 py-2 rounded-lg border border-outline-variant/40 hover:bg-surface-variant cursor-pointer"
+                  >
+                    Terminar
+                  </button>
+                </div>
               )}
             </div>
           );
