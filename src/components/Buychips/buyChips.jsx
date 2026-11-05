@@ -32,15 +32,16 @@ const PAYMENT_REGIONS = {
   co: { label: "Colombia", mercadoPago: { country: "co", currency: "COP", rate: 5200, symbol: "$" }, paypalCurrency: "USD" },
   mx: { label: "México", mercadoPago: { country: "mx", currency: "MXN", rate: 20, symbol: "$" }, paypalCurrency: "USD" },
   es: { label: "España", mercadoPago: null, paypalCurrency: "EUR" },
+  br: { label: "Brasil", mercadoPago: null, asaas: true, paypalCurrency: "USD" },
   other: { label: "Otro país", mercadoPago: null, paypalCurrency: "USD" },
 };
-const REGION_ORDER = ["ar", "co", "mx", "es", "other"];
+const REGION_ORDER = ["ar", "co", "mx", "es", "br", "other"];
 
 const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
 
 // "Fichas base" de la promo: lo que da la tasa de siempre (500.000 fichas por dólar o euro, 500 por
 // peso). Cada paquete muestra su bonus (+X%) y el total que recibe, que es lo que se acredita.
-const BASE_CHIPS_PER_UNIT = { USD: 500_000, EUR: 500_000, ARS: 500 };
+const BASE_CHIPS_PER_UNIT = { USD: 500_000, EUR: 500_000, ARS: 500, BRL: 100_000 };
 
 // Client id de PayPal: tiene que ser del mismo entorno (sandbox o live) que PAYPAL_MODE
 // en el backend. Sin él no se muestra PayPal, en vez de caer a un id fijo de otro entorno.
@@ -82,6 +83,9 @@ const CHIP_CATALOG = {
   // Argentina: 20% más de fichas que el equivalente en dólares.
   ARS: tiers("ARS", 301, [[100, 120_000], [500, 900_000], [1_000, 3_000_000], [5_000, 18_000_000],
     [10_000, 60_000_000], [100_000, 900_000_000], [500_000, 6_000_000_000], [1_000_000, 18_000_000_000]]),
+  // Brasil (Asaas): mismas fichas que los paquetes de USD, con precios redondos en reales.
+  BRL: tiers("BRL", 401, [[5, 2_500_000], [25, 15_000_000], [50, 40_000_000], [250, 250_000_000],
+    [500, 600_000_000], [1000, 1_500_000_000], [2500, 7_500_000_000], [5000, 20_000_000_000]]),
 };
 
 // Porcentaje de bonus: cuánto más que las fichas base da el paquete.
@@ -156,12 +160,14 @@ export default function BuyChips() {
   const mercadoPago = regionConfig.mercadoPago;
   const paypalCurrency = regionConfig.paypalCurrency;
 
-  // Medio de pago por defecto al cambiar de país: Mercado Pago donde existe, si no PayPal.
-  useEffect(() => {
-    setPaymentMethod(mercadoPago ? "mercadopago" : "paypal");
-  }, [region, mercadoPago]);
+  const asaasAvailable = !!regionConfig.asaas;
 
-  const availableMethods = [mercadoPago && "mercadopago", PAYPAL_CLIENT_ID && "paypal"].filter(Boolean);
+  // Medio de pago por defecto al cambiar de país: el local donde existe, si no PayPal.
+  useEffect(() => {
+    setPaymentMethod(asaasAvailable ? "asaas" : mercadoPago ? "mercadopago" : "paypal");
+  }, [region, mercadoPago, asaasAvailable]);
+
+  const availableMethods = [mercadoPago && "mercadopago", asaasAvailable && "asaas", PAYPAL_CLIENT_ID && "paypal"].filter(Boolean);
 
   useEffect(() => {
     const el = paypalBoxRef.current;
@@ -177,10 +183,11 @@ export default function BuyChips() {
   // Qué paquetes y en qué moneda: Mercado Pago Argentina vende los de pesos; Colombia/México los de
   // USD convertidos a su moneda; PayPal los de USD o EUR (España) con el precio tal cual.
   const payingWithMercadoPago = paymentMethod === "mercadopago" && !!mercadoPago;
-  const catalogCurrency = payingWithMercadoPago ? (mercadoPago.currency === "ARS" ? "ARS" : "USD") : paypalCurrency;
+  const payingWithAsaas = paymentMethod === "asaas" && asaasAvailable;
+  const catalogCurrency = payingWithAsaas ? "BRL" : payingWithMercadoPago ? (mercadoPago.currency === "ARS" ? "ARS" : "USD") : paypalCurrency;
   const displayRate = payingWithMercadoPago && catalogCurrency === "USD" ? mercadoPago.rate : 1;
-  const currency = payingWithMercadoPago ? mercadoPago.currency : paypalCurrency;
-  const symbol = payingWithMercadoPago ? mercadoPago.symbol : PAYPAL_SYMBOLS[paypalCurrency];
+  const currency = payingWithAsaas ? "BRL" : payingWithMercadoPago ? mercadoPago.currency : paypalCurrency;
+  const symbol = payingWithAsaas ? "R$" : payingWithMercadoPago ? mercadoPago.symbol : PAYPAL_SYMBOLS[paypalCurrency];
   const getDisplayPrice = (chip) => (chip.price * displayRate).toFixed(2);
   // Con centavos siempre 2 decimales ("0,10"); montos enteros sin decimales ("1.000").
   const formatPrice = (chip) => {
@@ -190,19 +197,21 @@ export default function BuyChips() {
   };
   const formatChips = (amount) => new Intl.NumberFormat("es-ES").format(amount);
 
-  const visibleChipOptions = CHIP_CATALOG[catalogCurrency];
   // Oferta vigente (panel -> Ofertas) en la moneda de este jugador, si la tiene. Fichas y precio los
   // decide el backend a partir del packageId, igual que con los paquetes de siempre.
   const [currentOffer, setCurrentOffer] = useState(null);
   useEffect(() => {
     axios.get(`${API_URL}/chip-offers/current`).then(({ data }) => setCurrentOffer(data?.offer ?? null)).catch(() => {});
   }, []);
+  // Oferta express: cualquier paquete da sus fichas multiplicadas (el backend decide lo que se acredita).
+  const offerMultiplier = currentOffer?.multiplier ?? 1;
+  const visibleChipOptions = CHIP_CATALOG[catalogCurrency].map((chip) => ({ ...chip, chips: chip.chips * offerMultiplier }));
   const offerItem = currentOffer?.items.find((item) => item.currency === catalogCurrency);
   const offerChip = offerItem ? { id: offerItem.packageId, currency: offerItem.currency, price: offerItem.price, chips: offerItem.chips } : null;
   useEffect(() => {
     if (offerChip) setSelectedChip(offerChip);
-    else if (!visibleChipOptions.some((chip) => chip.id === selectedChip?.id)) setSelectedChip(visibleChipOptions[0]);
-  }, [catalogCurrency, paymentMethod, offerChip?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    else setSelectedChip(visibleChipOptions.find((chip) => chip.id === selectedChip?.id) ?? visibleChipOptions[0]);
+  }, [catalogCurrency, paymentMethod, offerChip?.id, offerMultiplier]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch real transaction history from backend
   useEffect(() => {
@@ -300,12 +309,67 @@ export default function BuyChips() {
     }
   };
 
+  // Asaas exige nombre y CPF de quien paga. Solo se ofrece en Brasil, por eso los textos van en
+  // portugués. El CPF se manda a Asaas y no se guarda en nuestra base.
+  const createAsaasOrder = async () => {
+    if (!currentUser?.id) {
+      Swal.fire({ icon: "warning", title: "Faça login", text: "Você precisa entrar na sua conta para comprar fichas.", confirmButtonColor: "#C9A84C" });
+      return;
+    }
+    const { value: payer } = await Swal.fire({
+      title: "Dados do pagador",
+      html:
+        '<input id="asaas-name" class="swal2-input" placeholder="Nome completo" maxlength="100" autocomplete="name">' +
+        '<input id="asaas-cpf" class="swal2-input" placeholder="CPF" maxlength="14" inputmode="numeric">',
+      confirmButtonText: "Continuar",
+      confirmButtonColor: "#C9A84C",
+      showCancelButton: true,
+      cancelButtonText: "Cancelar",
+      focusConfirm: false,
+      preConfirm: () => {
+        const name = document.getElementById("asaas-name").value.trim();
+        const cpf = document.getElementById("asaas-cpf").value.replace(/\D/g, "");
+        if (name.length < 3) return Swal.showValidationMessage("Informe seu nome completo.");
+        if (cpf.length !== 11) return Swal.showValidationMessage("O CPF deve ter 11 dígitos.");
+        return { name, cpf };
+      },
+    });
+    if (!payer) return;
+
+    try {
+      Swal.fire({
+        title: "Gerando seu pagamento...",
+        text: "Aguarde enquanto levamos você à página segura do Asaas.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      const { data } = await axios.post(`${API_URL}/asaas/create-order`, {
+        userId: currentUser.id,
+        packageId: selectedChip.id,
+        name: payer.name,
+        cpf: payer.cpf,
+      });
+      if (!data?.invoiceUrl) throw new Error("No invoiceUrl returned from backend");
+      window.location.href = data.invoiceUrl;
+    } catch (error) {
+      const invalidCpf = error?.response?.data?.message === "CPF inválido.";
+      Swal.fire({
+        icon: invalidCpf ? "warning" : "error",
+        title: invalidCpf ? "CPF inválido" : "Erro no pagamento",
+        text: invalidCpf ? "Confira o número do CPF e tente novamente." : "Não foi possível gerar seu pagamento. Tente novamente.",
+        confirmButtonColor: "#C9A84C",
+      });
+    }
+  };
+
   // Helper formatting for platform name
   const formatPlatformName = (platform) => {
     if (!platform) return "Sistema";
     switch (platform.toLowerCase()) {
       case "paypal":
         return "PayPal Gateway";
+      case "asaas":
+        return "Asaas (BRL)";
       case "mepago":
         return "Mercado Pago (USD)";
       case "mepago_mx":
@@ -488,6 +552,27 @@ export default function BuyChips() {
                           </span>
                         </button>
                       )}
+                      {asaasAvailable && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("asaas")}
+                          aria-pressed={paymentMethod === "asaas"}
+                          className={`glass-card relative px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
+                            paymentMethod === "asaas"
+                              ? "border-primary bg-primary/20 shadow-[0_0_14px_rgba(230,195,100,0.45)]"
+                              : "border-outline-variant/30 opacity-70 hover:opacity-100 hover:border-primary/45"
+                          }`}
+                        >
+                          {paymentMethod === "asaas" && <SelectedMark />}
+                          <span className="w-8 h-8 rounded-full bg-[#32BCAD] flex items-center justify-center flex-shrink-0">
+                            <span className="material-symbols-outlined text-[18px] text-white">qr_code_2</span>
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-xs font-bold text-white">Pix ou cartão</span>
+                            <span className="block text-[0.625rem] text-on-surface-variant">Pague em reais (R$)</span>
+                          </span>
+                        </button>
+                      )}
                       {PAYPAL_CLIENT_ID && (
                         <button
                           type="button"
@@ -555,6 +640,15 @@ export default function BuyChips() {
                   <label className="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
                     3. Selecciona un Paquete de Fichas
                   </label>
+                  {offerMultiplier > 1 && (
+                    <div className="w-full mb-4 rounded-xl border-2 border-primary bg-primary/15 p-3 flex items-center gap-3 text-left">
+                      <img src={currentOffer.imageUrl} alt="" className="w-28 h-16 object-cover rounded-lg shrink-0" />
+                      <span className="min-w-0">
+                        <span className="block text-white font-bold truncate">{currentOffer.title}</span>
+                        <span className="block text-sm text-primary font-bold">Todos los paquetes dan x{offerMultiplier} fichas</span>
+                      </span>
+                    </div>
+                  )}
                   {offerChip && (
                     <button
                       type="button"
@@ -680,6 +774,7 @@ export default function BuyChips() {
                     </div>
                     {availableMethods.includes(paymentMethod) && (
                       <p className="basis-full text-[0.6875rem] text-on-surface-variant leading-snug">
+                        {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix ou cartão. As fichas são creditadas assim que o pagamento é confirmado."}
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>
@@ -771,6 +866,18 @@ export default function BuyChips() {
                             }}
                           />
                         </div>
+                      )}
+
+                      {/* ASAAS ACTIVE RENDER */}
+                      {paymentMethod === "asaas" && asaasAvailable && (
+                        <button
+                          type="button"
+                          onClick={createAsaasOrder}
+                          className="w-full bg-[#32BCAD] hover:bg-[#2AA396] py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                        >
+                          <span className="material-symbols-outlined">qr_code_2</span>
+                          Pagar com Pix ou cartão
+                        </button>
                       )}
 
                       {/* MERCADO PAGO ACTIVE RENDER */}

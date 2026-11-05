@@ -8,6 +8,7 @@ const CURRENCIES = [
   { code: "USD", label: "Dólares", hint: "PayPal y Mercado Pago Colombia/México" },
   { code: "ARS", label: "Pesos argentinos", hint: "Mercado Pago Argentina" },
   { code: "EUR", label: "Euros", hint: "PayPal España" },
+  { code: "BRL", label: "Reales", hint: "Asaas Brasil" },
 ];
 
 const fmt = (v) => new Intl.NumberFormat("es-ES").format(Number(v) || 0);
@@ -20,9 +21,10 @@ const emptyForm = () => {
   const now = new Date();
   return {
     title: "",
+    multiplier: "",
     startsAt: toLocalInput(now),
     endsAt: toLocalInput(new Date(now.getTime() + 24 * 3600 * 1000)),
-    prices: { USD: { price: "", chips: "" }, ARS: { price: "", chips: "" }, EUR: { price: "", chips: "" } },
+    prices: { USD: { price: "", chips: "" }, ARS: { price: "", chips: "" }, EUR: { price: "", chips: "" }, BRL: { price: "", chips: "" } },
   };
 };
 
@@ -71,6 +73,7 @@ export default function AdminOffers() {
     body.append("startsAt", new Date(form.startsAt).toISOString());
     body.append("endsAt", new Date(form.endsAt).toISOString());
     body.append("items", JSON.stringify(items));
+    if (form.multiplier) body.append("multiplier", form.multiplier);
 
     setSaving(true);
     try {
@@ -174,7 +177,25 @@ export default function AdminOffers() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div>
+          <label htmlFor="offer-multiplier" className={labelClass}>Oferta express: multiplicador en cualquier compra</label>
+          <input
+            id="offer-multiplier"
+            type="number"
+            min="2"
+            max="20"
+            step="1"
+            className={inputClass}
+            value={form.multiplier}
+            onChange={(e) => setForm({ ...form, multiplier: e.target.value })}
+            placeholder="Ej: 7 para un 7x1. Vacío = oferta de paquete propio"
+          />
+          <p className="text-xs text-on-surface-variant mt-1">
+            Multiplica las fichas de todos los paquetes, en todas las monedas y medios de pago, sin cambiar el precio.
+          </p>
+        </div>
+
+        {!form.multiplier && <div className="space-y-3">
           <p className={labelClass}>Precio y fichas por moneda</p>
           <p className="text-xs text-on-surface-variant">
             Completá al menos una. Quien paga en una moneda que dejes vacía no ve la oferta en la página de compra.
@@ -209,7 +230,7 @@ export default function AdminOffers() {
               />
             </div>
           ))}
-        </div>
+        </div>}
 
         <button
           type="submit"
@@ -237,7 +258,7 @@ export default function AdminOffers() {
                   {new Date(offer.startsAt).toLocaleString("es-ES")} → {new Date(offer.endsAt).toLocaleString("es-ES")}
                 </p>
                 <p className="text-sm">
-                  {offer.items.map((item) => `${fmt(item.chips)} fichas por ${fmt(item.price)} ${item.currency}`).join(" · ")}
+                  {offer.multiplier ? `Express: x${offer.multiplier} en cualquier compra` : offer.items.map((item) => `${fmt(item.chips)} fichas por ${fmt(item.price)} ${item.currency}`).join(" · ")}
                 </p>
               </div>
               {canEnd && (

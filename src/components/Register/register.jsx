@@ -202,7 +202,6 @@ const RegistroForm = ({ className, children }) => {
             {isRegisterOpen && createPortal(
                 <div
                     className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto"
-                    onClick={toggleRegisterBox}
                 >
                     <main
                         className="relative z-10 w-full max-w-[420px] border border-primary/15 rounded-xl overflow-hidden shadow-[0_25px_70px_-15px_rgba(0,0,0,0.65),0_0_50px_-12px_rgba(201,168,76,0.15)] transition-all duration-300 my-4 select-none"
