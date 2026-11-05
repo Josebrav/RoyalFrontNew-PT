@@ -30,7 +30,9 @@ const initialForm = {
 export default function BingoBots() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === "admin";
+  // Admins y mods (el backend también los deja: /admin/bingo-bots es Admin/Mod).
+  const viewerRole = useSelector((state) => state.currentUser?.role);
+  const viewerIsAdmin = viewerRole === "admin" || viewerRole === "mod";
 
   const [bots, setBots] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -228,7 +230,7 @@ export default function BingoBots() {
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4 block">lock</span>
           <h2 className="font-headline-md text-headline-md text-white mb-2">Acceso Restringido</h2>
           <p className="text-on-surface-variant text-sm mb-6">
-            Los bots de Bingo son una palanca de la economía de la casa — solo administradores pueden crearlos o tocarlos.
+            Solo administradores y moderadores pueden crear o manejar los bots.
           </p>
           <button
             onClick={() => navigate('/admin/dashboard')}
@@ -271,7 +273,7 @@ export default function BingoBots() {
           className="bg-surface-container-high rounded-xl border border-outline-variant/20 p-6 mb-8 grid grid-cols-2 md:grid-cols-4 gap-4"
         >
           <div className="col-span-2 md:col-span-1">
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Nick</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Nick</label>
             <input
               name="nick"
               value={form.nick}
@@ -281,7 +283,7 @@ export default function BingoBots() {
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Género</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Género</label>
             <select
               name="sexo"
               value={form.sexo}
@@ -293,7 +295,7 @@ export default function BingoBots() {
             </select>
           </div>
           <div className="col-span-2 md:col-span-1">
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Sala (opcional)</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Sala (opcional)</label>
             <select
               name="roomId"
               value={form.roomId}
@@ -307,35 +309,35 @@ export default function BingoBots() {
             </select>
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Fichas iniciales</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Fichas iniciales</label>
             <input
               type="number" min="0" name="initialChips" value={form.initialChips} onChange={handleFormChange}
               className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Min. cartones/partida</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Min. cartones/partida</label>
             <input
               type="number" min="1" max="24" name="minCardsPerGame" value={form.minCardsPerGame} onChange={handleFormChange}
               className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Máx. cartones/partida</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Máx. cartones/partida</label>
             <input
               type="number" min="1" max="24" name="maxCardsPerGame" value={form.maxCardsPerGame} onChange={handleFormChange}
               className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Auto-recarga: umbral</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Auto-recarga: umbral</label>
             <input
               type="number" min="0" name="autoTopUpThreshold" value={form.autoTopUpThreshold} onChange={handleFormChange}
               className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Auto-recarga: monto</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Auto-recarga: monto</label>
             <input
               type="number" min="0" name="autoTopUpAmount" value={form.autoTopUpAmount} onChange={handleFormChange}
               className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 py-2.5 text-body-sm focus:border-primary outline-none text-on-surface"
@@ -392,12 +394,12 @@ export default function BingoBots() {
                       </td>
                       <td className="px-6 py-4">
                         {bot.connected ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-400">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-wider bg-green-500/10 text-green-400">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                             {bot.roomName}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-500/10 text-gray-400">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-wider bg-gray-500/10 text-gray-400">
                             <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
                             Desconectado
                           </span>

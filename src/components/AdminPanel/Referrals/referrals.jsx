@@ -20,7 +20,19 @@ export default function AdminReferrals() {
       }
     };
     fetchReferrals();
+    // Solo admin (para un mod devuelve 403 y la tabla no se muestra).
+    axios.get(`${API_URL}/admin/staff-referral-codes`).then(({ data }) => setStaff(data)).catch(() => setStaff([]));
   }, []);
+
+  const [staff, setStaff] = useState([]);
+  const [copied, setCopied] = useState(null);
+  const staffLink = (code) => `${window.location.origin}/?ref=${code}`;
+  const copyStaffLink = (code) => {
+    navigator.clipboard?.writeText(staffLink(code)).then(() => {
+      setCopied(code);
+      setTimeout(() => setCopied(null), 1500);
+    }).catch(() => {});
+  };
 
   const converted = referrals.filter((r) => r.firstDepositAt);
 
@@ -45,14 +57,53 @@ export default function AdminReferrals() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest text-primary">Total Referidos</span>
+            <span className="text-[0.625rem] uppercase tracking-widest text-primary">Total Referidos</span>
             <span className="font-headline-md text-headline-md">{referrals.length}</span>
           </div>
           <div className="bg-surface-container-high px-6 py-4 rounded-xl border border-outline-variant/20 flex flex-col">
-            <span className="text-[10px] uppercase tracking-widest text-primary">Con Carga Realizada</span>
+            <span className="text-[0.625rem] uppercase tracking-widest text-primary">Con Carga Realizada</span>
             <span className="font-headline-md text-headline-md">{converted.length}</span>
           </div>
         </div>
+
+        {staff.length > 0 && (
+          <div className="bg-surface-container rounded-xl border border-outline-variant/20 overflow-hidden">
+            <div className="px-6 py-4 border-b border-outline-variant/20">
+              <h2 className="text-white font-bold text-lg">Códigos del equipo</h2>
+              <p className="text-on-surface-variant text-xs">El código de cada admin y mod. Quien se registra con su enlace queda como referido suyo.</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-surface-container-high border-b border-outline-variant/30 text-xs">
+                    {["Nick", "Rol", "Código", "Enlace", "Registros", ""].map((h) => (
+                      <th key={h} className="px-4 py-3 font-label-lg text-primary uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-outline-variant/10">
+                  {staff.map((s) => (
+                    <tr key={s.referralCode} className="hover:bg-surface-variant/20">
+                      <td className="px-4 py-3 font-bold text-white">{s.nick}</td>
+                      <td className="px-4 py-3 text-on-surface-variant uppercase text-xs">{s.role}</td>
+                      <td className="px-4 py-3 font-bold text-primary tracking-widest">{s.referralCode}</td>
+                      <td className="px-4 py-3 text-on-surface-variant text-xs break-all">{staffLink(s.referralCode)}</td>
+                      <td className="px-4 py-3 tabular-nums">{s.referredCount}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => copyStaffLink(s.referralCode)}
+                          className="px-3 py-1.5 rounded-lg bg-primary text-black text-xs font-bold border-0 cursor-pointer whitespace-nowrap"
+                        >
+                          {copied === s.referralCode ? "¡Copiado!" : "Copiar enlace"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="px-margin-desktop max-w-container-max mx-auto">
@@ -105,7 +156,7 @@ export default function AdminReferrals() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          className={`px-3 py-1 rounded-full text-[0.625rem] font-bold uppercase tracking-wider ${
                             r.firstDepositAt ? "bg-green-500/10 text-green-400" : "bg-amber-500/10 text-amber-400"
                           }`}
                         >

@@ -25,6 +25,9 @@ import { fetchUserProfile, getUserByEmail } from "../../redux/actions";
 import API_URL from "../../api/rutaApi";
 import { useAuth } from "../../context/oauthContext";
 import { t } from "../../i18n/strings";
+import { LOCALE } from "../../i18n/locale";
+import SeoIntro from "./seoIntro";
+import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
 
 const SIMULATED_ONLINE_MIN = 18;
 const SIMULATED_ONLINE_MAX = 34;
@@ -294,15 +297,15 @@ export default function Home() {
         {/* <div className="sticky top-16 z-40 bg-surface-container-low border-b border-outline-variant/10 px-4 md:px-margin-desktop py-2 flex items-center justify-between">
           <div className="flex gap-4 md:gap-8 overflow-x-auto no-scrollbar py-1">
             <div className="flex flex-col text-left">
-              <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Balance Real</span>
+              <span className="text-on-surface-variant text-[0.625rem] uppercase font-bold tracking-widest">Balance Real</span>
               <span className="text-on-surface font-bold text-label-lg font-label-lg">{formattedChipsValue}</span>
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Crédito de Bono</span>
+              <span className="text-on-surface-variant text-[0.625rem] uppercase font-bold tracking-widest">Crédito de Bono</span>
               <span className="text-primary font-bold text-label-lg font-label-lg">$250.00</span>
             </div>
             <div className="flex flex-col text-left">
-              <span className="text-on-surface-variant text-[10px] uppercase font-bold tracking-widest">Nivel VIP</span>
+              <span className="text-on-surface-variant text-[0.625rem] uppercase font-bold tracking-widest">Nivel VIP</span>
               <span className="text-secondary font-bold text-label-lg font-label-lg">{vipLevel}</span>
             </div>
           </div>
@@ -329,35 +332,35 @@ export default function Home() {
             {/* Secondary promo slides/widgets */}
             <div className="lg:col-span-4 flex flex-col gap-6 h-[320px] lg:h-full">
               <div 
-                onClick={() => handleSoonAlert('Recarga Semanal')}
+                onClick={() => handleSoonAlert('Bono Semanal')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-outline-variant/30 group cursor-pointer"
               >
                 <EditableImage
                   contentKey="home.dashboard.banner2"
                   fallbackSrc={sportsBanner}
-                  alt="Banner de Recarga Semanal"
+                  alt="Banner de Bono Semanal"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-black/40 p-6 flex flex-col justify-end text-left">
-                  <h3 className="font-headline-sm text-headline-sm text-white">Recarga Semanal</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-white">Bono Semanal</h3>
                   <p className="text-on-surface-variant text-body-sm font-body-sm">Mejora tus fines de semana con un bono del 50%.</p>
                 </div> */}
               </div>
 
               <div 
-                onClick={() => handleSoonAlert('Premios Pragmatic')}
+                onClick={() => handleSoonAlert('Premios')}
                 className="relative flex-1 rounded-xl overflow-hidden border border-primary/40 group cursor-pointer gold-glow"
               >
                 <EditableImage
                   contentKey="home.dashboard.banner3"
                   fallbackSrc={bannercelu}
-                  alt="Banner de Premios Pragmatic"
+                  alt="Banner de Premios"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
                 />
                 {/* <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent p-6 flex flex-col justify-end text-left">
-                  <h3 className="font-headline-sm text-headline-sm text-primary">Premios de Pragmatic</h3>
+                  <h3 className="font-headline-sm text-headline-sm text-primary">Premios</h3>
                   <p className="text-white text-body-sm font-body-sm">Ganancias diarias en todos tus favoritos.</p>
                 </div> */}
               </div>
@@ -408,7 +411,7 @@ export default function Home() {
                       />
                     </div>
                     <div className="p-3 text-left">
-                      <span className={`inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 ${CATEGORY_META[game.category].chipClassName}`}>
+                      <span className={`inline-block text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 ${CATEGORY_META[game.category].chipClassName}`}>
                         {t(`catalog.category.${game.category}`)}
                       </span>
                       <h4 className="font-bold text-label-lg font-label-lg truncate text-white">{game.name}</h4>
@@ -474,6 +477,14 @@ export default function Home() {
                       </div>
                     ))
                   )}
+                <button
+                  type="button"
+                  onClick={() => navigate(newsArticlePath(POINTS_AND_TOURNAMENTS_NEWS_ID))}
+                  className="w-full text-center text-xs font-bold text-emerald-400 hover:underline cursor-pointer bg-transparent border-0 pt-1 flex items-center justify-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">emoji_events</span>
+                  ¿Cómo funcionan los puntos y torneos?
+                </button>
                 </div>
               </div>
 
@@ -511,7 +522,7 @@ export default function Home() {
                               <p className={`font-bold text-white text-sm truncate ${isRealPlayer ? "group-hover:text-sky-400 group-hover:underline" : ""}`}>
                                 {player.nick}
                               </p>
-                              <p className="text-[11px] text-on-surface-variant truncate">
+                              <p className="text-[0.6875rem] text-on-surface-variant truncate">
                                 {activeGame ? <span className="text-sky-400">{t("home.dashboard.jugandoA")} {activeGame.name}</span> : t("home.dashboard.enElSitio")}
                               </p>
                             </div>
@@ -519,7 +530,7 @@ export default function Home() {
                           {activeGame && (
                             <button
                               onClick={() => handlePlayGame(activeGame.playPath, activeGame.name)}
-                              className="px-3 py-1.5 rounded bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[11px] font-bold uppercase flex-shrink-0 cursor-pointer border-0 hover:brightness-110 transition-all"
+                              className="px-3 py-1.5 rounded bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[0.6875rem] font-bold uppercase flex-shrink-0 cursor-pointer border-0 hover:brightness-110 transition-all"
                             >
                               {t("home.dashboard.jugarBtn")}
                             </button>
@@ -541,6 +552,7 @@ export default function Home() {
           <div className="pt-8 border-t border-outline-variant/10">
             <GamesCatalog compact />
           </div>
+
         </main>
 
         {/* BottomNavBar (Mobile Only) */}
@@ -609,6 +621,7 @@ export default function Home() {
             />
             <EditableText
               contentKey="home.heroTagline"
+              as="h1"
               className="text-on-surface-variant text-lg md:text-xl font-light tracking-tight mb-6"
               translations={{ en: "The best games site", pt: "A melhor página de jogos" }}
             >
@@ -738,11 +751,13 @@ export default function Home() {
         </div>
       </section>
 
+      {LOCALE === "es" && <SeoIntro />}
+
       {/* BottomNavBar (Mobile Only for Guest) */}
       <nav className="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-container dark:bg-surface-container border-t border-outline-variant/30 shadow-lg flex justify-around items-center h-16 px-4 md:hidden">
         <button
           onClick={() => scrollToSection("hero-shader-canvas")}
-          className="text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
+          className="text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">home</span>
           <span>{t("home.bottomNavInicio")}</span>
@@ -750,7 +765,7 @@ export default function Home() {
 
         <button
           onClick={() => navigate("/juegos")}
-          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
+          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">casino</span>
           <span>{t("home.bottomNavJuegos")}</span>
@@ -758,13 +773,13 @@ export default function Home() {
 
         <button
           onClick={() => navigate("/juegos")}
-          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
+          className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 cursor-pointer"
         >
           <span className="material-symbols-outlined">search</span>
           <span>{t("home.bottomNavBuscar")}</span>
         </button>
 
-        <Login className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[11px] active:scale-90 transition-transform duration-200 bg-transparent border-0 p-0 font-normal cursor-pointer">
+        <Login className="text-on-surface-variant hover:text-primary flex flex-col items-center gap-1 text-[0.6875rem] active:scale-90 transition-transform duration-200 bg-transparent border-0 p-0 font-normal cursor-pointer">
           <span className="material-symbols-outlined">login</span>
           <span>{t("home.bottomNavAcceder")}</span>
         </Login>

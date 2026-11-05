@@ -42,7 +42,7 @@ export default function PaymentFailure() {
         <div className="bg-[#0A0A0F]/60 border border-outline-variant/20 rounded-xl p-5 text-left space-y-4">
           <div className="flex justify-between items-center text-sm pb-3 border-b border-outline-variant/10">
             <span className="text-on-surface-variant">Estado del Depósito</span>
-            <span className="px-3 py-1 rounded-full bg-red-500/10 text-error text-[10px] font-bold uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-red-500/10 text-error text-[0.625rem] font-bold uppercase tracking-wider">
               Declinado / Cancelado
             </span>
           </div>

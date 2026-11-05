@@ -1,5 +1,66 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { Box, Spinner, Center } from "@chakra-ui/react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import API_URL from "../../../api/rutaApi";
+import { authService } from "../../../services/authService";
+
+const TAB_ID_KEY = "rg_tab_id";
+
+// Identificador de esta pestaña, estable al recargarla (sessionStorage) y distinto en cada
+// pestaña. El juego lo manda al servidor para que un bono le pertenezca a la pestaña que lo
+// disparó: el mismo jugador con el juego abierto en dos pantallas no ve el bono de una en la otra.
+let fallbackTabId = null;
+
+function getTabId() {
+  try {
+    let id = sessionStorage.getItem(TAB_ID_KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem(TAB_ID_KEY, id);
+    }
+    return id;
+  } catch {
+    // Sin sessionStorage (bloqueado): id fijo mientras viva la página, así no cambia la URL del
+    // juego entre renders. Solo se pierde el "retomar al recargar".
+    if (!fallbackTabId) fallbackTabId = crypto.randomUUID();
+    return fallbackTabId;
+  }
+}
+
+/** 12 h: el token dura 24 h, así que un juego abierto mucho tiempo recibe uno nuevo antes de que venza. */
+const GAME_TOKEN_REFRESH_MS = 12 * 60 * 60 * 1000;
+
+/** Token de juego (POST games/session-token): el servidor identifica al jugador por este token y no
+ *  por el jugadorID de la URL, que cualquiera puede cambiar. Sin sesión, el juego abre sin token. */
+async function fetchGameToken() {
+  if (!authService.getToken()) return "";
+  try {
+    const { data } = await axios.post(`${API_URL}/games/session-token`, {});
+    return data?.token || "";
+  } catch (error) {
+    console.error("No se pudo obtener el token de juego:", error);
+    return "";
+  }
+}
+
+function withGameToken(src, token) {
+  if (!src || !token) return src;
+  return `${src}${src.includes("?") ? "&" : "?"}gameToken=${encodeURIComponent(token)}`;
+}
+
+function frameOrigin(src) {
+  try {
+    return new URL(src).origin;
+  } catch {
+    return null;
+  }
+}
+
+function withTabId(src) {
+  if (!src) return src;
+  return `${src}${src.includes("?") ? "&" : "?"}tabId=${encodeURIComponent(getTabId())}`;
+}
 
 const HEARTBEAT_MS = 15 * 1000;
 // Pestañas en segundo plano reciben timers como mucho una vez por minuto, y el celular puede
@@ -61,27 +122,64 @@ function useReloadWhenStale() {
 // the iframe *element itself* (a black box from CSS's point of view, no cross-origin read needed)
 // with transform: scale() so the whole game always fits without clipping, letterboxed if the
 // screen's aspect ratio doesn't match. Games whose native resolution isn't known yet fall back to
-// the old 100%/scroll behavior, plus the Fullscreen API toggle either way.
-export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
+// the old 100%/scroll behavior.
+// onBack (opcional): muestra un boton arriba a la izquierda para volver (ej. de una slot al lobby
+// de Royal Slots, que vive en esta misma pagina).
+export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBack, backLabel = "Volver" }) {
   const wrapperRef = useRef(null);
   const scaleContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [scale, setScale] = useState(1);
   const hasFixedResolution = !!(nativeWidth && nativeHeight);
   useReloadWhenStale();
+  const iframeRef = useRef(null);
+  const chips = useSelector((state) => state.currentUser?.chips);
+  const userId = useSelector((state) => state.currentUser?.id);
 
-  const toggleFullscreen = useCallback(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const isCurrentlyFullscreen = document.fullscreenElement || document.webkitFullscreenElement;
-    if (!isCurrentlyFullscreen) {
-      const request = el.requestFullscreen || el.webkitRequestFullscreen;
-      request?.call(el);
-    } else {
-      const exit = document.exitFullscreen || document.webkitExitFullscreen;
-      exit?.call(document);
-    }
-  }, []);
+  // El primer token va en la URL; los siguientes se mandan por mensaje (cambiar la URL recargaría el
+  // juego en medio de una partida).
+  const [gameToken, setGameToken] = useState({ value: "", ready: false });
+  // El token renovado más nuevo: si el juego cambia de URL (RoyalSlots al pasar de una tragamonedas a
+  // otra) arranca con este y no con el primero, que puede estar por vencer.
+  const latestTokenRef = useRef("");
+  useEffect(() => {
+    latestTokenRef.current = "";
+    let cancelled = false;
+    setGameToken({ value: "", ready: false });
+    fetchGameToken().then((value) => {
+      if (!cancelled) setGameToken({ value, ready: true });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId || !src) return undefined;
+    const origin = frameOrigin(src);
+    if (!origin) return undefined;
+    const timer = setInterval(async () => {
+      const value = await fetchGameToken();
+      if (!value) return;
+      latestTokenRef.current = value;
+      iframeRef.current?.contentWindow?.postMessage({ type: "royal:game-token", token: value }, origin);
+    }, GAME_TOKEN_REFRESH_MS);
+    return () => clearInterval(timer);
+  }, [userId, src]);
+
+  const frameSrc = useMemo(
+    () => withGameToken(withTabId(src), latestTokenRef.current || gameToken.value),
+    [src, gameToken.value]
+  );
+
+  // Saldo nuevo (la página lo vuelve a leer cada pocos segundos mientras se juega, ver App.jsx): se
+  // le avisa al juego, que lo aplica cuando no está en medio de una jugada (RoyalChipsBridge en
+  // Unity). Así, si alguien entra sin fichas y recarga por fuera, puede seguir jugando sin recargar
+  // la página. El saldo no es secreto: se manda sin restringir el origen del juego.
+  useEffect(() => {
+    if (chips === undefined || chips === null) return;
+    iframeRef.current?.contentWindow?.postMessage({ type: "royal:chips", chips: Number(chips) }, "*");
+  }, [chips]);
 
   useEffect(() => {
     const handleChange = () => {
@@ -143,7 +241,7 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
       display="flex"
       flexDirection="column"
     >
-      {src ? (
+      {src && gameToken.ready ? (
         <Box
           ref={scaleContainerRef}
           flex="1"
@@ -166,7 +264,8 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
               }}
             >
               <iframe
-                src={src}
+                ref={iframeRef}
+                src={frameSrc}
                 title={title}
                 scrolling="no"
                 style={{ width: "100%", height: "100%", border: "none", display: "block", overflow: "hidden" }}
@@ -174,36 +273,42 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight }) {
             </div>
           ) : (
             <iframe
-              src={src}
+              ref={iframeRef}
+              src={frameSrc}
               title={title}
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
           )}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-            style={{
-              position: "absolute",
-              top: 8,
-              right: 8,
-              zIndex: 10,
-              width: 36,
-              height: 36,
-              borderRadius: 8,
-              border: "1px solid rgba(255,255,255,0.15)",
-              background: "rgba(0,0,0,0.55)",
-              color: "#C9A84C",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-              {isFullscreen ? "fullscreen_exit" : "fullscreen"}
-            </span>
-          </button>
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              title={backLabel}
+              style={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                zIndex: 10,
+                height: 36,
+                padding: "0 12px 0 8px",
+                borderRadius: 8,
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(0,0,0,0.55)",
+                color: "#C9A84C",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                fontWeight: 700,
+                fontSize: 13,
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                arrow_back
+              </span>
+              {backLabel}
+            </button>
+          )}
         </Box>
       ) : (
         <Center h="100%">

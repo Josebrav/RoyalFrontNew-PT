@@ -74,7 +74,7 @@ export default function GameImages() {
                       <div className="text-center">
                         <p className="font-bold text-label-md text-white truncate">{game.name}</p>
                         <span
-                          className={`inline-block mt-0.5 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          className={`inline-block mt-0.5 text-[0.5625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
                             game.status === "active"
                               ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                               : "text-on-surface-variant/70 border border-outline-variant/30"

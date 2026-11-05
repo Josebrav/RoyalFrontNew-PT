@@ -81,13 +81,6 @@ export default function Login({ className, children }) {
 
             setIsLoginOpen(false); // Cierra el modal
             navigate('/');
-            Swal.fire({
-                position: "center",
-                icon: "success",
-                title: t("login.successTitle"),
-                showConfirmButton: false,
-                timer: 2500,
-            });
 
         } catch (error) {
             console.error("Error al iniciar sesión:", error);
@@ -114,7 +107,8 @@ export default function Login({ className, children }) {
             if (result?.firstChipsReceived) {
                 Swal.fire(t("login.firstChipsTitle"), t("login.firstChipsText"), "success");
             } else {
-                Swal.fire({ position: "center", icon: "success", title: t("login.successTitle"), showConfirmButton: false, timer: 2500 });
+                // Cierra el "cargando" de Google; no hay cartel de inicio de sesion exitoso.
+                Swal.close();
             }
         } catch (error) {
             Swal.fire({ icon: "error", title: t("login.googleErrorTitle"), text: error?.message || t("login.googleErrorText"), confirmButtonColor: "#C9A84C" });

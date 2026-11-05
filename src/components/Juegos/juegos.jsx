@@ -94,14 +94,14 @@ export default function GameGrid() {
                 </div>
 
                 <div className="absolute bottom-0 w-full p-3 bg-gradient-to-t from-black via-black/70 to-transparent text-left">
-                  <span className={`text-[9px] font-black uppercase tracking-widest ${CATEGORY_META[game.category].className}`}>
+                  <span className={`text-[0.5625rem] font-black uppercase tracking-widest ${CATEGORY_META[game.category].className}`}>
                     {CATEGORY_META[game.category].label}
                   </span>
                   <p className="text-white font-bold text-sm truncate">{game.name}</p>
                 </div>
 
                 {!isActive && (
-                  <span className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-on-surface-variant text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border border-white/10">
+                  <span className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-on-surface-variant text-[0.5625rem] font-bold uppercase tracking-wider px-2 py-1 rounded-full border border-white/10">
                     Próximamente
                   </span>
                 )}

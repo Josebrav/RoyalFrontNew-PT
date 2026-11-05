@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
+import axios from 'axios';
+import API_URL from '../../../api/rutaApi';
 import {
   addUserChips,
   removeUserChips,
@@ -57,7 +59,7 @@ function ActivityAccordion({ title, badge, fetchFn, children: renderContent, def
         <span className="font-semibold text-on-surface text-sm">{title}</span>
         <div className="flex items-center gap-2 flex-shrink-0">
           {badge != null && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+            <span className="text-[0.625rem] font-bold uppercase tracking-wider text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
               {badge}
             </span>
           )}
@@ -93,6 +95,10 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
   const [newDescription, setNewDescription] = useState(user?.description || '');
   const [loading, setLoading] = useState(false);
   const [activitySummary, setActivitySummary] = useState(null);
+  // Referido: quien lo invito (se puede poner a mano si se registro sin el codigo).
+  const [referrer, setReferrer] = useState(null);
+  const [referralCode, setReferralCode] = useState('');
+  const [giveReferralBonus, setGiveReferralBonus] = useState(true);
 
   // The modal is a single persistent instance reused for every user, so this keeps the
   // email field from showing a stale value when the admin selects a different user.
@@ -100,8 +106,11 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
     setNewEmail(user?.email || '');
     setNewDescription(user?.description || '');
     setActivitySummary(null);
+    setReferrer(null);
+    setReferralCode('');
     if (user?.id && isOpen) {
       dispatch(fetchUserActivitySummary(user.id)).then(setActivitySummary).catch(() => {});
+      axios.get(API_URL + '/admin/users/' + user.id + '/referrer').then(({ data }) => setReferrer(data)).catch(() => {});
     }
   }, [user?.id, isOpen]);
 
@@ -183,6 +192,24 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
       onUserUpdate();
     } catch (error) {
       Swal.fire('Error', 'No se pudo cambiar el rol del usuario', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetReferrer = async (clear = false) => {
+    const code = clear ? '' : referralCode.trim().toUpperCase();
+    if (!clear && !code) return;
+    setLoading(true);
+    try {
+      const { data } = await axios.put(API_URL + '/admin/users/' + user.id + '/referrer', { code, giveBonus: !clear && giveReferralBonus });
+      setReferrer(data);
+      setReferralCode('');
+      const bonus = data.bonusGiven ? ' y se le acreditaron ' + new Intl.NumberFormat('es-ES').format(data.bonusGiven) + ' fichas de bono' : '';
+      Swal.fire('Listo', clear ? 'Se quitó el referido' : 'Ahora es referido de ' + data.referrerNick + bonus, 'success');
+    } catch (err) {
+      const message = err.response?.data?.message;
+      Swal.fire('Error', Array.isArray(message) ? message[0] : message || 'No se pudo guardar el referido', 'error');
     } finally {
       setLoading(false);
     }
@@ -376,13 +403,13 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
-              <p className="text-[10px] uppercase tracking-widest text-primary mb-1">Fichas</p>
+              <p className="text-[0.625rem] uppercase tracking-widest text-primary mb-1">Fichas</p>
               <p className="font-headline-md text-headline-md text-on-surface">
                 {new Intl.NumberFormat('es-ES').format(user.chips || 0)}
               </p>
             </div>
             <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
-              <p className="text-[10px] uppercase tracking-widest text-primary mb-1">Rol</p>
+              <p className="text-[0.625rem] uppercase tracking-widest text-primary mb-1">Rol</p>
               <p className="font-headline-md text-headline-md text-on-surface capitalize">{user.role}</p>
             </div>
           </div>
@@ -478,6 +505,65 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
             </div>
           )}
 
+          {/* Referido — solo admins: poner el codigo a quien se registro sin usarlo */}
+          {viewerIsAdmin && (
+            <div className="space-y-4">
+              <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
+                Referido
+              </h4>
+              <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 space-y-3">
+                <p className="text-sm text-on-surface-variant">
+                  {referrer?.referrerNick ? (
+                    <>
+                      Referido de <span className="font-bold text-primary">{referrer.referrerNick}</span> ({referrer.referrerCode})
+                    </>
+                  ) : (
+                    'Se registró sin código de referido.'
+                  )}
+                  {referrer?.bonusReceived ? ' · Ya cobró el bono de referido.' : ''}
+                </p>
+                <div className="flex gap-3">
+                  <input
+                    id="admin-referral-code"
+                    type="text"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    placeholder="Código de quien lo invitó"
+                    className="flex-1 bg-background border border-outline-variant/30 rounded-lg px-4 py-2 text-on-surface tracking-widest focus:border-primary outline-none"
+                    disabled={loading}
+                  />
+                  <button
+                    onClick={() => handleSetReferrer(false)}
+                    disabled={loading || !referralCode.trim()}
+                    className="px-4 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {referrer?.referrerNick ? 'Cambiar' : 'Asignar'}
+                  </button>
+                  {referrer?.referrerNick && (
+                    <button
+                      onClick={() => handleSetReferrer(true)}
+                      disabled={loading}
+                      className="px-4 py-2 border border-outline-variant/30 text-on-surface rounded-lg font-semibold hover:bg-surface-variant/20 disabled:opacity-50 transition-colors"
+                    >
+                      Quitar
+                    </button>
+                  )}
+                </div>
+                {!referrer?.bonusReceived && (
+                  <label className="flex items-center gap-2 text-sm text-on-surface cursor-pointer">
+                    <input
+                      id="admin-referral-bonus"
+                      type="checkbox"
+                      checked={giveReferralBonus}
+                      onChange={(e) => setGiveReferralBonus(e.target.checked)}
+                    />
+                    Darle también el bono de referido (1.000.000 fichas, como si se hubiera registrado con el código)
+                  </label>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Description */}
           <div className="space-y-4">
             <h4 className="font-label-lg text-label-lg text-on-surface uppercase tracking-wider">
@@ -538,9 +624,9 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 {({ summary, rounds }) => (
                   <>
                     <div className="grid grid-cols-3 gap-2 mb-3 text-center">
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Rondas</p><p className="text-on-surface font-bold text-sm">{summary.totalRounds}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Apostado</p><p className="text-on-surface font-bold text-sm">{fmtChips(summary.totalWagered)}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Rondas</p><p className="text-on-surface font-bold text-sm">{summary.totalRounds}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Apostado</p><p className="text-on-surface font-bold text-sm">{fmtChips(summary.totalWagered)}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
                     </div>
                     {rounds.length === 0 ? <EmptyRow /> : (
                       <div className="space-y-1.5 max-h-56 overflow-y-auto">
@@ -569,9 +655,9 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 {({ summary, winnings, giftsSent, giftsReceived }) => (
                   <>
                     <div className="grid grid-cols-3 gap-2 mb-3 text-center">
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Cartones dados</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedSent}</p></div>
-                      <div><p className="text-on-surface-variant text-[10px] uppercase">Cartones recibidos</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedReceived}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Ganado</p><p className="text-green-500 font-bold text-sm">{fmtChips(summary.totalWon)}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Cartones dados</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedSent}</p></div>
+                      <div><p className="text-on-surface-variant text-[0.625rem] uppercase">Cartones recibidos</p><p className="text-on-surface font-bold text-sm">{summary.cardsGiftedReceived}</p></div>
                     </div>
                     {winnings.length === 0 && giftsSent.length === 0 && giftsReceived.length === 0 ? <EmptyRow /> : (
                       <div className="space-y-1.5 max-h-56 overflow-y-auto">
@@ -610,7 +696,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                           <p className="text-on-surface truncate">{p.paymentPlatform} · {fmtChips(p.chips)} fichas</p>
                           <p className="text-on-surface-variant">{fmtDate(p.createdAt)}</p>
                         </div>
-                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        <span className={`text-[0.625rem] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
                           p.status === 'approved' ? 'text-green-500 bg-green-500/10' : p.status === 'pending' ? 'text-yellow-500 bg-yellow-500/10' : 'text-error bg-error/10'
                         }`}>
                           {p.status}
@@ -646,7 +732,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                     <div className="space-y-3">
                       {panelGrants.length > 0 && (
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Fichas cargadas/quitadas desde el panel</p>
+                          <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1">Fichas cargadas/quitadas desde el panel</p>
                           <div className="space-y-1.5 max-h-40 overflow-y-auto">
                             {panelGrants.map((g) => (
                               <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
@@ -659,7 +745,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                       )}
                       {selfGifts.length > 0 && (
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Fichas que se regaló él/ella mismo/a jugando</p>
+                          <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1">Fichas que se regaló él/ella mismo/a jugando</p>
                           <div className="space-y-1.5 max-h-40 overflow-y-auto">
                             {selfGifts.map((g) => (
                               <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
@@ -672,7 +758,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                       )}
                       {cardGifts.length > 0 && (
                         <div>
-                          <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">Cartones de bingo que regaló</p>
+                          <p className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1">Cartones de bingo que regaló</p>
                           <div className="space-y-1.5 max-h-40 overflow-y-auto">
                             {cardGifts.map((g) => (
                               <div key={g.id} className="flex items-center justify-between text-xs gap-2 py-1 border-b border-outline-variant/5 last:border-0">
@@ -700,7 +786,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
             </p>
             <div className="bg-surface-container-low border border-outline-variant/10 rounded-xl p-4 space-y-3">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Correo Electrónico</label>
+                <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Correo Electrónico</label>
                 <div className="flex gap-3">
                   <input
                     type="email"
@@ -720,7 +806,7 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Nueva Contraseña</label>
+                <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Nueva Contraseña</label>
                 <div className="flex gap-3">
                   <input
                     type="text"
@@ -765,14 +851,17 @@ const UserDetailModal = ({ user, isOpen, onClose, onUserUpdate }) => {
                 {user.banned ? 'Desbanear' : 'Banear'}
               </button>
             </div>
-            <button
-              onClick={handleDeleteUser}
-              disabled={loading}
-              className="w-full px-4 py-3 bg-error text-white rounded-lg font-semibold hover:bg-error/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-            >
-              <span className="material-symbols-outlined">delete_forever</span>
-              Eliminar Usuario Definitivamente
-            </button>
+            {/* Eliminar la cuenta es solo para admins (el servidor tambien lo rechaza a los mods). */}
+            {viewerIsAdmin && (
+              <button
+                onClick={handleDeleteUser}
+                disabled={loading}
+                className="w-full px-4 py-3 bg-error text-white rounded-lg font-semibold hover:bg-error/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined">delete_forever</span>
+                Eliminar Usuario Definitivamente
+              </button>
+            )}
           </div>
         </div>
 

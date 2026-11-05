@@ -153,7 +153,7 @@ export default function Trophies() {
           className="bg-surface-container-high rounded-xl border border-outline-variant/20 p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Nick del ganador</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Nick del ganador</label>
             <input
               name="nick"
               value={form.nick}
@@ -163,7 +163,7 @@ export default function Trophies() {
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Título del torneo</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Título del torneo</label>
             <input
               name="title"
               value={form.title}
@@ -173,7 +173,7 @@ export default function Trophies() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Descripción (opcional)</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Descripción (opcional)</label>
             <input
               name="description"
               value={form.description}
@@ -183,7 +183,7 @@ export default function Trophies() {
             />
           </div>
           <div className="md:col-span-2">
-            <label className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 block">Imagen del trofeo</label>
+            <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant mb-1 block">Imagen del trofeo</label>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"

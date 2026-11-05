@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
 import RankBadge from "../ui/RankBadge/rankBadge";
+import { useAuth } from "../../context/oauthContext";
 import { fetchConversations, fetchThread, sendMessage } from "../../redux/actions/index";
 
 // Mientras hay una conversación abierta se sondea seguido, para que el otro vea el mensaje sin
@@ -49,6 +50,7 @@ export default function Messages() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { nick } = useParams();
+  const auth = useAuth();
   const currentUser = useSelector((state) => state.currentUser);
   const { conversations, threads } = useSelector((state) => state.messages);
 
@@ -121,6 +123,10 @@ export default function Messages() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [activeMessages.length]);
 
+  // Mientras se restaura la sesión (al recargar tarda un instante) no se decide nada: si no, se
+  // mostraba "Debes iniciar sesión" aunque el usuario sí estuviera logueado.
+  if (auth.loading) return null;
+
   if (!currentUser?.id) {
     return (
       <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 pt-20 md:pt-24">
@@ -174,7 +180,7 @@ export default function Messages() {
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-white font-bold truncate">{c.partnerNick}</span>
                     {c.unreadCount > 0 && (
-                      <span className="bg-primary text-black text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      <span className="bg-primary text-black text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                         {c.unreadCount}
                       </span>
                     )}
@@ -234,7 +240,7 @@ export default function Messages() {
                         >
                           {m.content}
                         </div>
-                        <span className="text-[10px] text-on-surface-variant/70 mt-1 px-1">
+                        <span className="text-[0.625rem] text-on-surface-variant/70 mt-1 px-1">
                           {formatMessageTimestamp(m.createdAt)}
                         </span>
                       </div>

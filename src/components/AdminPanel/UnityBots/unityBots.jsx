@@ -13,6 +13,8 @@ const UNITY_BOT_GAMES = [
   { slug: "royalslots", label: "Royal Slots" },
   { slug: "santawilds", label: "Santa Wilds" },
   { slug: "sugarcalavera", label: "Sugar Calavera" },
+  { slug: "furiaolimpo", label: "Furia del Olimpo" },
+  { slug: "gildedcobra", label: "Gilded Cobra" },
 ];
 
 const numberFormat = (n) => new Intl.NumberFormat("es-ES").format(n || 0);
@@ -170,7 +172,7 @@ export default function UnityBots() {
                               />
                               <button
                                 onClick={() => handleEditAmounts(bot, game.slug)}
-                                className="text-[10px] text-on-surface-variant hover:text-primary underline cursor-pointer bg-transparent border-0"
+                                className="text-[0.625rem] text-on-surface-variant hover:text-primary underline cursor-pointer bg-transparent border-0"
                               >
                                 {numberFormat(cfg.minAmount)}–{numberFormat(cfg.maxAmount)}
                               </button>

@@ -17,7 +17,7 @@ const CONTENT = {
       },
       {
         title: "3. Qué datos generamos mientras jugás",
-        content: "Registramos tu saldo de fichas, tus depósitos, los movimientos de fichas (compras, regalos, ajustes de un administrador) y las fichas ganadas en cada juego, para poder mostrarte tu historial y los rankings. También guardamos la última vez que estuviste activo y qué juego estás jugando, para las funciones de \"jugadores conectados\".",
+        content: "Registramos tu saldo de fichas, tus depósitos, los movimientos de fichas (compras y ajustes de un administrador) y las fichas ganadas en cada juego, para poder mostrarte tu historial y los rankings. También guardamos la última vez que estuviste activo y qué juego estás jugando, para las funciones de \"jugadores conectados\".",
       },
       {
         title: "4. Para qué usamos tus datos y con qué base legal",
@@ -76,7 +76,7 @@ const CONTENT = {
       },
       {
         title: "3. What data we generate while you play",
-        content: "We record your chip balance, your deposits, your chip movements (purchases, gifts, admin adjustments) and the chips won in each game, so we can show you your history and the rankings. We also store the last time you were active and which game you're playing, for the \"players online\" features.",
+        content: "We record your chip balance, your deposits, your chip movements (purchases and admin adjustments) and the chips won in each game, so we can show you your history and the rankings. We also store the last time you were active and which game you're playing, for the \"players online\" features.",
       },
       {
         title: "4. What we use your data for, and on what legal basis",
@@ -135,7 +135,7 @@ const CONTENT = {
       },
       {
         title: "3. Quais dados geramos enquanto você joga",
-        content: "Registramos seu saldo de fichas, seus depósitos, as movimentações de fichas (compras, presentes, ajustes de um administrador) e as fichas ganhas em cada jogo, para poder mostrar seu histórico e os rankings. Também guardamos a última vez que você esteve ativo e qual jogo está jogando, para as funções de \"jogadores conectados\".",
+        content: "Registramos seu saldo de fichas, seus depósitos, as movimentações de fichas (compras e ajustes de um administrador) e as fichas ganhas em cada jogo, para poder mostrar seu histórico e os rankings. Também guardamos a última vez que você esteve ativo e qual jogo está jogando, para as funções de \"jogadores conectados\".",
       },
       {
         title: "4. Para que usamos seus dados e com qual base legal",

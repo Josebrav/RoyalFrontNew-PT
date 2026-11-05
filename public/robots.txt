@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /perfil
+Disallow: /mensajes
+Disallow: /amigos
+Disallow: /chips
+Disallow: /game/
+Disallow: /restablecer-contrasena
+Disallow: /mercadopago/
+
+Sitemap: https://www.royaljuegos.com/sitemap.xml
