@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/auth/:path*", "destination": "https://api.royalgames.lat/auth/:path*" },
+    { "source": "/asaas/webhook", "destination": "https://api.royalgames.lat/asaas/webhook" },
     { "source": "/(.*)", "destination": "/" }
   ],
   "headers": [
