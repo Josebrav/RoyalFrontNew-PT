@@ -49,6 +49,7 @@ import AdminPrizes from './components/AdminPanel/Prizes/prizes';
 import AdminReferrals from './components/AdminPanel/Referrals/referrals';
 import AdminGameStats from './components/AdminPanel/GameStats/gameStats';
 import AdminPromos from './components/AdminPanel/Promos/promos';
+import AdminStaffChips from './components/AdminPanel/StaffChips/staffChips';
 import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
 import MinesBots from './components/AdminPanel/MinesBots/minesBots';
 import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
@@ -238,6 +239,7 @@ function App() {
             <Route path="/admin/online" element={<ProtectedRoute><AdminPresence /></ProtectedRoute>} />
             <Route path="/admin/tickets" element={<ProtectedRoute><SupportTicketsAdmin /></ProtectedRoute>} />
             <Route path="/admin/deposits" element={<ProtectedRoute><AdminDeposits /></ProtectedRoute>} />
+            <Route path="/admin/staff-chips" element={<ProtectedRoute><AdminStaffChips /></ProtectedRoute>} />
             <Route path="/admin/prizes" element={<ProtectedRoute><AdminPrizes /></ProtectedRoute>} />
             <Route path="/admin/referrals" element={<ProtectedRoute><AdminReferrals /></ProtectedRoute>} />
             <Route path="/admin/game-stats" element={<ProtectedRoute><AdminGameStats /></ProtectedRoute>} />
