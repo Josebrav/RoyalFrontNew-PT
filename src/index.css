@@ -396,3 +396,16 @@ body .swal2-icon.swal2-info {
   background: rgba(230, 195, 100, 0.06);
 }
 
+/* Fondo de la página: imagen difuminada fija detrás de todo. Va en una capa fija (::before) y no con
+   background-attachment: fixed, que en iPhone se ve ampliado. Los campos de texto con bg-background
+   siguen opacos. */
+html { background: #0a0a12 !important; }
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #0a0a12 url("/fondo.jpg") center / cover no-repeat;
+  pointer-events: none;
+}
+body, .bg-background:not(input):not(select):not(textarea) { background-color: transparent !important; }
