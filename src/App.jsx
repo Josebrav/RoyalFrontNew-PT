@@ -72,6 +72,7 @@ import Support from './components/Support/support';
 import Contact from './components/Contact/contact';
 import Faq from './components/Faq/faq';
 import Privacidad from './components/Legal/privacidad';
+import EliminarCuenta from './components/Legal/eliminarCuenta';
 import Cumplimiento from './components/Legal/cumplimiento';
 import Careers from './components/Careers/careers';
 
@@ -259,6 +260,7 @@ function App() {
             <Route path="/about" element={<AboutUs />} />
             <Route path="/terminos-y-condiciones" element={<TermsAndConditions />} />
             <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/eliminar-cuenta" element={<EliminarCuenta />} />
             <Route path="/cumplimiento" element={<Cumplimiento />} />
             <Route path="/trabaja-con-nosotros" element={<Careers />} />
             <Route path="/game/minas" element={<RequireAuth><Diamantes /></RequireAuth>} />
