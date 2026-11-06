@@ -81,7 +81,7 @@ export default function OfferBanner() {
           src={offer.imageUrl}
           alt={offer.title}
           onClick={buy}
-          className="w-full max-h-[75vh] object-contain rounded-xl cursor-pointer"
+          className="w-full max-h-[65vh] object-contain rounded-xl cursor-pointer"
         />
         <button
           onClick={close}
@@ -90,13 +90,14 @@ export default function OfferBanner() {
         >
           <span className="material-symbols-outlined">close</span>
         </button>
-        <div className="absolute bottom-3 left-0 right-0 flex flex-col items-center gap-2 px-4 pointer-events-none">
+        {/* Debajo de la imagen, para no tapar lo que dice la oferta. */}
+        <div className="mt-3 flex flex-col items-center gap-2 px-4">
           {left && (
             <span className="px-4 py-1 rounded-full bg-black/70 text-white text-sm font-bold">Termina en {left}</span>
           )}
           <button
             onClick={buy}
-            className="pointer-events-auto gold-gradient gold-glow px-8 py-2.5 rounded-lg font-bold uppercase tracking-wider text-[#0A0A0F] cursor-pointer"
+            className="gold-gradient gold-glow px-8 py-2.5 rounded-lg font-bold uppercase tracking-wider text-[#0A0A0F] cursor-pointer"
           >
             Ver oferta
           </button>
