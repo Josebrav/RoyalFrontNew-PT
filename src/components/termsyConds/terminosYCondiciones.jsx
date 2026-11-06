@@ -5,7 +5,7 @@ import { t } from "../../i18n/strings";
 const CONTENT = {
   es: {
     heading: "Términos y Condiciones de Uso",
-    updatedAt: "06/10/2026",
+    updatedAt: "06/11/2026",
     intro: "Bienvenido a Royal Games. Al acceder a esta plataforma y utilizar nuestros servicios, aceptas los siguientes Términos y Condiciones de uso. Si no estás de acuerdo con alguna de las disposiciones, te pedimos que no utilices nuestros servicios.",
     noticeTitle: "Aviso importante: esto no es un casino de apuestas con dinero real",
     noticeP1: "RoyalGames es un servicio de entretenimiento social. No ofrecemos, prometemos ni implicamos la posibilidad de ganar dinero real ni premios con valor monetario de ningún tipo. Todo lo que se juega, gana o pierde dentro de la plataforma son fichas virtuales sin valor monetario real, presente ni futuro.",
@@ -57,11 +57,15 @@ const CONTENT = {
         title: "11. Jurisdicción y ley aplicable",
         content: "Estos Términos y Condiciones se regirán e interpretarán de acuerdo con las leyes del país correspondiente al usuario."
       },
+      {
+        title: "12. Chat, denuncias y moderación",
+        content: "Los chats de la plataforma (en los juegos, en Mensajes y en el perfil de cada jugador) son espacios compartidos y se rigen por las Normas de conducta del punto 5. Está prohibido publicar insultos, acoso o amenazas, contenido sexual, spam o publicidad, intentos de estafa (incluida la compra o venta de fichas fuera de la tienda oficial) y datos personales de terceros. Cualquier usuario puede denunciar a otro jugador desde el menú que aparece al tocar su nick en el chat de los juegos o desde su perfil, eligiendo el motivo; la denuncia incluye los últimos mensajes del jugador denunciado para que el equipo pueda revisarla. También podés bloquear a cualquier jugador: dejás de ver sus mensajes en los chats y no puede escribirte en privado. Podés desbloquearlo cuando quieras. El equipo de moderación de Royal Juegos revisa las denuncias, normalmente dentro de las 48 horas, y según la gravedad y los antecedentes puede descartarla, enviar una advertencia, silenciar al jugador en todos los chats por 24 horas o 7 días, o suspender su cuenta de forma definitiva. Los moderadores también pueden silenciar o expulsar temporalmente a un jugador de una sala en el momento. Si creés que una sanción fue un error, podés escribirnos desde la sección de Ayuda para que la revisemos."
+      },
     ],
   },
   en: {
     heading: "Terms and Conditions of Use",
-    updatedAt: "10/06/2026",
+    updatedAt: "06/11/2026",
     intro: "Welcome to Royal Games. By accessing this platform and using our services, you accept the following Terms and Conditions of use. If you don't agree with any of these provisions, please don't use our services.",
     noticeTitle: "Important notice: this is not a real-money gambling casino",
     noticeP1: "RoyalGames is a social entertainment service. We do not offer, promise, or imply the possibility of winning real money or prizes with any monetary value. Everything played, won, or lost within the platform uses virtual chips with no real monetary value, present or future.",
@@ -113,11 +117,15 @@ const CONTENT = {
         title: "11. Jurisdiction and applicable law",
         content: "These Terms and Conditions shall be governed and interpreted in accordance with the laws of the user's corresponding country."
       },
+      {
+        title: "12. Chat, reports and moderation",
+        content: "The platform's chats (in the games, in Messages and on each player's profile) are shared spaces and are governed by the Rules of conduct in section 5. Insults, harassment or threats, sexual content, spam or advertising, scam attempts (including buying or selling chips outside the official store) and other people's personal data are forbidden. Any user can report another player from the menu that opens when tapping their nickname in a game chat, or from their profile, by choosing a reason; the report includes the reported player's latest messages so the team can review it. You can also block any player: you stop seeing their messages in the chats and they cannot message you privately. You can unblock them at any time. The Royal Juegos moderation team reviews reports, usually within 48 hours, and depending on the severity and history may dismiss the report, send a warning, mute the player in every chat for 24 hours or 7 days, or permanently suspend their account. Moderators can also mute or temporarily kick a player from a room on the spot. If you believe a sanction was a mistake, you can write to us from the Help section so we can review it."
+      },
     ],
   },
   pt: {
     heading: "Termos e Condições de Uso",
-    updatedAt: "06/10/2026",
+    updatedAt: "06/11/2026",
     intro: "Bem-vindo ao Royal Games. Ao acessar esta plataforma e usar nossos serviços, você aceita os seguintes Termos e Condições de uso. Se você não concordar com alguma das disposições, pedimos que não utilize nossos serviços.",
     noticeTitle: "Aviso importante: isto não é um cassino de apostas com dinheiro real",
     noticeP1: "O RoyalGames é um serviço de entretenimento social. Não oferecemos, prometemos nem sugerimos a possibilidade de ganhar dinheiro real ou prêmios com qualquer valor monetário. Tudo o que se joga, ganha ou perde dentro da plataforma são fichas virtuais sem valor monetário real, presente ou futuro.",
@@ -168,6 +176,10 @@ const CONTENT = {
       {
         title: "11. Jurisdição e lei aplicável",
         content: "Estes Termos e Condições serão regidos e interpretados de acordo com as leis do país correspondente ao usuário."
+      },
+      {
+        title: "12. Chat, denúncias e moderação",
+        content: "Os chats da plataforma (nos jogos, em Mensagens e no perfil de cada jogador) são espaços compartilhados e seguem as Normas de conduta do item 5. É proibido publicar insultos, assédio ou ameaças, conteúdo sexual, spam ou publicidade, tentativas de golpe (incluindo comprar ou vender fichas fora da loja oficial) e dados pessoais de terceiros. Qualquer usuário pode denunciar outro jogador pelo menu que aparece ao tocar no apelido dele no chat dos jogos ou pelo perfil dele, escolhendo o motivo; a denúncia inclui as últimas mensagens do jogador denunciado para que a equipe possa analisá-la. Você também pode bloquear qualquer jogador: deixa de ver as mensagens dele nos chats e ele não pode escrever para você no privado. Você pode desbloqueá-lo quando quiser. A equipe de moderação da Royal Juegos analisa as denúncias, normalmente em até 48 horas, e conforme a gravidade e o histórico pode descartá-la, enviar uma advertência, silenciar o jogador em todos os chats por 24 horas ou 7 dias, ou suspender a conta dele de forma definitiva. Os moderadores também podem silenciar ou expulsar temporariamente um jogador de uma sala na hora. Se você acha que uma sanção foi um erro, pode nos escrever pela seção de Ajuda para que a gente revise."
       },
     ],
   },
