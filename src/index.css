@@ -405,7 +405,7 @@ html::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: #0a0a12 url("/fondo.jpg") center / cover no-repeat;
+  background: #0a0a12 url("/fondo-azul.jpg") center / cover no-repeat;
   pointer-events: none;
 }
 body, .bg-background:not(input):not(select):not(textarea) { background-color: transparent !important; }
