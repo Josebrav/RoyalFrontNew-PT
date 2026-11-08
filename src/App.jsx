@@ -34,6 +34,7 @@ import Domino from './components/Juegos/Domino/domino';
 import Parchis from './components/Juegos/Parchis/parchis';
 import GemaOfGold from './components/Juegos/GemaOfGold/gemaofgold';
 import RoyalRuleta from './components/Juegos/RoyalRuleta/royalruleta';
+import Blackjack from './components/Juegos/Blackjack/blackjack';
 import API_URL from './api/rutaApi';
 import Swal from 'sweetalert2';
 import { tokenStore } from './api/tokenStore';
@@ -276,6 +277,7 @@ function App() {
             <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
             <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
             <Route path="/game/royalruleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
+            <Route path="/game/blackjack" element={<RequireAuth><Blackjack /></RequireAuth>} />
             <Route path="/royalstore" element={<RoyalStore />} />
             <Route path="/amigos" element={<Friends />} />
             <Route path="/mensajes" element={<Messages />} />
