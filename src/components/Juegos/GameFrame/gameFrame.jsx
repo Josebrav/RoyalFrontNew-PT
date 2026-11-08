@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import API_URL from "../../../api/rutaApi";
 import { authService } from "../../../services/authService";
+import { LOCALE } from "../../../i18n/locale";
 
 const TAB_ID_KEY = "rg_tab_id";
 
@@ -59,7 +60,8 @@ function frameOrigin(src) {
 
 function withTabId(src) {
   if (!src) return src;
-  return `${src}${src.includes("?") ? "&" : "?"}tabId=${encodeURIComponent(getTabId())}`;
+  // lang: el idioma del sitio, para que el juego use las voces en ese idioma
+  return `${src}${src.includes("?") ? "&" : "?"}tabId=${encodeURIComponent(getTabId())}&lang=${LOCALE}`;
 }
 
 const HEARTBEAT_MS = 15 * 1000;
