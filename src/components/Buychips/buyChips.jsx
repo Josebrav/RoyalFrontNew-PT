@@ -38,6 +38,7 @@ const PAYMENT_REGIONS = {
 const REGION_ORDER = ["ar", "co", "mx", "es", "br", "other"];
 
 const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
+const OFFER_LINK_KEY = "royal_offer_link";
 
 // "Fichas base" de la promo: lo que da la tasa de siempre (500.000 fichas por dólar o euro, 500 por
 // peso). Cada paquete muestra su bonus (+X%) y el total que recibe, que es lo que se acredita.
@@ -202,7 +203,61 @@ export default function BuyChips() {
   const [currentOffer, setCurrentOffer] = useState(null);
   useEffect(() => {
     axios.get(`${API_URL}/chip-offers/current`).then(({ data }) => setCurrentOffer(data?.offer ?? null)).catch(() => {});
-  }, []);
+  }, [currentUser?.id]);
+
+  // Link de oferta de un solo uso (/chips?oferta=CODIGO): se guarda por si primero tiene que iniciar
+  // sesión, y con sesión se reclama. La primera cuenta que lo reclama se queda con la oferta.
+  const offerLinkTriedRef = useRef(false);
+  useEffect(() => {
+    const fromUrl = searchParams.get("oferta");
+    try {
+      if (fromUrl) localStorage.setItem(OFFER_LINK_KEY, fromUrl);
+    } catch {
+      // sin storage: se usa el de la URL
+    }
+    let token = fromUrl;
+    try {
+      token = token || localStorage.getItem(OFFER_LINK_KEY);
+    } catch {
+      // sin storage
+    }
+    if (!token || !currentUser?.id || offerLinkTriedRef.current) return;
+    offerLinkTriedRef.current = true;
+    const forget = () => {
+      try {
+        localStorage.removeItem(OFFER_LINK_KEY);
+      } catch {
+        // sin storage
+      }
+    };
+    axios
+      .post(`${API_URL}/chip-offers/claim/${encodeURIComponent(token)}`)
+      .then(({ data }) => {
+        forget();
+        if (!data?.offer) return;
+        setCurrentOffer(data.offer);
+        Swal.fire({
+          icon: "success",
+          title: `¡Tu oferta ${data.offer.multiplier}x1 está activa!`,
+          text: "Elegí cualquier paquete y recibís las fichas multiplicadas. Vale para una sola compra.",
+          confirmButtonText: "¡Genial!",
+          confirmButtonColor: "#C9A84C",
+          background: "#1a1a1a",
+          color: "#fff",
+        });
+      })
+      .catch((error) => {
+        forget();
+        Swal.fire({
+          icon: "info",
+          title: "Oferta no disponible",
+          text: error?.response?.data?.message || "Este link de oferta ya no se puede usar.",
+          confirmButtonColor: "#C9A84C",
+          background: "#1a1a1a",
+          color: "#fff",
+        });
+      });
+  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   // Oferta express: cualquier paquete da sus fichas multiplicadas (el backend decide lo que se acredita).
   const offerMultiplier = currentOffer?.multiplier ?? 1;
   const visibleChipOptions = CHIP_CATALOG[catalogCurrency].map((chip) => ({ ...chip, chips: chip.chips * offerMultiplier }));
