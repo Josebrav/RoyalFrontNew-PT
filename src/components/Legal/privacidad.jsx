@@ -1,6 +1,12 @@
 import LegalPage from "./LegalPage";
 import { LOCALE } from "../../i18n/locale";
 
+// Dominio del sitio que se está mirando (royaljuegos.com en español; los sitios en otros idiomas tienen el suyo).
+const SITE_HOST =
+  typeof window !== "undefined" && window.location.hostname && window.location.hostname !== "localhost"
+    ? window.location.hostname.replace(/^www\./, "")
+    : "royaljuegos.com";
+
 const CONTENT = {
   es: {
     title: "Política de Privacidad",
@@ -9,7 +15,7 @@ const CONTENT = {
     sections: [
       {
         title: "1. Quiénes somos",
-        content: "RoyalGames (royalgames.lat) es una plataforma de entretenimiento social operada por José Santos Bravo Parada (DNI 39.129.716, CUIL 23-39129716-9), persona física responsable del tratamiento de los datos personales que recopilamos a través del sitio. Para cualquier consulta, reclamo o ejercicio de tus derechos sobre tus datos, podés escribirnos a royalgames2025@gmail.com.",
+        content: `RoyalGames (${SITE_HOST}) es una plataforma de entretenimiento social, responsable del tratamiento de los datos personales que recopilamos a través del sitio. Para cualquier consulta, reclamo o ejercicio de tus derechos sobre tus datos, podés escribirnos a royalgames2025@gmail.com.`,
       },
       {
         title: "2. Qué datos recopilamos",
@@ -68,7 +74,7 @@ const CONTENT = {
     sections: [
       {
         title: "1. Who we are",
-        content: "RoyalGames (royalgames.lat) is a social entertainment platform operated by José Santos Bravo Parada (Argentine National ID / DNI 39.129.716, CUIL 23-39129716-9), the individual responsible for processing the personal data we collect through the site. For any question, complaint, or to exercise your rights over your data, you can write to us at royalgames2025@gmail.com.",
+        content: `RoyalGames (${SITE_HOST}) is a social entertainment platform, responsible for processing the personal data we collect through the site. For any question, complaint, or to exercise your rights over your data, you can write to us at royalgames2025@gmail.com.`,
       },
       {
         title: "2. What data we collect",
@@ -127,7 +133,7 @@ const CONTENT = {
     sections: [
       {
         title: "1. Quem somos",
-        content: "O RoyalGames (royalgames.lat) é uma plataforma de entretenimento social operada por José Santos Bravo Parada (DNI 39.129.716, CUIL 23-39129716-9), pessoa física responsável pelo tratamento dos dados pessoais que coletamos através do site. Para qualquer dúvida, reclamação ou para exercer seus direitos sobre seus dados, escreva para royalgames2025@gmail.com.",
+        content: `O RoyalGames (${SITE_HOST}) é uma plataforma de entretenimento social, responsável pelo tratamento dos dados pessoais que coletamos através do site. Para qualquer dúvida, reclamação ou para exercer seus direitos sobre seus dados, escreva para royalgames2025@gmail.com.`,
       },
       {
         title: "2. Quais dados coletamos",
