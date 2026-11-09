@@ -201,6 +201,10 @@ const STRINGS = {
     "chat.err.muted": "Estás silenciado en el chat por ahora.",
     "chat.err.offline": "Sin conexión con el chat, reintentando...",
     "chat.err.generic": "No se pudo enviar el mensaje.",
+    "chat.new.badge": "NUEVO!",
+    "chat.new.headline": "Prueba el chat general",
+    "chat.new.hint": "Tocá la burbuja de abajo para entrar y charlar con la comunidad.",
+    "chat.new.dismiss": "Cerrar aviso",
   },
 
   en: {
@@ -399,6 +403,10 @@ const STRINGS = {
     "chat.err.muted": "You're muted in the chat for now.",
     "chat.err.offline": "Chat disconnected, retrying...",
     "chat.err.generic": "The message couldn't be sent.",
+    "chat.new.badge": "NEW!",
+    "chat.new.headline": "Try the global chat",
+    "chat.new.hint": "Tap the bubble below to jump in and chat with the community.",
+    "chat.new.dismiss": "Dismiss announcement",
   },
 
   pt: {
@@ -597,6 +605,10 @@ const STRINGS = {
     "chat.err.muted": "Você está silenciado no chat por enquanto.",
     "chat.err.offline": "Sem conexão com o chat, tentando de novo...",
     "chat.err.generic": "Não foi possível enviar a mensagem.",
+    "chat.new.badge": "NOVO!",
+    "chat.new.headline": "Experimente o chat geral",
+    "chat.new.hint": "Toque na bolha abaixo para entrar e conversar com a comunidade.",
+    "chat.new.dismiss": "Fechar aviso",
   },
 };
 

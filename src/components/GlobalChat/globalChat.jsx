@@ -27,6 +27,27 @@ const MAX_RECONNECT_DELAY_MS = 30000;
 const MAX_MESSAGES_KEPT = 200;
 const DATE_LOCALE = LOCALE === "en" ? "en-US" : LOCALE === "pt" ? "pt-BR" : "es-ES";
 
+// Aviso de "NUEVO!" del chat general: se muestra una sola vez por navegador.
+// Para lanzar otro aviso en el futuro alcanza con cambiar la versión de la clave.
+const NEW_CHAT_NOTICE_KEY = "globalChat:newFeatureNotice:v1";
+const NEW_CHAT_NOTICE_DELAY_MS = 2000;
+
+const wasNewChatNoticeSeen = () => {
+  try {
+    return localStorage.getItem(NEW_CHAT_NOTICE_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
+const markNewChatNoticeSeen = () => {
+  try {
+    localStorage.setItem(NEW_CHAT_NOTICE_KEY, "1");
+  } catch {
+    // sin localStorage (modo privado) el aviso puede volver a salir en la próxima visita
+  }
+};
+
 const ERROR_KEYS = {
   LOGIN_REQUIRED: "chat.err.loginRequired",
   TOO_FAST: "chat.err.tooFast",
@@ -89,6 +110,9 @@ export default function GlobalChat() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // En los juegos (iframes a pantalla completa) y en la landing de invitados no se muestra.
+  const hidden = location.pathname.includes("/game") || (location.pathname === "/" && !currentUser?.id && !location.search.includes("vista=invitado"));
+
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState("connecting"); // connecting | open | reconnecting
   const [messages, setMessages] = useState([]);
@@ -98,6 +122,7 @@ export default function GlobalChat() {
   const [draft, setDraft] = useState("");
   const [notice, setNotice] = useState(null); // { text, tone: 'error' | 'info' }
   const [unread, setUnread] = useState(0);
+  const [showNewNotice, setShowNewNotice] = useState(false);
 
   const wsRef = useRef(null);
   const reconnectTimerRef = useRef(null);
@@ -240,6 +265,18 @@ export default function GlobalChat() {
     if (open) setUnread(0);
   }, [open]);
 
+  // Aviso de "NUEVO!" apuntando a la burbuja del chat. Aparece una sola vez por navegador
+  // (queda marcado en localStorage) unos segundos después de entrar, para no tapar la carga
+  // inicial. Se cancela si el usuario abre el chat o cae en una vista donde la burbuja no existe.
+  useEffect(() => {
+    if (hidden || open || wasNewChatNoticeSeen()) return undefined;
+    const timer = setTimeout(() => {
+      setShowNewNotice(true);
+      markNewChatNoticeSeen();
+    }, NEW_CHAT_NOTICE_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [hidden, open]);
+
   // Auto-scroll solo si el usuario ya estaba abajo (no lo arrancamos de lo que está leyendo).
   useEffect(() => {
     const el = listRef.current;
@@ -299,8 +336,13 @@ export default function GlobalChat() {
     if (result.isConfirmed) sendEnvelope("mute", { userId: message.userId, minutes: Number(result.value) });
   };
 
-  // En los juegos (iframes a pantalla completa) y en la landing de invitados no se muestra.
-  const hidden = location.pathname.includes("/game") || (location.pathname === "/" && !currentUser?.id && !location.search.includes("vista=invitado"));
+  const dismissNewNotice = () => setShowNewNotice(false);
+
+  const openChatFromNotice = () => {
+    setShowNewNotice(false);
+    setOpen(true);
+  };
+
   if (hidden) return null;
 
   const canWrite = !!me?.canWrite;
@@ -308,13 +350,56 @@ export default function GlobalChat() {
 
   return (
     <>
+      {!open && showNewNotice && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed z-[61] right-4 bottom-[9.5rem] md:bottom-[5.75rem] w-64 max-w-[calc(100vw-2rem)]"
+        >
+          <div className="relative">
+            <button
+              type="button"
+              onClick={openChatFromNotice}
+              className="w-full text-left rounded-xl border border-primary/50 bg-surface-container-high/95 backdrop-blur-md shadow-2xl gold-glow p-4 pr-9 cursor-pointer hover:border-primary/80 transition-colors"
+            >
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full gold-gradient text-[#0A0A0F] text-[10px] font-extrabold uppercase tracking-widest">
+                <span className="material-symbols-outlined text-[13px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  auto_awesome
+                </span>
+                {t("chat.new.badge")}
+              </span>
+              <p className="mt-2 text-white font-bold text-sm leading-tight">{t("chat.new.headline")}</p>
+              <p className="mt-1 text-on-surface-variant text-[11px] leading-snug">{t("chat.new.hint")}</p>
+            </button>
+            <button
+              type="button"
+              onClick={dismissNewNotice}
+              aria-label={t("chat.new.dismiss")}
+              className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center bg-transparent border-0 text-on-surface-variant hover:text-white hover:bg-surface-variant/40 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">close</span>
+            </button>
+            <span
+              aria-hidden="true"
+              className="absolute -bottom-1.5 right-9 w-3 h-3 rotate-45 bg-surface-container-high border-b border-r border-primary/50"
+            />
+          </div>
+        </div>
+      )}
+
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={openChatFromNotice}
           aria-label={t("chat.title")}
           className="fixed z-[60] right-4 bottom-20 md:bottom-6 w-14 h-14 rounded-full gold-gradient gold-glow flex items-center justify-center text-[#0A0A0F] shadow-2xl border-0 cursor-pointer hover:brightness-110 active:scale-95 transition-all"
         >
+          {showNewNotice && (
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border-2 border-primary/80 animate-ping pointer-events-none"
+            />
+          )}
           <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
             forum
           </span>
