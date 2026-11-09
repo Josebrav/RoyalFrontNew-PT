@@ -46,6 +46,62 @@ function Avatar({ userId, nick, size = "w-11 h-11" }) {
   );
 }
 
+const URL_PATTERN = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi;
+
+// Separa el texto en partes, marcando los enlaces. La puntuación pegada al final ("mirá: x.com.")
+// no es parte del enlace. Solo http/https: nunca se arma un href con otro protocolo.
+function splitLinks(text) {
+  const source = String(text ?? "");
+  const parts = [];
+  let last = 0;
+  for (const match of source.matchAll(URL_PATTERN)) {
+    const url = match[0].replace(/[.,;:!?)\]]+$/, "");
+    let href = null;
+    try {
+      const parsed = new URL(url.toLowerCase().startsWith("www.") ? `https://${url}` : url);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") href = parsed.href;
+    } catch {
+      // no es una URL válida: queda como texto
+    }
+    if (!href) continue;
+    if (match.index > last) parts.push({ text: source.slice(last, match.index) });
+    parts.push({ text: url, href });
+    last = match.index + url.length;
+  }
+  if (last < source.length) parts.push({ text: source.slice(last) });
+  return parts;
+}
+
+// Solo los mensajes de un admin llevan enlaces clickeables: si cualquier jugador pudiera mandarlos,
+// serían la forma más fácil de estafar a otro. El resto se ve como texto.
+function MessageText({ content, linkify, linkClassName }) {
+  if (!linkify) return content;
+  return splitLinks(content).map((part, i) =>
+    part.href ? (
+      <a
+        key={i}
+        href={part.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`underline font-bold ${linkClassName}`}
+      >
+        {part.text}
+      </a>
+    ) : (
+      <span key={i}>{part.text}</span>
+    ),
+  );
+}
+
+function AdminBadge() {
+  return (
+    <span className="inline-flex items-center gap-0.5 flex-shrink-0 rounded-full bg-primary text-black text-[0.625rem] font-black uppercase tracking-wider pl-1 pr-2 py-0.5">
+      <span className="material-symbols-outlined text-[14px] leading-none">verified</span>
+      Admin
+    </span>
+  );
+}
+
 export default function Messages() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,6 +113,8 @@ export default function Messages() {
   const [activePartner, setActivePartner] = useState(null); // { id, nick, rank }
   const [messageText, setMessageText] = useState("");
   const threadContainerRef = useRef(null);
+  const [partnerRoles, setPartnerRoles] = useState({}); // nick en minúsculas -> rol
+  const rolesRequestedRef = useRef(new Set());
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -90,6 +148,31 @@ export default function Messages() {
       cancelled = true;
     };
   }, [nick, currentUser?.id, conversations]);
+
+  // El rol sale siempre del perfil en el servidor, nunca del nick ni del texto, para que nadie pueda
+  // hacerse pasar por admin. Se pide una vez por persona y de a una, para no saturar la API con
+  // listas largas. Mientras no se sabe, se trata como jugador normal.
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    const nicks = [...conversations.map((c) => c.partnerNick), activePartner?.nick]
+      .filter(Boolean)
+      .filter((n) => !rolesRequestedRef.current.has(n.toLowerCase()));
+    if (nicks.length === 0) return;
+    nicks.forEach((n) => rolesRequestedRef.current.add(n.toLowerCase()));
+
+    (async () => {
+      for (const n of nicks) {
+        try {
+          const { data } = await axios.get(`${API_URL}/user-nick?nick=${encodeURIComponent(n)}`);
+          setPartnerRoles((prev) => ({ ...prev, [n.toLowerCase()]: data?.role }));
+        } catch {
+          // sin rol: se ve como jugador normal
+        }
+      }
+    })();
+  }, [conversations, activePartner?.nick, currentUser?.id]);
+
+  const isAdminNick = (n) => partnerRoles[n?.toLowerCase()] === "admin";
 
   const refreshThread = useCallback(() => {
     if (activePartner?.id) {
@@ -178,7 +261,10 @@ export default function Messages() {
                 <Avatar userId={c.partnerId} nick={c.partnerNick} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-white font-bold truncate">{c.partnerNick}</span>
+                    <span className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-white font-bold truncate">{c.partnerNick}</span>
+                      {isAdminNick(c.partnerNick) && <AdminBadge />}
+                    </span>
                     {c.unreadCount > 0 && (
                       <span className="bg-primary text-black text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                         {c.unreadCount}
@@ -215,8 +301,16 @@ export default function Messages() {
                 >
                   <span className="text-white font-bold">{activePartner.nick}</span>
                   <RankBadge tier={activePartner.rank} size="sm" />
+                  {isAdminNick(activePartner.nick) && <AdminBadge />}
                 </button>
               </div>
+
+              {isAdminNick(activePartner.nick) && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border-b border-primary/30 text-primary text-xs font-bold">
+                  <span className="material-symbols-outlined text-[18px]">verified</span>
+                  Cuenta oficial del equipo de Royal Juegos
+                </div>
+              )}
 
               <div ref={threadContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                 {activeMessages.length === 0 ? (
@@ -226,19 +320,26 @@ export default function Messages() {
                 ) : (
                   activeMessages.map((m) => {
                     const isMine = m.senderId === currentUser.id;
+                    const fromAdmin = isMine ? currentUser.role === "admin" : isAdminNick(activePartner.nick);
                     return (
                       <div
                         key={m.id}
                         className={`flex flex-col max-w-[75%] ${isMine ? "ml-auto items-end" : "items-start"}`}
                       >
                         <div
-                          className={`px-4 py-2 rounded-2xl text-sm ${
+                          className={`px-4 py-2 rounded-2xl text-sm [overflow-wrap:anywhere] select-text ${
                             isMine
                               ? "royal-gold-gradient text-surface-container-lowest rounded-br-sm"
-                              : "bg-surface-container-lowest text-on-surface rounded-bl-sm"
+                              : fromAdmin
+                                ? "bg-primary/15 border-2 border-primary text-white rounded-bl-sm"
+                                : "bg-surface-container-lowest text-on-surface rounded-bl-sm"
                           }`}
                         >
-                          {m.content}
+                          <MessageText
+                            content={m.content}
+                            linkify={fromAdmin}
+                            linkClassName={isMine ? "text-surface-container-lowest" : "text-primary"}
+                          />
                         </div>
                         <span className="text-[0.625rem] text-on-surface-variant/70 mt-1 px-1">
                           {formatMessageTimestamp(m.createdAt)}
