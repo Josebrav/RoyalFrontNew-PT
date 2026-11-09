@@ -49,6 +49,10 @@ export const GAME_SEO = {
     title: "Ruleta online gratis | RoyalJuegos",
     description: "Ruleta online gratis con mesas compartidas. Apostá con fichas de regalo y jugá con otros jugadores en vivo.",
   },
+  blackjack: {
+    title: "Blackjack online gratis con mesas en vivo | RoyalJuegos",
+    description: "Jugá blackjack online gratis en mesas compartidas con otros jugadores: vencé al crupier sin pasarte de 21. Fichas de regalo y chat en vivo.",
+  },
   domino: {
     title: "Dominó online gratis contra jugadores reales | RoyalJuegos",
     description: "Jugá dominó online gratis en mesas con jugadores reales, con chat y salas por apuesta. Partidas rápidas desde el celular o la PC.",

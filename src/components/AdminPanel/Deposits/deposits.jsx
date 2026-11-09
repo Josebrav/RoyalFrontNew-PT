@@ -23,7 +23,8 @@ export default function AdminDeposits() {
   const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === "admin";
   const [deposits, setDeposits] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("all");
+  // Por defecto solo las cargas aprobadas (las pendientes son pagos que no se completaron).
+  const [statusFilter, setStatusFilter] = useState("approved");
   const [forbidden, setForbidden] = useState(false);
 
   useEffect(() => {

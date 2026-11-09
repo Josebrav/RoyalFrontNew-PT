@@ -3,6 +3,7 @@ import minasImage from "../assets/minas2.png";
 import pachinkaImage from "../assets/rpachinka2.png";
 import bingoImage from "../assets/bingoproxi.png";
 import ruletaImage from "../assets/ruleta.png";
+import blackjackImage from "../assets/blackjack.jpg";
 import gemaOfGoldImage from "../assets/gemaOfGold.png";
 import dominoImage from "../assets/domino.png";
 
@@ -183,8 +184,11 @@ export const GAMES_CATALOG = [
     slug: "blackjack",
     name: "Blackjack",
     category: "casino",
-    status: "soon",
+    status: "active",
+    image: blackjackImage,
     icon: "style",
+    players: 0,
+    playPath: "/game/blackjack",
     description:
       "El clásico 21: vence al crupier sin pasarte de 21 puntos. Estrategia, cartas y la adrenalina de la mesa de blackjack.",
   },

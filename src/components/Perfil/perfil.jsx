@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import API_URL from "../../api/rutaApi";
 import axios from "axios";
+import reportUser from "../../utils/reportUser";
 import chipsIcon from "../../assets/chips.png";
 import bannerPerfil from "../../assets/bannerperfil.png";
 import bannerPerfilDorado from "../../assets/BannerPerfilDorado.png";
@@ -655,6 +656,15 @@ const Perfil = ({ isPublic = false }) => {
                     >
                       <span className="material-symbols-outlined text-[20px]">{isBlocked ? "how_to_reg" : "block"}</span>
                       <span className="font-label-lg text-label-lg">{isBlocked ? "Desbloquear Usuario" : "Bloquear Usuario"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => reportUser({ userId: user.id, nick: capitalize(user.nick), context: "Perfil" })}
+                      className="flex items-center gap-3 px-6 py-3 text-left bg-transparent border-0 border-t border-outline-variant/10 hover:bg-surface-variant/30 transition-colors cursor-pointer text-error"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">flag</span>
+                      <span className="font-label-lg text-label-lg">Denunciar Usuario</span>
                     </button>
                   </div>
                 </div>

@@ -76,6 +76,9 @@ function Footer() {
             <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/cumplimiento">
               {t("footer.cumplimiento")}
             </Link>
+            <Link className="text-on-surface-variant hover:text-primary transition-colors normal-case font-normal" to="/eliminar-cuenta">
+              {t("footer.eliminarCuenta")}
+            </Link>
           </div>
           <div className="flex flex-col gap-4">
             <h5 className="text-white mb-2 font-black">{t("footer.empresa")}</h5>

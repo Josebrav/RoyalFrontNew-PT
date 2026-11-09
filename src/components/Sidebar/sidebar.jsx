@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import API_URL from "../../api/rutaApi";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
 import { fetchConversations } from "../../redux/actions/index";
@@ -12,6 +14,17 @@ export default function Sidebar() {
   // Mods ven el panel de admin igual que los admins (todo excepto gestión de roles).
   const canAccessAdminPanel = currentUser?.role === "admin" || currentUser?.role === "mod";
   const unreadTotal = (messages?.conversations || []).reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+
+  // Denuncias pendientes, para el aviso del menú del staff (se vuelve a mirar cada minuto).
+  const isStaff = currentUser?.role === "admin" || currentUser?.role === "mod";
+  const [pendingReports, setPendingReports] = useState(0);
+  useEffect(() => {
+    if (!isStaff) return undefined;
+    const check = () => axios.get(`${API_URL}/admin/reports/pending-count`).then(({ data }) => setPendingReports(data?.count || 0)).catch(() => {});
+    check();
+    const timer = setInterval(check, 60000);
+    return () => clearInterval(timer);
+  }, [isStaff]);
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -41,7 +54,9 @@ export default function Sidebar() {
     { to: "/admin/online", icon: "radar", label: t("sidebar.enLinea"), color: "#4caf7d" },
     { to: "/admin/users", icon: "manage_accounts", label: t("sidebar.usuarios"), color: "#a855f7" },
     { to: "/admin/tickets", icon: "support_agent", label: t("sidebar.tickets"), color: "#2dd4bf" },
+    { to: "/admin/denuncias", icon: "flag", label: t("sidebar.denuncias"), badge: pendingReports, color: "#e05252" },
     ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: t("sidebar.cargas"), color: "#4caf7d" }] : []),
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/staff-chips", icon: "badge", label: t("sidebar.fichasStaff"), color: "#e6c364" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/game-stats", icon: "query_stats", label: t("sidebar.estadisticasJuegos"), color: "#e6c364" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/promos", icon: "campaign", label: t("sidebar.promociones"), color: "#2dd4bf" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/ofertas", icon: "sell", label: t("sidebar.ofertas"), color: "#e6c364" }] : []),

@@ -1,6 +1,12 @@
 import LegalPage from "./LegalPage";
 import { LOCALE } from "../../i18n/locale";
 
+// Dominio del sitio que se está mirando (royaljuegos.com en español; los sitios en otros idiomas tienen el suyo).
+const SITE_HOST =
+  typeof window !== "undefined" && window.location.hostname && window.location.hostname !== "localhost"
+    ? window.location.hostname.replace(/^www\./, "")
+    : "royaljuegos.com";
+
 const CONTENT = {
   es: {
     title: "Política de Privacidad",
@@ -9,7 +15,7 @@ const CONTENT = {
     sections: [
       {
         title: "1. Quiénes somos",
-        content: "RoyalGames (royalgames.lat) es una plataforma de entretenimiento social operada por José Santos Bravo Parada (DNI 39.129.716, CUIL 23-39129716-9), persona física responsable del tratamiento de los datos personales que recopilamos a través del sitio. Para cualquier consulta, reclamo o ejercicio de tus derechos sobre tus datos, podés escribirnos a royalgames2025@gmail.com.",
+        content: `RoyalGames (${SITE_HOST}) es una plataforma de entretenimiento social, responsable del tratamiento de los datos personales que recopilamos a través del sitio. Para cualquier consulta, reclamo o ejercicio de tus derechos sobre tus datos, podés escribirnos a royalgames2025@gmail.com.`,
       },
       {
         title: "2. Qué datos recopilamos",
@@ -45,7 +51,7 @@ const CONTENT = {
       },
       {
         title: "10. Tus derechos: acceso, rectificación, actualización, supresión y oposición",
-        content: "La Ley 25.326 te reconoce el derecho a acceder a tus datos personales, rectificarlos o actualizarlos si están desactualizados o son incorrectos, pedir su supresión, y oponerte a un uso puntual que no te parezca correcto (derechos ARCO). Podés ejercer la mayoría de estos derechos vos mismo, cuando quieras, editando tu perfil (nick, edad, país, descripción, avatar, correo y contraseña) desde Configuración. Para pedir la eliminación de tu cuenta y tus datos, o cualquier otro reclamo sobre esta política, escribinos por Contacto, abrí un ticket en Mesa de Ayuda, o mandanos un correo a royalgames2025@gmail.com. Si no quedás conforme con nuestra respuesta, también podés hacer tu reclamo ante la Agencia de Acceso a la Información Pública (AAIP), el organismo de control de la Ley 25.326 en Argentina.",
+        content: "La Ley 25.326 te reconoce el derecho a acceder a tus datos personales, rectificarlos o actualizarlos si están desactualizados o son incorrectos, pedir su supresión, y oponerte a un uso puntual que no te parezca correcto (derechos ARCO). Podés ejercer la mayoría de estos derechos vos mismo, cuando quieras, editando tu perfil (nick, edad, país, descripción, avatar, correo y contraseña) desde Configuración. Podés eliminar tu cuenta y tus datos vos mismo desde royaljuegos.com/eliminar-cuenta (ahí se detalla qué se borra y qué se conserva). Para pedirla por otro medio, o cualquier otro reclamo sobre esta política, escribinos por Contacto, abrí un ticket en Mesa de Ayuda, o mandanos un correo a royalgames2025@gmail.com. Si no quedás conforme con nuestra respuesta, también podés hacer tu reclamo ante la Agencia de Acceso a la Información Pública (AAIP), el organismo de control de la Ley 25.326 en Argentina.",
       },
       {
         title: "11. Menores de edad",
@@ -68,7 +74,7 @@ const CONTENT = {
     sections: [
       {
         title: "1. Who we are",
-        content: "RoyalGames (royalgames.lat) is a social entertainment platform operated by José Santos Bravo Parada (Argentine National ID / DNI 39.129.716, CUIL 23-39129716-9), the individual responsible for processing the personal data we collect through the site. For any question, complaint, or to exercise your rights over your data, you can write to us at royalgames2025@gmail.com.",
+        content: `RoyalGames (${SITE_HOST}) is a social entertainment platform, responsible for processing the personal data we collect through the site. For any question, complaint, or to exercise your rights over your data, you can write to us at royalgames2025@gmail.com.`,
       },
       {
         title: "2. What data we collect",
@@ -104,7 +110,7 @@ const CONTENT = {
       },
       {
         title: "10. Your rights: access, rectification, update, erasure, and objection",
-        content: "Argentina's Ley 25.326 recognizes your right to access your personal data, rectify or update it if it's outdated or incorrect, request its erasure, and object to a specific use you don't agree with. You can exercise most of these rights yourself, whenever you want, by editing your profile (nick, age, country, bio, avatar, email, and password) from Settings. To request deletion of your account and data, or for any other complaint about this policy, write to us via Contact, open a ticket at the Help Desk, or email royalgames2025@gmail.com. If you're not satisfied with our response, you can also file a complaint with Argentina's Agencia de Acceso a la Información Pública (AAIP), the oversight body for Ley 25.326.",
+        content: "Argentina's Ley 25.326 recognizes your right to access your personal data, rectify or update it if it's outdated or incorrect, request its erasure, and object to a specific use you don't agree with. You can exercise most of these rights yourself, whenever you want, by editing your profile (nick, age, country, bio, avatar, email, and password) from Settings. You can delete your account and data yourself at royaljuegos.com/eliminar-cuenta (it explains what is deleted and what is kept). To request it another way, or for any other complaint about this policy, write to us via Contact, open a ticket at the Help Desk, or email royalgames2025@gmail.com. If you're not satisfied with our response, you can also file a complaint with Argentina's Agencia de Acceso a la Información Pública (AAIP), the oversight body for Ley 25.326.",
       },
       {
         title: "11. Minors",
@@ -127,7 +133,7 @@ const CONTENT = {
     sections: [
       {
         title: "1. Quem somos",
-        content: "O RoyalGames (royalgames.lat) é uma plataforma de entretenimento social operada por José Santos Bravo Parada (DNI 39.129.716, CUIL 23-39129716-9), pessoa física responsável pelo tratamento dos dados pessoais que coletamos através do site. Para qualquer dúvida, reclamação ou para exercer seus direitos sobre seus dados, escreva para royalgames2025@gmail.com.",
+        content: `O RoyalGames (${SITE_HOST}) é uma plataforma de entretenimento social, responsável pelo tratamento dos dados pessoais que coletamos através do site. Para qualquer dúvida, reclamação ou para exercer seus direitos sobre seus dados, escreva para royalgames2025@gmail.com.`,
       },
       {
         title: "2. Quais dados coletamos",
@@ -163,7 +169,7 @@ const CONTENT = {
       },
       {
         title: "10. Seus direitos: acesso, retificação, atualização, exclusão e oposição",
-        content: "A Lei 25.326 da Argentina reconhece seu direito de acessar seus dados pessoais, retificá-los ou atualizá-los se estiverem desatualizados ou incorretos, pedir sua exclusão, e se opor a um uso específico com o qual você não concorde. Você pode exercer a maioria desses direitos por conta própria, quando quiser, editando seu perfil (nick, idade, país, descrição, avatar, e-mail e senha) em Configurações. Para pedir a exclusão da sua conta e dados, ou qualquer outra reclamação sobre esta política, escreva para nós em Contato, abra um chamado na Central de Ajuda, ou envie um e-mail para royalgames2025@gmail.com. Se não ficar satisfeito com nossa resposta, você também pode registrar uma reclamação junto à Agência de Acesso à Informação Pública (AAIP) da Argentina, o órgão de controle da Lei 25.326.",
+        content: "A Lei 25.326 da Argentina reconhece seu direito de acessar seus dados pessoais, retificá-los ou atualizá-los se estiverem desatualizados ou incorretos, pedir sua exclusão, e se opor a um uso específico com o qual você não concorde. Você pode exercer a maioria desses direitos por conta própria, quando quiser, editando seu perfil (nick, idade, país, descrição, avatar, e-mail e senha) em Configurações. Você pode excluir sua conta e seus dados por conta própria em royaljuegos.com/eliminar-cuenta (lá explicamos o que é apagado e o que é mantido). Para pedir de outra forma, ou qualquer outra reclamação sobre esta política, escreva para nós em Contato, abra um chamado na Central de Ajuda, ou envie um e-mail para royalgames2025@gmail.com. Se não ficar satisfeito com nossa resposta, você também pode registrar uma reclamação junto à Agência de Acesso à Informação Pública (AAIP) da Argentina, o órgão de controle da Lei 25.326.",
       },
       {
         title: "11. Menores de idade",
