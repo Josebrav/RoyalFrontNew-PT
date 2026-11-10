@@ -28,7 +28,7 @@ export const authService = {
   /**
    * Registra un nuevo usuario
    */
-  signup: async (nick, email, password, sexo, referredByCode) => {
+  signup: async (nick, email, password, sexo, referredByCode, marketingOptIn = false) => {
     try {
       const response = await axios.post(`${API_URL}/signup`, {
         nick,
@@ -36,6 +36,7 @@ export const authService = {
         password,
         sexo,
         ...(referredByCode ? { referredByCode } : {}),
+        marketingOptIn: marketingOptIn === true,
       });
       return response.data;
     } catch (error) {

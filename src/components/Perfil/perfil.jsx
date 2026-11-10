@@ -11,7 +11,7 @@ import bannerPerfilDorado from "../../assets/BannerPerfilDorado.png";
 import bannerPerfilVerde from "../../assets/BannerPerfilVerde.png";
 import insigniaAdmin from "../../assets/InsigniaAdmin.png";
 import insigniaMod from "../../assets/InsigniaMod.png";
-import defaultAvatar from "../../assets/defaultAvatar.png";
+import AvatarImg from "../Avatar/avatarImg";
 import {
   viewedUserProfile,
   updateUserProfile,
@@ -445,38 +445,17 @@ const Perfil = ({ isPublic = false }) => {
               <div
                 className="relative aspect-square w-full flex items-center justify-center bg-transparent overflow-visible"
               >
-                {avatarSrc ? (
-                  <img
+                {(
+                  <AvatarImg
                     alt="Avatar de Usuario"
                     className="w-full h-full object-contain object-bottom"
-                    src={avatarSrc}
-                    onError={(e) => {
-                      // Un solo swap, a un asset local que no puede fallar. El guard con
-                      // dataset es lo único fiable: React re-engancha el listener de error
-                      // en cada render, así que `target.onerror = null` no corta el bucle
-                      // (antes loopeaba contra user.image / placeholder remoto → 429).
-                      const target = e.currentTarget;
-                      if (target.dataset.fellBack) return;
-                      target.dataset.fellBack = "1";
-                      target.src = defaultAvatar;
-                    }}
+                    src={avatarSrc || user.image || null}
+                    fallback={
+                      <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-2xl sm:text-4xl font-bold">
+                        {getInitials(user.nick)}
+                      </div>
+                    }
                   />
-                ) : user.image ? (
-                  <img
-                    alt="Avatar de Usuario"
-                    className="w-full h-full object-contain object-bottom"
-                    src={user.image}
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      if (target.dataset.fellBack) return;
-                      target.dataset.fellBack = "1";
-                      target.src = defaultAvatar;
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full rounded-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest text-2xl sm:text-4xl font-bold">
-                    {getInitials(user.nick)}
-                  </div>
                 )}
                 {isOwnProfile && (
                   <button

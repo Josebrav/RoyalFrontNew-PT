@@ -4,6 +4,7 @@ import pachinkaImage from "../assets/rpachinka2.png";
 import bingoImage from "../assets/bingoproxi.png";
 import ruletaImage from "../assets/ruleta.png";
 import blackjackImage from "../assets/blackjack.jpg";
+import buracoImage from "../assets/buraco.jpg";
 import gemaOfGoldImage from "../assets/gemaOfGold.png";
 import dominoImage from "../assets/domino.png";
 
@@ -223,8 +224,11 @@ export const GAMES_CATALOG = [
     slug: "buraco",
     name: "Buraco",
     category: "cartas",
-    status: "soon",
+    status: "active",
+    image: buracoImage,
     icon: "extension",
+    players: 0,
+    playPath: "/game/buraco",
     description:
       "Armá tríos y escaleras antes que tus rivales en este clásico de mesa sudamericano, ahora online contra otros jugadores de RoyalGames.",
   },
