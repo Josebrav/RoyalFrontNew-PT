@@ -294,6 +294,10 @@ const RegistroForm = ({ className, children }) => {
                                             required
                                             type={showPassword ? "text" : "password"}
                                             name="password"
+                                            autoComplete="new-password"
+                                            autoCapitalize="off"
+                                            autoCorrect="off"
+                                            spellCheck={false}
                                             value={input.password}
                                             onChange={handleInputChange}
                                         />
@@ -320,6 +324,10 @@ const RegistroForm = ({ className, children }) => {
                                             required
                                             type={showConfirmPassword ? "text" : "password"}
                                             name="confirmPassword"
+                                            autoComplete="new-password"
+                                            autoCapitalize="off"
+                                            autoCorrect="off"
+                                            spellCheck={false}
                                             value={input.confirmPassword}
                                             onChange={handleInputChange}
                                         />
