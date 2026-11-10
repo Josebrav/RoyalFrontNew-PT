@@ -29,6 +29,7 @@ const RegistroForm = ({ className, children }) => {
 
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isTermsChecked, setIsTermsChecked] = useState(false);
+    const [isMarketingChecked, setIsMarketingChecked] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -149,6 +150,7 @@ const RegistroForm = ({ className, children }) => {
                 input.password,
                 input.sexo,
                 input.referredByCode.trim() || undefined,
+                isMarketingChecked,
             );
 
             await dispatch(getUserByEmail(input.email));
@@ -411,6 +413,20 @@ const RegistroForm = ({ className, children }) => {
                                         >
                                             {t("register.termsLink")}
                                         </a>
+                                    </span>
+                                </label>
+                                {/* Opcional: sin tildar se registra igual, solo no recibe mails de ofertas */}
+                                <label className="flex items-start gap-2.5 cursor-pointer group mt-2">
+                                    <div className="relative flex items-center pt-0.5">
+                                        <input
+                                            className="peer h-4 w-4 rounded border-[#2A2A36] bg-[#0A0A0F] text-primary focus:ring-primary transition-all cursor-pointer"
+                                            type="checkbox"
+                                            checked={isMarketingChecked}
+                                            onChange={(e) => setIsMarketingChecked(e.target.checked)}
+                                        />
+                                    </div>
+                                    <span className="font-body-sm text-[12px] text-on-surface-variant group-hover:text-on-surface transition-colors select-none">
+                                        {t("register.marketingOptIn")}
                                     </span>
                                 </label>
                             </div>
