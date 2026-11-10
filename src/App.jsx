@@ -32,6 +32,7 @@ import FuriaOlimpo from './components/Juegos/FuriaOlimpo/furiaolimpo';
 import GildedCobra from './components/Juegos/GildedCobra/gildedcobra';
 import Domino from './components/Juegos/Domino/domino';
 import Parchis from './components/Juegos/Parchis/parchis';
+import Buraco from './components/Juegos/Buraco/buraco';
 import GemaOfGold from './components/Juegos/GemaOfGold/gemaofgold';
 import RoyalRuleta from './components/Juegos/RoyalRuleta/royalruleta';
 import Blackjack from './components/Juegos/Blackjack/blackjack';
@@ -56,6 +57,7 @@ import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
 import MinesBots from './components/AdminPanel/MinesBots/minesBots';
 import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
 import ParchisBots from './components/AdminPanel/ParchisBots/parchisBots';
+import BuracoBots from './components/AdminPanel/BuracoBots/buracoBots';
 import UnityBots from './components/AdminPanel/UnityBots/unityBots';
 import Trophies from './components/AdminPanel/Trophies/trophies';
 import GameImages from './components/AdminPanel/GameImages/gameImages';
@@ -254,6 +256,7 @@ function App() {
             <Route path="/admin/mines-bots" element={<ProtectedRoute><MinesBots /></ProtectedRoute>} />
             <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
             <Route path="/admin/parchis-bots" element={<ProtectedRoute><ParchisBots /></ProtectedRoute>} />
+            <Route path="/admin/buraco-bots" element={<ProtectedRoute><BuracoBots /></ProtectedRoute>} />
             <Route path="/admin/unity-bots" element={<ProtectedRoute><UnityBots /></ProtectedRoute>} />
             <Route path="/admin/trophies" element={<ProtectedRoute><Trophies /></ProtectedRoute>} />
             <Route path="/admin/game-images" element={<ProtectedRoute><GameImages /></ProtectedRoute>} />
@@ -276,6 +279,7 @@ function App() {
             <Route path="/game/gildedcobra" element={<RequireAuth><GildedCobra /></RequireAuth>} />
             <Route path="/game/domino" element={<RequireAuth><Domino /></RequireAuth>} />
             <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
+            <Route path="/game/buraco" element={<RequireAuth><Buraco /></RequireAuth>} />
             <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
             <Route path="/game/royalruleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
             <Route path="/game/blackjack" element={<RequireAuth><Blackjack /></RequireAuth>} />
