@@ -1,6 +1,6 @@
 import logo from '../../assets/LogoOficial.PNG';
 import chips from '../../assets/chips.png';
-import defaultAvatar from '../../assets/defaultAvatar.png';
+import AvatarImg from '../Avatar/avatarImg';
 import { useSelector, useDispatch } from "react-redux";
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
@@ -143,21 +143,15 @@ export default function Navbar() {
                 title={t("nav.cambiarAvatar")}
                 className="hud-avatar w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container-lowest transition-transform hover:scale-105 focus:outline-none cursor-pointer p-0"
               >
-                <img
+                <AvatarImg
                   alt={t("nav.avatarAlt")}
                   className="w-full h-full object-cover object-top"
                   src={avatarSrc}
-                  onError={(e) => {
-                    // Un solo swap, a un asset local que no puede fallar. El guard con
-                    // dataset es lo único fiable: React vuelve a enganchar el listener
-                    // de error en cada render, así que `target.onerror = null` no sirve
-                    // para cortar el bucle (por eso antes se disparaba en loop contra
-                    // la foto de Google hasta comerse un 429).
-                    const target = e.currentTarget;
-                    if (target.dataset.fellBack) return;
-                    target.dataset.fellBack = "1";
-                    target.src = defaultAvatar;
-                  }}
+                  fallback={
+                    <span className="w-full h-full royal-gold-gradient flex items-center justify-center text-surface-container-lowest font-bold text-sm">
+                      {(currentUser?.nick || "RG").slice(0, 2).toUpperCase()}
+                    </span>
+                  }
                 />
               </button>
               <button
