@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Container } from '@chakra-ui/react';
-import { useLocation, Route, Routes } from 'react-router-dom';
+import { useLocation, Route, Routes, Navigate } from 'react-router-dom';
+import { LOCALE } from './i18n/locale';
 import Nav from './components/Nav/nav';
 import Sidebar from './components/Sidebar/sidebar';
 import Footer from './components/footer/footer';
@@ -281,7 +282,9 @@ function App() {
             <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
             <Route path="/game/buraco" element={<RequireAuth><Buraco /></RequireAuth>} />
             <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
-            <Route path="/game/royalruleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
+            {/* En portugues la ruleta va en /game/royalroleta; la direccion vieja lleva a la nueva */}
+            <Route path="/game/royalruleta" element={LOCALE === "pt" ? <Navigate to="/game/royalroleta" replace /> : <RequireAuth><RoyalRuleta /></RequireAuth>} />
+            <Route path="/game/royalroleta" element={<RequireAuth><RoyalRuleta /></RequireAuth>} />
             <Route path="/game/blackjack" element={<RequireAuth><Blackjack /></RequireAuth>} />
             <Route path="/royalstore" element={<RoyalStore />} />
             <Route path="/amigos" element={<Friends />} />

@@ -1,3 +1,4 @@
+import { LOCALE } from "../i18n/locale";
 import rjImage from "../assets/rj.png";
 import minasImage from "../assets/minas2.png";
 import pachinkaImage from "../assets/rpachinka2.png";
@@ -168,7 +169,9 @@ export const GAMES_CATALOG = [
     image: ruletaImage,
     icon: "donut_large",
     players: 1120,
-    playPath: "/game/royalruleta",
+    // En el sitio en portugues la direccion es /game/royalroleta (las dos abren la ruleta)
+    playPath: LOCALE === "pt" ? "/game/royalroleta" : "/game/royalruleta",
+    playPathAliases: ["/game/royalruleta", "/game/royalroleta"],
     description:
       "Ruleta europea con mesas compartidas. Apuesta a tu número, color o docena favorita y deja girar la rueda.",
   },
@@ -324,7 +327,8 @@ export const GAMES_CATALOG = [
 
 export const getGameBySlug = (slug) => GAMES_CATALOG.find((game) => game.slug === slug);
 
-export const getGameByPlayPath = (path) => GAMES_CATALOG.find((game) => game.playPath === path);
+export const getGameByPlayPath = (path) =>
+  GAMES_CATALOG.find((game) => game.playPath === path || (game.playPathAliases || []).includes(path));
 
 export const getGamesByCategory = (category) =>
   GAMES_CATALOG.filter((game) => game.category === category);
