@@ -367,11 +367,11 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Popular Games & Active Tournament */}
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-            {/* Popular Games List */}
-            <section className="xl:col-span-8">
-              <div className="flex items-center justify-between mb-6">
+          {/* Juegos + Top Ganadores/Conectados: una sola grilla. En pantallas grandes el panel de la
+              derecha ocupa las 2 ultimas columnas de las primeras filas y las tarjetas siguen por debajo
+              de el, a todo el ancho (juegos activos y despues los proximos, en gris). */}
+          <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-6">
+              <div className="col-span-2 md:col-span-4 xl:col-start-1 xl:row-start-1 flex items-center justify-between">
                 <h2 className="font-headline-sm text-headline-sm flex items-center gap-2 text-white">
                   <span className="material-symbols-outlined text-primary">star</span>
                   <EditableText contentKey="home.dashboard.popularGamesTitle" as="span">
@@ -394,7 +394,6 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {GAMES_CATALOG.filter((game) => game.status === "active" && game.showOnHome !== false).map((game) => (
                   <div
                     key={game.slug}
@@ -414,7 +413,13 @@ export default function Home() {
                       <span className={`inline-block text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 ${CATEGORY_META[game.category].chipClassName}`}>
                         {t(`catalog.category.${game.category}`)}
                       </span>
-                      <h4 className="font-bold text-label-lg font-label-lg truncate text-white">{game.name}</h4>
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-bold text-label-lg font-label-lg truncate text-white min-w-0">{game.name}</h4>
+                        <span className="flex items-center gap-1 text-[0.6875rem] text-on-surface-variant flex-shrink-0">
+                          <span className="material-symbols-outlined text-[13px]">person</span>
+                          {new Intl.NumberFormat("es-ES").format(game.players || 0)}
+                        </span>
+                      </div>
                     </div>
                     {/* Hover Overlay */}
                     <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -433,12 +438,38 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
-              </div>
 
-            </section>
+                {/* Juegos que todavia no salieron: misma tarjeta, en gris y sin jugar */}
+                {GAMES_CATALOG.filter((game) => game.status !== "active").map((game) => (
+                  <div
+                    key={game.slug}
+                    onClick={() => navigate(`/juegos/${game.slug}`)}
+                    className="order-1 xl:order-none relative bg-surface-container-high/60 rounded-xl overflow-hidden border border-outline-variant/20 opacity-60 hover:opacity-80 transition-opacity cursor-pointer"
+                  >
+                    <div className="aspect-[3/4] overflow-hidden grayscale bg-surface-container flex items-center justify-center">
+                      <EditableImage
+                        contentKey={`games.${game.slug}.cover`}
+                        fallbackSrc={game.image}
+                        fallbackIcon={game.icon}
+                        alt={game.name}
+                        className="w-full h-full object-cover"
+                        recommendedSize="600×800px aprox. (vertical), JPG o PNG"
+                      />
+                    </div>
+                    <div className="p-3 text-left">
+                      <span className="inline-block text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1.5 text-on-surface-variant/80 border border-outline-variant/30">
+                        {t("catalog.proximamente")}
+                      </span>
+                      <h4 className="font-bold text-label-lg font-label-lg truncate text-on-surface-variant">{game.name}</h4>
+                    </div>
+                  </div>
+                ))}
 
-            {/* Top Winners + Online Players */}
-            <aside className="xl:col-span-4 flex flex-col gap-6 text-left">
+            {/* Top Winners + Online Players: arriba a la derecha (3 filas: titulo + 2 de tarjetas);
+                en pantallas grandes va "flotando" (absolute) en su lugar de la grilla, asi su alto no estira
+                las filas: el alto lo ponen las tarjetas y la lista de conectados usa scroll. */}
+            <div className="col-span-2 md:col-span-4 xl:col-span-2 xl:col-start-5 xl:row-start-1 xl:row-span-3 xl:relative">
+            <aside className="xl:absolute xl:inset-0 flex flex-col gap-6 text-left min-h-0">
               {/* Top Winners Leaderboard */}
               <div
                 className="bg-surface-container-high rounded-xl border border-emerald-400/30 overflow-hidden flex flex-col"
@@ -489,14 +520,14 @@ export default function Home() {
               </div>
 
               {/* Online Players */}
-              <div className="bg-surface-container-high rounded-xl border border-sky-400/20 overflow-hidden flex flex-col">
+              <div className="bg-surface-container-high rounded-xl border border-sky-400/20 overflow-hidden flex flex-col xl:flex-1 xl:min-h-0">
                 <div className="p-4 border-b border-outline-variant/10 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse flex-shrink-0"></span>
                   <h3 className="font-bold text-headline-sm font-headline-sm text-white">
                     {otherOnlineUsers.length} {otherOnlineUsers.length === 1 ? t("home.dashboard.jugadorConectado") : t("home.dashboard.jugadoresConectados")}
                   </h3>
                 </div>
-                <div className="max-h-80 overflow-y-auto divide-y divide-outline-variant/10">
+                <div className="max-h-80 xl:max-h-none xl:flex-1 xl:min-h-0 overflow-y-auto divide-y divide-outline-variant/10">
                   {otherOnlineUsers.length === 0 ? (
                     <p className="text-on-surface-variant text-sm text-center py-6 px-4">
                       {t("home.dashboard.noOtherPlayers")}
@@ -545,12 +576,7 @@ export default function Home() {
               {/* Tarjeta de Giro Diario VIP oculta a pedido (ver handleClaimDailySpin,
                   DailySpinModal y GET /daily-spin/status, todo intacto por si se retoma) */}
             </aside>
-          </div>
-
-          {/* Games Catalog by Category — a todo el ancho (no metido en la columna de 8/12 de
-              arriba), para aprovechar el espacio libre que deja el aside más corto al lado. */}
-          <div className="pt-8 border-t border-outline-variant/10">
-            <GamesCatalog compact />
+            </div>
           </div>
 
         </main>
