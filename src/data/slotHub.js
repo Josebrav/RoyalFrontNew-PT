@@ -35,6 +35,10 @@ export const HUB_SLOTS = {
     title: "Joker Wilds",
     url: withPlayer("https://jokerwilds.s3.us-east-2.amazonaws.com/jokerwilds/index.html"),
   },
+  sweettreats: {
+    title: "Sweet Treats",
+    url: withPlayer("https://sweettreats.s3.us-east-2.amazonaws.com/sweettreats/index.html"),
+  },
   gemaofgold: {
     title: "Gema of Gold",
     url: withPlayer("https://gemaofgold.s3.us-east-2.amazonaws.com/Gemaofgold/index.html"),
