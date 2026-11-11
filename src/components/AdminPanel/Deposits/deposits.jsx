@@ -18,6 +18,17 @@ const PLATFORM_LABELS = {
   mepago_mx: "Mercado Pago (MX)",
 };
 
+/** Monto pagado con su moneda (ARS, BRL, USD...). Los pagos viejos no guardaban la moneda: Asaas
+ *  siempre cobra en reales; en el resto se aclara que no quedo registrada. */
+function formatPaid(deposit) {
+  const amount = Number(deposit.price);
+  const text = Number.isFinite(amount)
+    ? new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount)
+    : deposit.price;
+  const currency = deposit.currency || (deposit.paymentPlatform === "asaas" ? "BRL" : null);
+  return currency ? `${text} ${currency}` : `${text} (sin moneda)`;
+}
+
 export default function AdminDeposits() {
   const navigate = useNavigate();
   const viewerIsAdmin = useSelector((state) => state.currentUser?.role) === "admin";
@@ -162,8 +173,8 @@ export default function AdminDeposits() {
                         <td className="px-6 py-4 text-on-surface-variant text-sm">
                           {PLATFORM_LABELS[deposit.paymentPlatform] || deposit.paymentPlatform || "—"}
                         </td>
-                        <td className="px-6 py-4 text-right font-bold text-white">
-                          {deposit.price}
+                        <td className="px-6 py-4 text-right font-bold text-white whitespace-nowrap">
+                          {formatPaid(deposit)}
                         </td>
                         <td className="px-6 py-4 text-right font-bold text-primary">
                           {new Intl.NumberFormat('es-ES').format(deposit.chips)}
