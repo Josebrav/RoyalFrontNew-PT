@@ -15,6 +15,7 @@ const UNITY_BOT_GAMES = [
   { slug: "sugarcalavera", label: "Sugar Calavera" },
   { slug: "furiaolimpo", label: "Furia del Olimpo" },
   { slug: "gildedcobra", label: "Gilded Cobra" },
+  { slug: "jokerwilds", label: "Joker Wilds" },
 ];
 
 const numberFormat = (n) => new Intl.NumberFormat("es-ES").format(n || 0);
