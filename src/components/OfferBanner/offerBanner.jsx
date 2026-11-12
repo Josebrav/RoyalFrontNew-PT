@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
 
@@ -36,16 +37,18 @@ const timeLeft = (endsAt) => {
 
 /**
  * Banner de la oferta vigente (panel -> Ofertas) en el centro de la pantalla, la primera vez del día que se
- * entra a la página en este navegador. No interrumpe a quien entra directo a un juego o al panel.
+ * entra a la página en este navegador. Solo con sesión iniciada (las ofertas son para comprar fichas).
+ * No interrumpe a quien entra directo a un juego o al panel.
  */
 export default function OfferBanner() {
   const location = useLocation();
   const navigate = useNavigate();
   const [offer, setOffer] = useState(null);
+  const loggedIn = useSelector((state) => Boolean(state.currentUser?.id));
   const blockedRoute = location.pathname.startsWith("/game/") || location.pathname.startsWith("/admin");
 
   useEffect(() => {
-    if (blockedRoute || offer) return undefined;
+    if (!loggedIn || blockedRoute || offer) return undefined;
     let cancelled = false;
     axios
       .get(`${API_URL}/chip-offers/current`)
@@ -58,9 +61,9 @@ export default function OfferBanner() {
     return () => {
       cancelled = true;
     };
-  }, [blockedRoute, offer]);
+  }, [loggedIn, blockedRoute, offer]);
 
-  if (!offer) return null;
+  if (!offer || !loggedIn) return null;
 
   const left = timeLeft(offer.endsAt);
   const close = () => setOffer(null);
