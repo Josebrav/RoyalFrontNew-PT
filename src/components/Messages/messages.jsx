@@ -112,6 +112,8 @@ export default function Messages() {
 
   const [activePartner, setActivePartner] = useState(null); // { id, nick, rank }
   const [messageText, setMessageText] = useState("");
+  const [threadLoading, setThreadLoading] = useState(false);
+  const [threadError, setThreadError] = useState(null);
   const threadContainerRef = useRef(null);
   const [partnerRoles, setPartnerRoles] = useState({}); // nick en minúsculas -> rol
   const rolesRequestedRef = useRef(new Set());
@@ -174,9 +176,16 @@ export default function Messages() {
 
   const isAdminNick = (n) => partnerRoles[n?.toLowerCase()] === "admin";
 
-  const refreshThread = useCallback(() => {
-    if (activePartner?.id) {
-      dispatch(fetchThread(activePartner.id));
+  const refreshThread = useCallback(async () => {
+    if (!activePartner?.id) return;
+    setThreadLoading(true);
+    setThreadError(null);
+    try {
+      await dispatch(fetchThread(activePartner.id));
+    } catch (error) {
+      setThreadError(error?.message || "No se pudieron cargar los mensajes de esta conversación");
+    } finally {
+      setThreadLoading(false);
     }
   }, [dispatch, activePartner?.id]);
 
@@ -243,7 +252,7 @@ export default function Messages() {
 
       <div className="glass-card rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-[320px_1fr] h-[70vh] min-h-[420px]">
         {/* Conversation list */}
-        <div className={`border-r border-outline-variant/10 overflow-y-auto ${activePartner ? "hidden md:block" : "block"}`}>
+        <div className={`border-r border-outline-variant/10 overflow-y-auto min-h-0 ${activePartner ? "hidden md:block" : "block"}`}>
           {conversations.length === 0 ? (
             <p className="p-6 text-on-surface-variant text-sm">
               Todavía no tienes conversaciones. Envía un mensaje desde el perfil de otro jugador.
@@ -282,10 +291,10 @@ export default function Messages() {
         </div>
 
         {/* Active thread */}
-        <div className={`flex flex-col ${activePartner ? "flex" : "hidden md:flex"}`}>
+        <div className={`flex flex-col min-h-0 ${activePartner ? "flex" : "hidden md:flex"}`}>
           {activePartner ? (
             <>
-              <div className="flex items-center gap-3 p-4 border-b border-outline-variant/10">
+              <div className="flex items-center gap-3 p-4 border-b border-outline-variant/10 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => navigate("/mensajes")}
@@ -306,51 +315,72 @@ export default function Messages() {
               </div>
 
               {isAdminNick(activePartner.nick) && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border-b border-primary/30 text-primary text-xs font-bold">
+                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 border-b border-primary/30 text-primary text-xs font-bold flex-shrink-0">
                   <span className="material-symbols-outlined text-[18px]">verified</span>
                   Cuenta oficial del equipo de Royal Juegos
                 </div>
               )}
 
-              <div ref={threadContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
-                {activeMessages.length === 0 ? (
-                  <p className="text-on-surface-variant text-sm text-center mt-8">
-                    Todavía no hay mensajes. ¡Escribe el primero!
-                  </p>
-                ) : (
-                  activeMessages.map((m) => {
-                    const isMine = m.senderId === currentUser.id;
-                    const fromAdmin = isMine ? currentUser.role === "admin" : isAdminNick(activePartner.nick);
-                    return (
-                      <div
-                        key={m.id}
-                        className={`flex flex-col max-w-[75%] ${isMine ? "ml-auto items-end" : "items-start"}`}
+              {threadLoading && activeMessages.length === 0 ? (
+                <div className="flex-1 min-h-0 flex flex-col items-center justify-center p-4 text-on-surface-variant text-sm">
+                  Cargando mensajes…
+                </div>
+              ) : (
+                <div ref={threadContainerRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
+                  {threadError ? (
+                    <div className="flex flex-col items-center justify-center p-6 text-center text-error">
+                      <p className="text-sm mb-3">
+                        No se pudieron cargar los mensajes de esta conversación.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={refreshThread}
+                        className="px-4 py-2 rounded-lg gold-gradient text-[#0A0A0F] font-bold text-sm hover:brightness-110"
                       >
-                        <div
-                          className={`px-4 py-2 rounded-2xl text-sm [overflow-wrap:anywhere] select-text ${
-                            isMine
-                              ? "royal-gold-gradient text-surface-container-lowest rounded-br-sm"
-                              : fromAdmin
-                                ? "bg-primary/15 border-2 border-primary text-white rounded-bl-sm"
-                                : "bg-surface-container-lowest text-on-surface rounded-bl-sm"
-                          }`}
-                        >
-                          <MessageText
-                            content={m.content}
-                            linkify={fromAdmin}
-                            linkClassName={isMine ? "text-surface-container-lowest" : "text-primary"}
-                          />
-                        </div>
-                        <span className="text-[0.625rem] text-on-surface-variant/70 mt-1 px-1">
-                          {formatMessageTimestamp(m.createdAt)}
-                        </span>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+                        Reintentar
+                      </button>
+                    </div>
+                  ) : (
+                    activeMessages.length === 0 ? (
+                      <p className="text-on-surface-variant text-sm text-center mt-8">
+                        Todavía no hay mensajes. ¡Escribe el primero!
+                      </p>
+                    ) : (
+                      activeMessages.map((m) => {
+                        const isMine = m.senderId === currentUser.id;
+                        const fromAdmin = isMine ? currentUser.role === "admin" : isAdminNick(activePartner.nick);
+                        return (
+                          <div
+                            key={m.id}
+                            className={`flex flex-col max-w-[75%] ${isMine ? "ml-auto items-end" : "items-start"}`}
+                          >
+                            <div
+                              className={`px-4 py-2 rounded-2xl text-sm [overflow-wrap:anywhere] select-text ${
+                                isMine
+                                  ? "royal-gold-gradient text-surface-container-lowest rounded-br-sm"
+                                  : fromAdmin
+                                    ? "bg-primary/15 border-2 border-primary text-white rounded-bl-sm"
+                                    : "bg-surface-container-lowest text-on-surface rounded-bl-sm"
+                              }`}
+                            >
+                              <MessageText
+                                content={m.content}
+                                linkify={fromAdmin}
+                                linkClassName={isMine ? "text-surface-container-lowest" : "text-primary"}
+                              />
+                            </div>
+                            <span className="text-[0.625rem] text-on-surface-variant/70 mt-1 px-1">
+                              {formatMessageTimestamp(m.createdAt)}
+                            </span>
+                          </div>
+                        );
+                      })
+                    )
+                  )}
+                </div>
+              )}
 
-              <form onSubmit={handleSend} className="flex items-center gap-3 p-4 border-t border-outline-variant/10">
+              <form onSubmit={handleSend} className="flex items-center gap-3 p-4 border-t border-outline-variant/10 flex-shrink-0">
                 <input
                   type="text"
                   value={messageText}

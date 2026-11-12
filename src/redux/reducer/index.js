@@ -181,17 +181,26 @@ const reducer = (state = initialState, action) => {
         case MESSAGES_CONVERSATIONS_SUCCESS:
             return { ...state, messages: { ...state.messages, conversations: action.payload } };
 
-        case MESSAGES_THREAD_SUCCESS:
+        case MESSAGES_THREAD_SUCCESS: {
+            const raw = action.payload.messages;
+            // El backend puede devolver los mensajes como array o envueltos en { messages: [...] }.
+            // Normalizamos siempre a array para que activeMessages.length nunca rompa.
+            const messages = Array.isArray(raw)
+                ? raw
+                : raw && Array.isArray(raw.messages)
+                    ? raw.messages
+                    : [];
             return {
                 ...state,
                 messages: {
                     ...state.messages,
                     threads: {
                         ...state.messages.threads,
-                        [action.payload.userId]: action.payload.messages,
+                        [action.payload.userId]: messages,
                     },
                 },
             };
+        }
 
         case MESSAGES_ACTION_ERROR:
             return { ...state, messages: { ...state.messages, error: action.payload } };
