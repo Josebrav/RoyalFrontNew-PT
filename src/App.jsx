@@ -16,6 +16,7 @@ import News from './components/News/news';
 import RankSystem from './components/RankSystem/rankSystem';
 import RankUpNotice from './components/RankUpNotice/rankUpNotice';
 import OfferBanner from './components/OfferBanner/offerBanner';
+import FeaturedNews from './components/FeaturedNews/featuredNews';
 import AdminOffers from './components/AdminPanel/Offers/offers';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
@@ -334,6 +335,7 @@ function App() {
         <GlobalChat />
         <RankUpNotice />
         <OfferBanner />
+        <FeaturedNews />
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"

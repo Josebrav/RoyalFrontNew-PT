@@ -76,6 +76,7 @@ export default function OfferBanner() {
     <div
       className="fixed inset-0 z-[99998] bg-black/75 flex items-center justify-center p-4"
       role="dialog"
+      data-offer-banner
       aria-label={offer.title}
       onClick={close}
     >
