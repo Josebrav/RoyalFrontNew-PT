@@ -25,12 +25,33 @@ const TAG_OPTIONS = Object.keys(TAG_META);
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-const emptyForm = { titulo: "", texto: "", tag: TAG_OPTIONS[0], image: null };
+const emptyForm = { titulo: "", texto: "", tag: TAG_OPTIONS[0], image: null, linkTo: "", featured: false, featuredUntil: "" };
+
+// "2026-11-30T23:59" (input datetime-local, hora local) <-> ISO del servidor
+const toLocalInput = (iso) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+/** Ruta interna ("/game/...") o URL completa: las internas se abren en la misma pestaña. */
+const isExternalLink = (link) => /^https?:\/\//i.test(link || "");
 
 function NewsFormModal({ article, onClose, onSaved }) {
   const dispatch = useDispatch();
   const [form, setForm] = useState(
-    article ? { titulo: article.titulo, texto: article.texto, tag: article.tag, image: null } : emptyForm,
+    article
+      ? {
+          titulo: article.titulo,
+          texto: article.texto,
+          tag: article.tag,
+          image: null,
+          linkTo: article.linkTo || "",
+          featured: Boolean(article.featured),
+          featuredUntil: toLocalInput(article.featuredUntil),
+        }
+      : emptyForm,
   );
   const [saving, setSaving] = useState(false);
 
@@ -56,6 +77,15 @@ function NewsFormModal({ article, onClose, onSaved }) {
       Swal.fire({ title: "Faltan datos", text: "Completá título y texto.", icon: "warning", ...swalThemeConfig });
       return;
     }
+    const link = form.linkTo.trim();
+    if (link && !/^(\/\S*|https?:\/\/\S+)$/i.test(link)) {
+      Swal.fire({ title: "Enlace inválido", text: "Tiene que empezar con / (página del sitio) o con https://", icon: "warning", ...swalThemeConfig });
+      return;
+    }
+    if (form.featured && !form.image && !article?.imageUrl) {
+      Swal.fire({ title: "Falta el banner", text: "Para salir en primera plana la noticia necesita una imagen.", icon: "warning", ...swalThemeConfig });
+      return;
+    }
     setSaving(true);
     try {
       const formData = new FormData();
@@ -63,6 +93,9 @@ function NewsFormModal({ article, onClose, onSaved }) {
       formData.append("texto", form.texto.trim());
       formData.append("tag", form.tag);
       if (form.image) formData.append("image", form.image);
+      formData.append("linkTo", link);
+      formData.append("featured", form.featured ? "true" : "false");
+      formData.append("featuredUntil", form.featured && form.featuredUntil ? new Date(form.featuredUntil).toISOString() : "");
 
       if (article) {
         await dispatch(updateNewsArticle(article.id, formData));
@@ -150,6 +183,48 @@ function NewsFormModal({ article, onClose, onSaved }) {
             className="w-full text-on-surface-variant text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary/10 file:text-primary file:cursor-pointer"
             disabled={saving}
           />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">
+            Enlace al tocar el banner (opcional) — ej. /game/sweettreats o https://...
+          </label>
+          <input
+            type="text"
+            value={form.linkTo}
+            placeholder="/game/sweettreats"
+            onChange={(e) => setForm((prev) => ({ ...prev, linkTo: e.target.value }))}
+            className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:border-primary"
+            disabled={saving}
+          />
+        </div>
+
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.featured}
+              onChange={(e) => setForm((prev) => ({ ...prev, featured: e.target.checked }))}
+              className="w-5 h-5 accent-[#e9c349] cursor-pointer"
+              disabled={saving}
+            />
+            <span className="text-sm text-white font-bold">Mostrar en primera plana</span>
+          </label>
+          <p className="text-xs text-on-surface-variant -mt-1">
+            El banner aparece en el centro de la página, como las ofertas (una vez por día a cada visitante). Al tocarlo lleva al enlace.
+          </p>
+          {form.featured && (
+            <div className="space-y-1">
+              <label className="text-[0.625rem] uppercase tracking-widest text-on-surface-variant">Mostrar hasta (vacío = sin fecha de fin)</label>
+              <input
+                type="datetime-local"
+                value={form.featuredUntil}
+                onChange={(e) => setForm((prev) => ({ ...prev, featuredUntil: e.target.value }))}
+                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-2.5 text-on-surface outline-none focus:border-primary"
+                disabled={saving}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
@@ -311,6 +386,11 @@ export default function News() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap mb-1">
                   <h3 className="font-bold text-white">{novedad.titulo}</h3>
+                  {canManage && novedad.featured && (
+                    <span className="text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 text-primary bg-primary/10 border-primary/40">
+                      Primera plana
+                    </span>
+                  )}
                   <span className={`text-[0.625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border flex-shrink-0 ${TAG_META[novedad.tag] || ""}`}>
                     {novedad.tag}
                   </span>
@@ -343,6 +423,16 @@ export default function News() {
                     </>
                   );
                 })()}
+                {novedad.linkTo && (
+                  <a
+                    href={novedad.linkTo}
+                    {...(isExternalLink(novedad.linkTo) ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="mt-3 inline-flex items-center gap-1 px-4 py-1.5 rounded-lg gold-gradient text-black text-xs font-bold uppercase tracking-wider no-underline hover:brightness-110"
+                  >
+                    Ver más
+                    <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  </a>
+                )}
               </div>
               {canManage && (
                 <div className="flex flex-col gap-1.5 flex-shrink-0">

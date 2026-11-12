@@ -16,10 +16,12 @@ import News from './components/News/news';
 import RankSystem from './components/RankSystem/rankSystem';
 import RankUpNotice from './components/RankUpNotice/rankUpNotice';
 import OfferBanner from './components/OfferBanner/offerBanner';
+import FeaturedNews from './components/FeaturedNews/featuredNews';
 import AdminOffers from './components/AdminPanel/Offers/offers';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
+import { HUB_ORIGINS } from './data/slotHub';
 import TermsAndConditions from './components/termsyConds/terminosYCondiciones';
 import axios from 'axios';
 import Diamantes from './components/Juegos/Diamantes/diamantes';
@@ -199,10 +201,34 @@ function App() {
   // comentario de arriba), nunca se entera de que las fichas cambiaron. Sondeamos cada pocos
   // segundos nada más que en esas rutas para que la nav siga el saldo casi en vivo mientras se
   // juega/compra.
+  // Las slots acreditan el premio (incluido el de todas las tiradas gratis) en el momento del giro,
+  // así que el sondeo mostraba el premio en la nav antes de que terminara de animarse. El juego
+  // avisa "royalgames:chips-hold" al girar y "royalgames:chips-release" cuando ya mostró el saldo
+  // final: mientras tanto la nav no se actualiza (con un tope por si el juego se cierra a la mitad).
+  const chipsHoldUntil = useRef(0);
   useEffect(() => {
+    const MAX_HOLD_MS = 4 * 60 * 1000;
+    const onMessage = (event) => {
+      if (!HUB_ORIGINS.has(event.origin)) return;
+      const type = event.data && typeof event.data === 'object' ? event.data.type : null;
+      if (type === 'royalgames:chips-hold') {
+        chipsHoldUntil.current = Date.now() + MAX_HOLD_MS;
+      } else if (type === 'royalgames:chips-release') {
+        chipsHoldUntil.current = 0;
+        if (currentUser?.email) dispatch(getUserByEmail(currentUser.email)).catch(() => {});
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.email]);
+
+  useEffect(() => {
+    chipsHoldUntil.current = 0; // al cambiar de página se suelta cualquier congelamiento
     const isGameOrRoyalStore = location.pathname.includes('/game') || location.pathname === '/royalstore';
     if (!currentUser?.email || !isGameOrRoyalStore) return;
     const interval = setInterval(() => {
+      if (Date.now() < chipsHoldUntil.current) return; // hay una tirada animándose
       dispatch(getUserByEmail(currentUser.email)).catch(() => {});
     }, 3000);
     return () => clearInterval(interval);
@@ -309,6 +335,7 @@ function App() {
         <GlobalChat />
         <RankUpNotice />
         <OfferBanner />
+        <FeaturedNews />
         {showWelcomeGift && currentUser?.id && createPortal(
           <div
             className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/85 backdrop-blur-sm p-4"
