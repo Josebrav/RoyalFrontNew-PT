@@ -8,6 +8,8 @@ import blackjackImage from "../assets/blackjack.jpg";
 import buracoImage from "../assets/buraco.jpg";
 import gemaOfGoldImage from "../assets/gemaOfGold.png";
 import dominoImage from "../assets/domino.png";
+import jokerWildsImage from "../assets/jokerwilds.jpg";
+import sweetTreatsImage from "../assets/sweettreats.jpg";
 
 // `chipClassName` es la misma paleta pero como píldora (fondo + borde translúcidos), para donde
 // la categoría necesita notarse de un vistazo (ej. la grilla de "Juegos Populares" del Home) en
@@ -130,6 +132,30 @@ export const GAMES_CATALOG = [
     playPath: "/game/gildedcobra",
     description:
       "Tragamonedas del antiguo Egipto con rodillos escalonados y 720 formas de ganar. Tres scatter dan tiradas gratis y el bonus de los huevos suma multiplicadores.",
+  },
+  {
+    slug: "jokerwilds",
+    name: "Joker Wilds",
+    category: "slots",
+    status: "active",
+    image: jokerWildsImage,
+    icon: "theater_comedy",
+    players: 0,
+    playPath: "/game/jokerwilds",
+    description:
+      "Tragamonedas del bufón: 5 rodillos con Joker, coronas, cofres y gemas. Cada símbolo paga en rodillos seguidos desde el primero, en cualquier fila; 5 Joker pagan 2.000 veces la apuesta.",
+  },
+  {
+    slug: "sweettreats",
+    name: "Sweet Treats",
+    category: "slots",
+    status: "active",
+    image: sweetTreatsImage,
+    icon: "cake",
+    players: 0,
+    playPath: "/game/sweettreats",
+    description:
+      "Tragamonedas de bombones en cascada: 4 o más iguales en cualquier lugar explotan y caen nuevos. Los multiplicadores multiplican el premio y 3 FREE SPIN dan 10 giros gratis.",
   },
   {
     slug: "bingo",

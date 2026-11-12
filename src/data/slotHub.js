@@ -31,6 +31,14 @@ export const HUB_SLOTS = {
     title: "Gilded Cobra",
     url: withPlayer("https://gildedcobra.s3.us-east-2.amazonaws.com/gildedcobra/index.html"),
   },
+  jokerwilds: {
+    title: "Joker Wilds",
+    url: withPlayer("https://jokerwilds.s3.us-east-2.amazonaws.com/jokerwilds/index.html"),
+  },
+  sweettreats: {
+    title: "Sweet Treats",
+    url: withPlayer("https://sweettreatsroyal.s3.us-east-2.amazonaws.com/sweettreats/index.html"),
+  },
   gemaofgold: {
     title: "Gema of Gold",
     url: withPlayer("https://gemaofgold.s3.us-east-2.amazonaws.com/Gemaofgold/index.html"),

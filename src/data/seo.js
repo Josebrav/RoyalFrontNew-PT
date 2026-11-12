@@ -85,6 +85,14 @@ export const GAME_SEO = {
     title: "Gilded Cobra: tragamonedas del antiguo Egipto gratis | RoyalJuegos",
     description: "Gilded Cobra, la tragamonedas del antiguo Egipto con 720 formas de ganar, tiradas gratis y bono de huevos. Jugá gratis online.",
   },
+  jokerwilds: {
+    title: "Joker Wilds: tragamonedas del bufón gratis | RoyalJuegos",
+    description: "Joker Wilds, la tragamonedas del bufón con coronas, cofres y gemas: 5 Joker pagan 2.000 veces la apuesta. Jugá gratis online.",
+  },
+  sweettreats: {
+    title: "Sweet Treats: tragamonedas de bombones en cascada gratis | RoyalJuegos",
+    description: "Sweet Treats, la tragamonedas de chocolates en cascada: 4 o más iguales explotan, multiplicadores y giros gratis. Jugá gratis online.",
+  },
   "gema-of-gold": {
     title: "Gema of Gold: tragamonedas de gemas gratis | RoyalJuegos",
     description: "Gema of Gold, la tragamonedas de gemas y oro con premios y bonos. Jugá gratis online con fichas de regalo.",
