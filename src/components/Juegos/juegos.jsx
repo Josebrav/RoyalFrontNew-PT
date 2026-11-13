@@ -5,12 +5,15 @@ import FavoriteButton from "./FavoriteButton";
 import { fetchFavoriteGames } from "../../redux/actions";
 import { GAMES_CATALOG, CATEGORY_META, CATEGORY_ORDER } from "../../data/gamesCatalog";
 import EditableImage from "../ui/EditableImage";
+import GameOrderEditor from "../ui/GameOrderEditor";
+import { useOrderedGames } from "../../data/gameOrder";
 
 export default function GameGrid() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentUser, favoriteGames } = useSelector((state) => state);
   const [activeCategory, setActiveCategory] = useState("all");
+  const orderedGames = useOrderedGames();
 
   useEffect(() => {
     if (currentUser?.id) {
@@ -19,8 +22,8 @@ export default function GameGrid() {
   }, [currentUser?.id, dispatch]);
 
   const games = activeCategory === "all"
-    ? GAMES_CATALOG
-    : GAMES_CATALOG.filter((game) => game.category === activeCategory);
+    ? orderedGames
+    : orderedGames.filter((game) => game.category === activeCategory);
 
   const availableCategories = CATEGORY_ORDER.filter((key) =>
     GAMES_CATALOG.some((game) => game.category === key)
@@ -34,6 +37,9 @@ export default function GameGrid() {
       <p className="text-on-surface-variant text-sm mb-6 text-center md:text-left">
         Explorá nuestro catálogo completo. Tocá un juego para ver sus detalles.
       </p>
+      <div className="flex justify-center md:justify-start mb-4">
+        <GameOrderEditor />
+      </div>
 
       {availableCategories.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-8">

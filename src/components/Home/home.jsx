@@ -20,6 +20,8 @@ import EditableText from "../ui/EditableText";
 import EditableImage from "../ui/EditableImage";
 import BannerCarousel from "../ui/BannerCarousel";
 import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
+import { useOrderedGames } from "../../data/gameOrder";
+import GameOrderEditor from "../ui/GameOrderEditor";
 import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
 import { fetchUserProfile, getUserByEmail } from "../../redux/actions";
 import API_URL from "../../api/rutaApi";
@@ -38,6 +40,7 @@ export default function Home() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
+  const orderedGames = useOrderedGames();
   // Al recargar la página, restaurar la sesión (canjear la cookie httpOnly por un access token
   // nuevo) es async — mientras tanto currentUser?.id todavía es falsy en Redux, así que sin este
   // chequeo se alcanzaba a pintar la landing de invitado (con el botón de Iniciar Sesión) un
@@ -378,7 +381,8 @@ export default function Home() {
                     {t("home.dashboard.popularGamesTitle")}
                   </EditableText>
                 </h2>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  <GameOrderEditor />
                   <button
                     onClick={() => navigate('/juegos')}
                     className="w-8 h-8 rounded bg-surface-container border border-outline-variant/20 flex items-center justify-center hover:bg-surface-variant transition-colors text-on-surface cursor-pointer"
@@ -394,7 +398,7 @@ export default function Home() {
                 </div>
               </div>
 
-                {GAMES_CATALOG.filter((game) => game.status === "active" && game.showOnHome !== false).map((game) => (
+                {orderedGames.filter((game) => game.status === "active" && game.showOnHome !== false).map((game) => (
                   <div
                     key={game.slug}
                     className="group relative bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all hover:-translate-y-1"
@@ -440,7 +444,7 @@ export default function Home() {
                 ))}
 
                 {/* Juegos que todavia no salieron: misma tarjeta, en gris y sin jugar */}
-                {GAMES_CATALOG.filter((game) => game.status !== "active").map((game) => (
+                {orderedGames.filter((game) => game.status !== "active").map((game) => (
                   <div
                     key={game.slug}
                     onClick={() => navigate(`/juegos/${game.slug}`)}
