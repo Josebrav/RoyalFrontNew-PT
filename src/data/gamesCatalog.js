@@ -10,6 +10,7 @@ import gemaOfGoldImage from "../assets/gemaOfGold.png";
 import dominoImage from "../assets/domino.png";
 import jokerWildsImage from "../assets/jokerwilds.jpg";
 import sweetTreatsImage from "../assets/sweettreats.jpg";
+import gomitasImage from "../assets/gomitas.jpg";
 
 // `chipClassName` es la misma paleta pero como píldora (fondo + borde translúcidos), para donde
 // la categoría necesita notarse de un vistazo (ej. la grilla de "Juegos Populares" del Home) en
@@ -156,6 +157,18 @@ export const GAMES_CATALOG = [
     playPath: "/game/sweettreats",
     description:
       "Tragamonedas de bombones en cascada: 4 o más iguales en cualquier lugar explotan y caen nuevos. Los multiplicadores multiplican el premio y 3 FREE SPIN dan 10 giros gratis.",
+  },
+  {
+    slug: "gomitas",
+    name: "Gomitas Espaciales",
+    category: "slots",
+    status: "active",
+    image: gomitasImage,
+    icon: "rocket_launch",
+    players: 0,
+    playPath: "/game/gomitas",
+    description:
+      "Tragamonedas neón de ositos de gomita en el espacio: 243 formas de ganar. 3 platillos dan giros gratis con premios x3 y 3 máquinas abren el bonus de la máquina de gomitas.",
   },
   {
     slug: "bingo",
@@ -353,8 +366,14 @@ export const GAMES_CATALOG = [
 
 export const getGameBySlug = (slug) => GAMES_CATALOG.find((game) => game.slug === slug);
 
-export const getGameByPlayPath = (path) =>
-  GAMES_CATALOG.find((game) => game.playPath === path || (game.playPathAliases || []).includes(path));
+/** La app (Android) manda su actividad como "app:" + la misma ruta de la web, ej. "app:/game/bingo". */
+export const isAppActivity = (path) => typeof path === "string" && path.startsWith("app:");
+export const stripAppPrefix = (path) => (isAppActivity(path) ? path.slice(4) : path);
+
+export const getGameByPlayPath = (rawPath) => {
+  const path = stripAppPrefix(rawPath);
+  return GAMES_CATALOG.find((game) => game.playPath === path || (game.playPathAliases || []).includes(path));
+};
 
 export const getGamesByCategory = (category) =>
   GAMES_CATALOG.filter((game) => game.category === category);

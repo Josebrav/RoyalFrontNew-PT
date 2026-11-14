@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Container } from '@chakra-ui/react';
-import { useLocation, Route, Routes, Navigate } from 'react-router-dom';
+import { useLocation, useNavigate, Route, Routes, Navigate } from 'react-router-dom';
 import { LOCALE } from './i18n/locale';
 import Nav from './components/Nav/nav';
 import Sidebar from './components/Sidebar/sidebar';
@@ -35,6 +35,7 @@ import FuriaOlimpo from './components/Juegos/FuriaOlimpo/furiaolimpo';
 import GildedCobra from './components/Juegos/GildedCobra/gildedcobra';
 import JokerWilds from './components/Juegos/JokerWilds/jokerwilds';
 import SweetTreats from './components/Juegos/SweetTreats/sweettreats';
+import Gomitas from './components/Juegos/Gomitas/gomitas';
 import Domino from './components/Juegos/Domino/domino';
 import Parchis from './components/Juegos/Parchis/parchis';
 import Buraco from './components/Juegos/Buraco/buraco';
@@ -89,6 +90,7 @@ function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
   const { currentUser } = useSelector((state) => state);
   const location = useLocation();
+  const navigate = useNavigate();
   useSeo();
   const dispatch = useDispatch();
 
@@ -216,6 +218,9 @@ function App() {
       } else if (type === 'royalgames:chips-release') {
         chipsHoldUntil.current = 0;
         if (currentUser?.email) dispatch(getUserByEmail(currentUser.email)).catch(() => {});
+      } else if (type === 'royalgames:buy-chips') {
+        // Boton "COMPRAR FICHAS" del cartel de fichas insuficientes de la slot.
+        navigate('/chips');
       }
     };
     window.addEventListener('message', onMessage);
@@ -308,6 +313,7 @@ function App() {
             <Route path="/game/gildedcobra" element={<RequireAuth><GildedCobra /></RequireAuth>} />
             <Route path="/game/jokerwilds" element={<RequireAuth><JokerWilds /></RequireAuth>} />
             <Route path="/game/sweettreats" element={<RequireAuth><SweetTreats /></RequireAuth>} />
+            <Route path="/game/gomitas" element={<RequireAuth><Gomitas /></RequireAuth>} />
             <Route path="/game/domino" element={<RequireAuth><Domino /></RequireAuth>} />
             <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
             <Route path="/game/buraco" element={<RequireAuth><Buraco /></RequireAuth>} />

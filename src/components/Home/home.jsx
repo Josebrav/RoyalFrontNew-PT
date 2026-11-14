@@ -19,7 +19,7 @@ import DailyBonusModal from "../DailyBonus/DailyBonusModal";
 import EditableText from "../ui/EditableText";
 import EditableImage from "../ui/EditableImage";
 import BannerCarousel from "../ui/BannerCarousel";
-import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug } from "../../data/gamesCatalog";
+import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug, isAppActivity } from "../../data/gamesCatalog";
 import { useOrderedGames } from "../../data/gameOrder";
 import GameOrderEditor from "../ui/GameOrderEditor";
 import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
@@ -539,6 +539,7 @@ export default function Home() {
                   ) : (
                     otherOnlineUsers.map((player) => {
                       const activeGame = getGameByPlayPath(player.currentActivity);
+                      const fromApp = isAppActivity(player.currentActivity);
                       // Simulated players (see fakeOnlinePlayers.js) have no real profile behind
                       // them, so only real players (real DB id) link out to /perfil/:nick.
                       const isRealPlayer = !player.id.startsWith("sim-");
@@ -558,7 +559,8 @@ export default function Home() {
                                 {player.nick}
                               </p>
                               <p className="text-[0.6875rem] text-on-surface-variant truncate">
-                                {activeGame ? <span className="text-sky-400">{t("home.dashboard.jugandoA")} {activeGame.name}</span> : t("home.dashboard.enElSitio")}
+                                {fromApp && <span className="material-symbols-outlined text-[13px] align-[-2px] mr-1 text-sky-400" title={t("home.dashboard.enLaApp")}>smartphone</span>}
+                                {activeGame ? <span className="text-sky-400">{t("home.dashboard.jugandoA")} {activeGame.name}</span> : fromApp ? t("home.dashboard.enLaApp") : t("home.dashboard.enElSitio")}
                               </p>
                             </div>
                           </button>

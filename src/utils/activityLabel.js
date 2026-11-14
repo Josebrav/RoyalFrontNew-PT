@@ -1,4 +1,4 @@
-import { getGameByPlayPath } from "../data/gamesCatalog";
+import { getGameByPlayPath, isAppActivity, stripAppPrefix } from "../data/gamesCatalog";
 
 // Paginas del sitio (no juegos) con nombre legible para el panel de admin.
 const PAGE_LABELS = {
@@ -20,8 +20,14 @@ const PAGE_LABELS = {
  * Traduce users.currentActivity (la ruta donde estaba en su ultimo latido) a algo legible:
  * { label, isGame }. Los juegos salen del catalogo; las rutas de admin y de perfiles ajenos se agrupan.
  */
-export function activityLabel(path) {
-  if (!path) return { label: "—", isGame: false };
+export function activityLabel(rawPath) {
+  if (!rawPath) return { label: "—", isGame: false };
+  // Desde la app: misma etiqueta que en la web, con la marca "(app)".
+  if (isAppActivity(rawPath)) {
+    const inner = activityLabel(stripAppPrefix(rawPath));
+    return { label: inner.isGame ? `${inner.label} (app)` : "En la app", isGame: inner.isGame };
+  }
+  const path = rawPath;
   const game = getGameByPlayPath(path);
   if (game) return { label: game.name, isGame: true };
   if (path.startsWith("/game/")) return { label: path.slice(6), isGame: true };

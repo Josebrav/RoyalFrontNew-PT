@@ -93,6 +93,10 @@ export const GAME_SEO = {
     title: "Sweet Treats: tragamonedas de bombones en cascada gratis | RoyalJuegos",
     description: "Sweet Treats, la tragamonedas de chocolates en cascada: 4 o más iguales explotan, multiplicadores y giros gratis. Jugá gratis online.",
   },
+  gomitas: {
+    title: "Gomitas Espaciales: tragamonedas de ositos de gomita gratis | RoyalJuegos",
+    description: "Gomitas Espaciales, la tragamonedas neón de ositos de gomita en el espacio: 243 formas de ganar, giros gratis con premios x3 y la máquina de gomitas. Jugá gratis online.",
+  },
   "gema-of-gold": {
     title: "Gema of Gold: tragamonedas de gemas gratis | RoyalJuegos",
     description: "Gema of Gold, la tragamonedas de gemas y oro con premios y bonos. Jugá gratis online con fichas de regalo.",
