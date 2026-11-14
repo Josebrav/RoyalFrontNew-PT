@@ -9,7 +9,7 @@ const Bingo = () => {
   const chat = useChatToken(currentUser?.id);
   const gameURL = `https://bingoroyal.s3.us-east-2.amazonaws.com/Bingo/index.html?userId=${userId}&chatToken=${encodeURIComponent(chat.token)}`;
 
-  return <GameFrame src={userId && chat.ready ? gameURL : null} title="Royal Bingo" nativeWidth={1920} nativeHeight={1080} />;
+  return <GameFrame src={userId && chat.ready ? gameURL : null} title="Royal Bingo" nativeWidth={2377} nativeHeight={1080} />;
 };
 
 export default Bingo;
