@@ -75,16 +75,17 @@ export default function Sidebar() {
     <NavLink
       key={to}
       to={to}
+      style={{ "--c": color }}
       className={({ isActive }) =>
         `group relative flex items-center justify-center lg:justify-start gap-3 w-12 h-12 lg:w-full lg:h-auto lg:px-3 lg:py-2.5 rounded-lg transition-colors duration-200 ${
           isActive
-            ? "hud-side-link is-active text-primary"
-            : "hud-side-link text-on-surface-variant hover:text-primary"
+            ? "hud-side-link is-active"
+            : "hud-side-link text-on-surface-variant"
         }`
       }
     >
-      <span className="relative material-symbols-outlined text-[22px]" style={{ color }}>
-        {icon}
+      <span className="hud-side-icon relative flex-shrink-0">
+        <span className="material-symbols-outlined text-[20px]" style={{ color }}>{icon}</span>
         {!!badge && (
           <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-error border-2 border-surface" />
         )}
@@ -93,7 +94,7 @@ export default function Sidebar() {
         {label}
       </span>
       {!!badge && (
-        <span className="hidden lg:inline-flex ml-auto bg-primary text-black text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
+        <span className="hidden lg:inline-flex ml-auto bg-[#ec4899] text-white text-[0.625rem] font-bold rounded-full min-w-[18px] h-[18px] items-center justify-center px-1">
           {badge}
         </span>
       )}

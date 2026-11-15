@@ -273,8 +273,10 @@ body .swal2-icon.swal2-info {
   position: sticky;
   overflow-x: clip;
   background:
-    radial-gradient(120% 140% at 50% -40%, rgba(230, 195, 100, 0.10), transparent 60%),
-    linear-gradient(180deg, #0d0d12 0%, #050507 70%, #000 100%);
+    radial-gradient(60% 160% at 15% -30%, rgba(139, 92, 246, 0.30), transparent 60%),
+    radial-gradient(60% 160% at 85% -30%, rgba(6, 182, 212, 0.22), transparent 60%),
+    radial-gradient(50% 140% at 50% -40%, rgba(236, 72, 153, 0.14), transparent 60%),
+    linear-gradient(180deg, #11122a 0%, #0a0b1c 70%, #07070f 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 30px -12px rgba(0, 0, 0, 0.9);
 }
 /* Trama de circuito muy tenue */
@@ -284,8 +286,8 @@ body .swal2-icon.swal2-info {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(230, 195, 100, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(230, 195, 100, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(167, 139, 250, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167, 139, 250, 0.06) 1px, transparent 1px);
   background-size: 28px 28px;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
@@ -299,8 +301,8 @@ body .swal2-icon.swal2-info {
   bottom: -1px;
   height: 1px;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(230, 195, 100, 0.35) 20%, #f5d980 50%, rgba(230, 195, 100, 0.35) 80%, transparent);
-  box-shadow: 0 0 8px rgba(245, 217, 128, 0.6), 0 0 18px rgba(201, 168, 76, 0.35);
+  background: linear-gradient(90deg, transparent, #8b5cf6 18%, #ec4899 42%, #f5d980 55%, #22d3ee 78%, transparent);
+  box-shadow: 0 0 8px rgba(236, 72, 153, 0.55), 0 0 18px rgba(139, 92, 246, 0.4);
 }
 
 .hud-link {
@@ -319,16 +321,16 @@ body .swal2-icon.swal2-info {
   width: 0;
   height: 3px;
   transform: translateX(-50%) skewX(-30deg);
-  background: linear-gradient(90deg, #c9a84c, #f5d980);
-  box-shadow: 0 0 10px rgba(245, 217, 128, 0.7);
+  background: linear-gradient(90deg, #8b5cf6, #ec4899, #22d3ee);
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.7);
   transition: width 0.25s ease;
 }
-.hud-link:hover { color: #f5d980; }
+.hud-link:hover { color: #a5f3fc; }
 .hud-link:hover::after { width: 60%; }
 .hud-link.is-active {
-  color: #f5d980;
+  color: #fff;
   font-weight: 700;
-  text-shadow: 0 0 12px rgba(245, 217, 128, 0.55);
+  text-shadow: 0 0 12px rgba(236, 72, 153, 0.7), 0 0 22px rgba(139, 92, 246, 0.5);
 }
 .hud-link.is-active::after { width: 100%; }
 
@@ -336,16 +338,16 @@ body .swal2-icon.swal2-info {
 .hud-chip-frame {
   --cut: 14px;
   padding: 1px;
-  background: linear-gradient(135deg, #f5d980, rgba(201, 168, 76, 0.25) 35%, rgba(201, 168, 76, 0.25) 65%, #f5d980);
+  background: linear-gradient(135deg, #a78bfa, #ec4899 30%, rgba(245, 217, 128, 0.6) 50%, #22d3ee 75%, #a78bfa);
   clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
-  filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.35));
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.45));
   transition: filter 0.2s;
 }
-.hud-chip-frame:hover { filter: drop-shadow(0 0 14px rgba(245, 217, 128, 0.55)); }
+.hud-chip-frame:hover { filter: drop-shadow(0 0 14px rgba(236, 72, 153, 0.6)); }
 .hud-chip {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 45%),
-    linear-gradient(135deg, #17171d, #0a0a0d);
+    linear-gradient(135deg, #1b1840, #0b0c1e);
   clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
 }
 .hud-avatar {
@@ -353,19 +355,20 @@ body .swal2-icon.swal2-info {
 }
 
 .hud-icon-btn {
-  border: 1px solid rgba(230, 195, 100, 0.25);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.08));
   clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
 }
 
 /* Barra lateral */
 .hud-side {
   background:
-    radial-gradient(120% 60% at 0% 0%, rgba(230, 195, 100, 0.07), transparent 60%),
-    linear-gradient(180deg, #08080b, #000);
+    radial-gradient(120% 40% at 0% 0%, rgba(139, 92, 246, 0.22), transparent 60%),
+    radial-gradient(120% 40% at 0% 100%, rgba(6, 182, 212, 0.14), transparent 60%),
+    linear-gradient(180deg, #0f1027, #07070f);
   border-right: 1px solid transparent;
-  border-image: linear-gradient(180deg, #f5d980, rgba(201, 168, 76, 0.25) 30%, rgba(201, 168, 76, 0.08) 80%, transparent) 1;
-  box-shadow: 6px 0 22px -10px rgba(201, 168, 76, 0.35);
+  border-image: linear-gradient(180deg, #a78bfa, #ec4899 35%, #22d3ee 75%, transparent) 1;
+  box-shadow: 6px 0 22px -10px rgba(139, 92, 246, 0.45);
 }
 .hud-side-label {
   align-items: center;
@@ -375,11 +378,12 @@ body .swal2-icon.swal2-info {
   content: "";
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, rgba(230, 195, 100, 0.35), transparent);
+  background: linear-gradient(90deg, rgba(167, 139, 250, 0.5), transparent);
 }
 .hud-side-link.is-active {
-  background: linear-gradient(90deg, rgba(230, 195, 100, 0.16), rgba(230, 195, 100, 0.02));
-  box-shadow: inset 0 0 0 1px rgba(230, 195, 100, 0.18);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c, #a78bfa) 28%, transparent), transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c, #a78bfa) 40%, transparent);
+  color: #fff !important;
 }
 .hud-side-link.is-active::before {
   content: "";
@@ -389,11 +393,33 @@ body .swal2-icon.swal2-info {
   bottom: 18%;
   width: 3px;
   border-radius: 2px;
-  background: #f5d980;
-  box-shadow: 0 0 10px rgba(245, 217, 128, 0.8);
+  background: var(--c, #a78bfa);
+  box-shadow: 0 0 10px var(--c, #a78bfa);
 }
 .hud-side-link:not(.is-active):hover {
-  background: rgba(230, 195, 100, 0.06);
+  background: color-mix(in srgb, var(--c, #a78bfa) 14%, transparent);
+  color: #fff !important;
+}
+/* Icono de cada opcion en un cuadrito de su color */
+.hud-side-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--c, #a78bfa) 18%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c, #a78bfa) 45%, transparent);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.hud-side-link.is-active .hud-side-icon,
+.hud-side-link:hover .hud-side-icon {
+  background: var(--c, #a78bfa);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--c, #a78bfa) 70%, transparent);
+}
+.hud-side-link.is-active .hud-side-icon > .material-symbols-outlined,
+.hud-side-link:hover .hud-side-icon > .material-symbols-outlined {
+  color: #fff !important;
 }
 
 /* Fondo de la página: imagen difuminada fija detrás de todo. Va en una capa fija (::before) y no con
