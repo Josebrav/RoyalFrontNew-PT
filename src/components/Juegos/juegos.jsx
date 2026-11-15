@@ -31,8 +31,9 @@ export default function GameGrid() {
 
   return (
     <div className="w-full max-w-container-max mx-auto px-4 md:px-margin-desktop py-6">
-      <h1 className="font-headline-lg text-headline-lg text-white mb-2 text-center md:text-left">
-        Todos los Juegos
+      <h1 className="font-headline-lg text-headline-lg text-white mb-2 flex items-center justify-center md:justify-start gap-3">
+        <span className="w-11 h-11 rounded-xl inline-flex items-center justify-center bg-gradient-to-br from-[#8b5cf6] to-[#06b6d4] shadow-[0_0_18px_rgba(139,92,246,0.55)] material-symbols-outlined text-[26px] text-white" style={{ fontVariationSettings: "'FILL' 1" }}>stadia_controller</span>
+        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ffe08f] via-[#f9a8d4] to-[#7dd3fc]">Todos los Juegos</span>
       </h1>
       <p className="text-on-surface-variant text-sm mb-6 text-center md:text-left">
         Explorá nuestro catálogo completo. Tocá un juego para ver sus detalles.
@@ -47,8 +48,8 @@ export default function GameGrid() {
             onClick={() => setActiveCategory("all")}
             className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
               activeCategory === "all"
-                ? "gold-gradient text-black border-transparent"
-                : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-variant/30 bg-transparent"
+                ? "bg-gradient-to-r from-[#8b5cf6] to-[#06b6d4] text-white shadow-[0_0_16px_rgba(139,92,246,0.45)] border-transparent"
+                : "border-[#a78bfa]/40 text-[#c4b5fd] hover:bg-[#8b5cf6]/15 bg-transparent"
             }`}
           >
             Todos
@@ -57,11 +58,21 @@ export default function GameGrid() {
             <button
               key={key}
               onClick={() => setActiveCategory(key)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
+              className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer hover:brightness-125"
+              style={
                 activeCategory === key
-                  ? "gold-gradient text-black border-transparent"
-                  : "border-outline-variant/30 text-on-surface-variant hover:bg-surface-variant/30 bg-transparent"
-              }`}
+                  ? {
+                      background: `linear-gradient(90deg, ${CATEGORY_META[key].accent}, ${CATEGORY_META[key].accentTo})`,
+                      color: "#fff",
+                      borderColor: "transparent",
+                      boxShadow: `0 0 14px ${CATEGORY_META[key].accent}88`,
+                    }
+                  : {
+                      background: `${CATEGORY_META[key].accent}14`,
+                      color: CATEGORY_META[key].accent,
+                      borderColor: `${CATEGORY_META[key].accent}66`,
+                    }
+              }
             >
               {CATEGORY_META[key].label}
             </button>
@@ -84,9 +95,12 @@ export default function GameGrid() {
               <div
                 key={game.slug}
                 onClick={() => navigate(`/juegos/${game.slug}`)}
-                className={`group relative rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/50 transition-all cursor-pointer bg-surface-container-high ${
+                className={`group relative rounded-xl overflow-hidden border-2 transition-all duration-200 cursor-pointer bg-surface-container-high hover:-translate-y-1 ${
                   isActive ? "" : "opacity-70 hover:opacity-100"
                 }`}
+                style={{ borderColor: `${CATEGORY_META[game.category].accent}55`, boxShadow: `0 6px 18px ${CATEGORY_META[game.category].accent}22` }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = CATEGORY_META[game.category].accent; e.currentTarget.style.boxShadow = `0 0 22px ${CATEGORY_META[game.category].accent}88`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${CATEGORY_META[game.category].accent}55`; e.currentTarget.style.boxShadow = `0 6px 18px ${CATEGORY_META[game.category].accent}22`; }}
               >
                 <div className={`aspect-square overflow-hidden flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container-low ${!isActive ? "grayscale" : ""}`}>
                   <EditableImage
@@ -100,7 +114,7 @@ export default function GameGrid() {
                 </div>
 
                 <div className="absolute bottom-0 w-full p-3 bg-gradient-to-t from-black via-black/70 to-transparent text-left">
-                  <span className={`text-[0.5625rem] font-black uppercase tracking-widest ${CATEGORY_META[game.category].className}`}>
+                  <span className="text-[0.5625rem] font-black uppercase tracking-widest" style={{ color: CATEGORY_META[game.category].accent }}>
                     {CATEGORY_META[game.category].label}
                   </span>
                   <p className="text-white font-bold text-sm truncate">{game.name}</p>
