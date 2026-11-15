@@ -261,6 +261,8 @@ export default function BuyChips() {
   // Oferta express: cualquier paquete da sus fichas multiplicadas (el backend decide lo que se acredita).
   const offerMultiplier = currentOffer?.multiplier ?? 1;
   const visibleChipOptions = CHIP_CATALOG[catalogCurrency].map((chip) => ({ ...chip, chips: chip.chips * offerMultiplier }));
+  // "Mejor valor": el paquete con mas bonus (mas fichas por cada peso o dolar).
+  const bestValueId = visibleChipOptions.reduce((best, c) => (!best || promoPercentOf(c) > promoPercentOf(best) ? c : best), null)?.id;
   const offerItem = currentOffer?.items.find((item) => item.currency === catalogCurrency);
   const offerChip = offerItem ? { id: offerItem.packageId, currency: offerItem.currency, price: offerItem.price, chips: offerItem.chips } : null;
   useEffect(() => {
@@ -727,13 +729,15 @@ export default function BuyChips() {
                     </button>
                   )}
                   <div
-                    className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3"
+                    className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3 pt-3"
                     style={{ "--pkg-cols": visibleChipOptions.length }}
                   >
                     {visibleChipOptions.map((chip) => {
                       const isSelected = selectedChip?.id === chip.id;
                       const baseChips = baseChipsOf(chip);
                       const image = IMAGE_BY_BASE_CHIPS[baseChips];
+                      const bestValue = chip.id === bestValueId;
+                      const chipsText = formatChips(chip.chips);
                       return (
                         <div
                           key={chip.id}
@@ -747,54 +751,64 @@ export default function BuyChips() {
                             }
                           }}
                           aria-pressed={isSelected}
-                          className={`flex flex-col gap-1.5 text-center cursor-pointer select-none group relative active:scale-95 transition-all rounded-xl p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                          className={`group relative flex flex-col cursor-pointer select-none rounded-2xl p-[2px] transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                             isSelected
-                              ? "ring-4 ring-primary bg-primary/15 shadow-[0_0_22px_rgba(230,195,100,0.55)]"
-                              : "opacity-75 hover:opacity-100"
+                              ? "bg-gradient-to-b from-[#ffe08f] via-[#e6c364] to-[#8a6a1c] shadow-[0_0_28px_rgba(230,195,100,0.55)] -translate-y-1"
+                              : "bg-gradient-to-b from-[#e6c364]/40 via-[#e6c364]/10 to-[#e6c364]/30 hover:from-[#e6c364]/80 hover:to-[#e6c364]/60 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
                           }`}
                         >
-                          <div
-                            className={`relative w-full rounded-xl overflow-hidden border-2 transition-all ${
-                              isSelected
-                                ? "border-primary shadow-[0_0_15px_rgba(201,168,76,0.35)]"
-                                : "border-outline-variant/20 group-hover:border-primary/50"
-                            }`}
-                          >
-                            {isSelected && (
-                              <div className="absolute bottom-9 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
-                                <span className="material-symbols-outlined text-[14px] text-[#0A0A0F] font-bold">check</span>
-                              </div>
-                            )}
-                            <EditableImage
-                              contentKey={`chips.packageImage.${baseChips}`}
-                              fallbackSrc={image}
-                              alt={`${formatChips(baseChips)} fichas`}
-                              className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
-                              recommendedSize={`cuadrada, 1000×1000px aprox., con el número ${formatChips(baseChips)}`}
-                              allowLink={false}
-                              placeholder={
-                                <div className="w-full h-full bg-gradient-to-b from-surface-container-high to-surface-container-lowest flex items-start justify-center pt-3">
-                                  <span className="text-white font-black text-sm [text-shadow:0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
-                                    {formatChips(baseChips)}
-                                  </span>
-                                </div>
-                              }
-                            />
-                            <div className="bg-white py-1">
-                              <span className="text-sm font-black text-[#0A0A0F] whitespace-nowrap">
-                                {symbol} {formatPrice(chip)}
+                          {bestValue && (
+                            <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap rounded-full bg-gradient-to-r from-[#ff5f6d] to-[#ffc371] px-2.5 py-0.5 text-[0.5625rem] font-black uppercase tracking-wider text-white shadow-[0_2px_8px_rgba(255,95,109,0.6)]">
+                              Mejor valor
+                            </span>
+                          )}
+                          <div className="relative flex flex-col h-full rounded-[14px] overflow-hidden bg-gradient-to-b from-[#1d1a2b] to-[#0d0c14]">
+                            {/* Imagen con el bonus en la esquina */}
+                            <div className="relative overflow-hidden">
+                              <EditableImage
+                                contentKey={`chips.packageImage.${baseChips}`}
+                                fallbackSrc={image}
+                                alt={`${formatChips(baseChips)} fichas`}
+                                className="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-500"
+                                recommendedSize={`cuadrada, 1000×1000px aprox., con el número ${formatChips(baseChips)}`}
+                                allowLink={false}
+                                placeholder={
+                                  <div className="w-full h-full bg-gradient-to-b from-surface-container-high to-surface-container-lowest flex items-start justify-center pt-3">
+                                    <span className="text-white font-black text-sm [text-shadow:0_2px_4px_rgba(0,0,0,0.9)] whitespace-nowrap">
+                                      {formatChips(baseChips)}
+                                    </span>
+                                  </div>
+                                }
+                              />
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#1d1a2b] to-transparent" />
+                              <span className="absolute bottom-1.5 left-1.5 z-10 rounded-lg bg-gradient-to-br from-[#ff3d5a] to-[#c4002b] px-1.5 py-0.5 text-[0.6875rem] font-black leading-none text-white shadow-[0_2px_6px_rgba(0,0,0,0.6)] ring-1 ring-white/30">
+                                +{promoPercentOf(chip)}%
+                              </span>
+                              {isSelected && (
+                                <span className="absolute bottom-1.5 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
+                                  <span className="material-symbols-outlined text-[14px] text-[#0A0A0F] font-bold">check</span>
+                                </span>
+                              )}
+                            </div>
+                            {/* Lo que recibe (y tachado, lo que daria sin bonus) */}
+                            <div className="flex-1 flex flex-col items-center justify-center px-1 pt-1.5 pb-2 leading-tight">
+                              <span className="text-[0.5625rem] uppercase tracking-wider text-on-surface-variant font-bold">Recibís</span>
+                              <span className={`font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fff3c4] to-[#e6c364] whitespace-nowrap ${chipsText.length > 13 ? "text-[0.6875rem]" : chipsText.length > 10 ? "text-xs" : "text-sm"}`}>
+                                {chipsText}
+                              </span>
+                              <span className="text-[0.5625rem] text-on-surface-variant line-through decoration-[#ff3d5a]/80 whitespace-nowrap">
+                                {formatChips(baseChips)}
                               </span>
                             </div>
-                          </div>
-                          <div className="w-full rounded-xl border-2 border-yellow-400 bg-gradient-to-b from-yellow-100 to-yellow-200 px-1 py-1.5 leading-tight">
-                              <p className="text-base font-black text-yellow-700">+{promoPercentOf(chip)}%</p>
-                              <p className="text-[0.625rem] font-black text-yellow-700 uppercase tracking-wider">Bonus</p>
-                              <p className="text-[0.5625rem] text-neutral-600 mt-0.5">Recibís</p>
-                              <p className={`font-black text-neutral-900 whitespace-nowrap ${formatChips(chip.chips).length > 11 ? "text-[0.625rem]" : "text-xs"}`}>
-                                {formatChips(chip.chips)}
-                              </p>
-                              <p className="text-[0.5625rem] text-neutral-600">fichas</p>
+                            {/* Precio */}
+                            <div className={`mx-1.5 mb-1.5 rounded-lg py-1.5 text-center transition-colors ${
+                              isSelected
+                                ? "bg-gradient-to-b from-[#ffe08f] to-[#c9a84c] text-[#1a1206]"
+                                : "bg-white/5 text-white border border-[#e6c364]/30 group-hover:bg-[#e6c364]/15"
+                            }`}>
+                              <span className="text-sm font-black whitespace-nowrap">{symbol} {formatPrice(chip)}</span>
                             </div>
+                          </div>
                         </div>
                       );
                     })}
@@ -802,11 +816,11 @@ export default function BuyChips() {
                 </div>
 
                 {/* Franja 3: resumen y cobro */}
-                <div className="glass-card rounded-2xl border border-outline-variant/20 bg-[#12121A]/60 p-4 flex flex-col lg:flex-row lg:items-center gap-4">
+                <div className="relative overflow-hidden rounded-2xl border border-[#e6c364]/40 bg-gradient-to-r from-[#1d1a2b] via-[#15131f] to-[#2a2210] p-4 flex flex-col lg:flex-row lg:items-center gap-4 shadow-[0_0_30px_rgba(230,195,100,0.12)]">
                   <div className="flex-1 min-w-0 flex flex-wrap items-end gap-x-8 gap-y-2">
                     <div>
                       <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Paquete</p>
-                      <p className="text-sm text-white font-bold">{selectedChip ? formatChips(selectedChip.chips) : "0"} fichas</p>
+                      <p className="text-lg text-white font-black">{selectedChip ? formatChips(selectedChip.chips) : "0"} <span className="text-sm font-bold text-on-surface-variant">fichas</span></p>
                     </div>
                     {rankBonusPercent > 0 && selectedChip && (
                       <div>
@@ -824,7 +838,7 @@ export default function BuyChips() {
                     </div>
                     <div>
                       <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Total a pagar</p>
-                      <p className="text-3xl font-black text-primary leading-none">
+                      <p className="text-4xl font-black leading-none text-transparent bg-clip-text bg-gradient-to-b from-[#fff3c4] to-[#e6c364]">
                         {symbol} {selectedChip ? formatPrice(selectedChip) : "0"}
                       </p>
                     </div>
