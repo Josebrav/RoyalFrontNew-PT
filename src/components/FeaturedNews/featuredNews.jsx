@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
+import { LOCALE } from "../../i18n/locale";
 
 const seenKey = (id) => `featuredNews:${id}`;
 const today = () => new Date().toLocaleDateString("en-CA");
@@ -43,7 +44,7 @@ export default function FeaturedNews() {
     if (blockedRoute || article || pending) return undefined;
     let cancelled = false;
     axios
-      .get(`${API_URL}/news/featured`)
+      .get(`${API_URL}/news/featured`, { params: { locale: LOCALE } })
       .then(({ data }) => {
         const a = data?.article;
         if (cancelled || !a?.imageUrl || wasSeenToday(a.id)) return;

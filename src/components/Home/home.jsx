@@ -348,6 +348,7 @@ export default function Home() {
               >
                 <EditableImage
                   contentKey="home.dashboard.banner2"
+                  perLocale
                   fallbackSrc={sportsBanner}
                   alt="Banner de Bono Semanal"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -365,6 +366,7 @@ export default function Home() {
               >
                 <EditableImage
                   contentKey="home.dashboard.banner3"
+                  perLocale
                   fallbackSrc={bannercelu}
                   alt="Banner de Premios"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

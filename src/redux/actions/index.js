@@ -41,6 +41,7 @@ import {
     NEWS_ACTION_ERROR,
 } from "./action.types";
 import axios from 'axios';
+import { LOCALE } from '../../i18n/locale';
 
 // El header Authorization lo adjunta el request interceptor global
 // (src/api/axiosInterceptors.js) leyendo el access token de memoria (tokenStore) en
@@ -627,7 +628,7 @@ export const updateSiteContentLink = (key, linkTo) => async (dispatch, getState)
 // ===== Banner carousel slides (the big "Bienvenida" banner on Home) =====
 
 export const fetchBannerSlides = () => async () => {
-    const { data } = await axios.get(`${API_URL}/banner-slides`);
+    const { data } = await axios.get(`${API_URL}/banner-slides`, { params: { locale: LOCALE } });
     return data;
 };
 
@@ -635,6 +636,7 @@ export const createBannerSlide = (file, linkTo) => async () => {
     const formData = new FormData();
     formData.append('image', file);
     if (linkTo) formData.append('linkTo', linkTo);
+    formData.append('locale', LOCALE); // cada sitio (es / pt / en) tiene sus banners
     const { data } = await axios.post(`${API_URL}/banner-slides`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -654,7 +656,7 @@ export const deleteBannerSlide = (id) => async () => {
 
 export const fetchNews = () => async (dispatch) => {
     try {
-        const { data } = await axios.get(`${API_URL}/news`);
+        const { data } = await axios.get(`${API_URL}/news`, { params: { locale: LOCALE } });
         dispatch({ type: NEWS_LIST_SUCCESS, payload: data });
     } catch (error) {
         dispatch({ type: NEWS_ACTION_ERROR, payload: error.message });
@@ -662,6 +664,7 @@ export const fetchNews = () => async (dispatch) => {
 };
 
 export const createNewsArticle = (formData) => async (dispatch) => {
+    if (!formData.has('locale')) formData.append('locale', LOCALE); // cada sitio (es / pt / en) tiene sus noticias
     await axios.post(`${API_URL}/news`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
     });
