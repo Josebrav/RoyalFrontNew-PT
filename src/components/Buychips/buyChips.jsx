@@ -84,8 +84,11 @@ const IMAGE_BY_BASE_CHIPS = {
   1_000_000_000: billon,
   2_600_000_000: veinticeisb,
 };
+// 2026-11-18: todos los paquetes dan 50% más (igual que el backend). `offerChips` es el valor de
+// antes: las ofertas express (ej. la 6x1 de lau) multiplican ese, así se ven y acreditan igual que antes.
+const PACKAGE_BOOST = 1.5;
 const tiers = (currency, firstId, rows) =>
-  rows.map(([price, chips], i) => ({ id: firstId + i, currency, price, chips }));
+  rows.map(([price, chips], i) => ({ id: firstId + i, currency, price, chips: Math.round(chips * PACKAGE_BOOST), offerChips: chips }));
 
 const CHIP_CATALOG = {
   USD: tiers("USD", 101, [[1, 2_500_000], [5, 15_000_000], [10, 40_000_000], [50, 250_000_000],
@@ -212,8 +215,15 @@ export default function BuyChips() {
   // Oferta vigente (panel -> Ofertas) en la moneda de este jugador, si la tiene. Fichas y precio los
   // decide el backend a partir del packageId, igual que con los paquetes de siempre.
   const [currentOffer, setCurrentOffer] = useState(null);
+  // Hasta saber si tiene oferta no se muestran los paquetes: con oferta express se ven con otros
+  // valores, y no queremos que se vean un instante los de sin oferta.
+  const [offerLoaded, setOfferLoaded] = useState(false);
   useEffect(() => {
-    axios.get(`${API_URL}/chip-offers/current`).then(({ data }) => setCurrentOffer(data?.offer ?? null)).catch(() => {});
+    axios
+      .get(`${API_URL}/chip-offers/current`)
+      .then(({ data }) => setCurrentOffer(data?.offer ?? null))
+      .catch(() => {})
+      .finally(() => setOfferLoaded(true));
   }, [currentUser?.id]);
 
   // Link de oferta de un solo uso (/chips?oferta=CODIGO): se guarda por si primero tiene que iniciar
@@ -271,7 +281,9 @@ export default function BuyChips() {
   }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   // Oferta express: cualquier paquete da sus fichas multiplicadas (el backend decide lo que se acredita).
   const offerMultiplier = currentOffer?.multiplier ?? 1;
-  const visibleChipOptions = CHIP_CATALOG[catalogCurrency].map((chip) => ({ ...chip, chips: chip.chips * offerMultiplier }));
+  const visibleChipOptions = CHIP_CATALOG[catalogCurrency].map((chip) =>
+    offerMultiplier > 1 ? { ...chip, chips: chip.offerChips * offerMultiplier } : chip,
+  );
   // "Mejor valor": el paquete con mas bonus (mas fichas por cada peso o dolar).
   const bestValueId = visibleChipOptions.reduce((best, c) => (!best || promoPercentOf(c) > promoPercentOf(best) ? c : best), null)?.id;
   const offerItem = currentOffer?.items.find((item) => item.currency === catalogCurrency);
@@ -743,7 +755,7 @@ export default function BuyChips() {
                     </button>
                   )}
                   <div
-                    className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3 pt-3"
+                    className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-[repeat(var(--pkg-cols),minmax(0,1fr))] gap-3 pt-3 transition-opacity ${offerLoaded ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                     style={{ "--pkg-cols": visibleChipOptions.length }}
                   >
                     {visibleChipOptions.map((chip) => {
@@ -795,8 +807,9 @@ export default function BuyChips() {
                                 }
                               />
                               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#1d1a2b] to-transparent" />
-                              <span className="absolute bottom-1.5 left-1.5 z-10 rounded-lg bg-gradient-to-br from-[#ff3d5a] to-[#c4002b] px-1.5 py-0.5 text-[0.6875rem] font-black leading-none text-white shadow-[0_2px_6px_rgba(0,0,0,0.6)] ring-1 ring-white/30">
-                                +{promoPercentOf(chip)}%
+                              <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center rounded-xl bg-gradient-to-br from-[#ff4d6a] via-[#ff1f4b] to-[#b8002a] px-2.5 py-1 leading-none text-white shadow-[0_0_14px_rgba(255,45,85,0.75),0_3px_8px_rgba(0,0,0,0.6)] ring-2 ring-[#ffd0d8]/70 whitespace-nowrap">
+                                <span className="text-base sm:text-lg font-black tracking-tight [text-shadow:0_2px_3px_rgba(0,0,0,0.45)]">+{promoPercentOf(chip)}%</span>
+                                <span className="text-[0.5rem] font-black uppercase tracking-[0.15em] text-[#ffe3e8] mt-0.5">extra</span>
                               </span>
                               {isSelected && (
                                 <span className="absolute bottom-1.5 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
@@ -806,8 +819,8 @@ export default function BuyChips() {
                             </div>
                             {/* Lo que recibe (y tachado, lo que daria sin bonus) */}
                             <div className="flex-1 flex flex-col items-center justify-center px-1 pt-1.5 pb-2 leading-tight">
-                              <span className="text-[0.5625rem] uppercase tracking-wider text-on-surface-variant font-bold">Recibís</span>
-                              <span className={`font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fff3c4] to-[#e6c364] whitespace-nowrap ${chipsText.length > 13 ? "text-[0.6875rem]" : chipsText.length > 10 ? "text-xs" : "text-sm"}`}>
+                              <span className="text-[0.625rem] uppercase tracking-[0.12em] text-[#f5d980] font-black">Recibís</span>
+                              <span className={`font-black text-transparent bg-clip-text bg-gradient-to-b from-[#fffbe6] via-[#ffe08f] to-[#e6b84c] whitespace-nowrap [filter:drop-shadow(0_0_6px_rgba(247,205,79,0.55))] ${chipsText.length > 13 ? "text-sm" : chipsText.length > 10 ? "text-base" : "text-lg"}`}>
                                 {chipsText}
                               </span>
                               <span className="text-[0.5625rem] text-on-surface-variant line-through decoration-[#ff3d5a]/80 whitespace-nowrap">
@@ -834,9 +847,9 @@ export default function BuyChips() {
                   <div className="flex-1 min-w-0 flex flex-wrap items-end gap-x-8 gap-y-2">
                     <div>
                       <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">Paquete</p>
-                      <p className="text-lg text-white font-black">{selectedChip ? formatChips(selectedChip.chips) : "0"} <span className="text-sm font-bold text-on-surface-variant">fichas</span></p>
+                      <p className="text-lg text-white font-black">{selectedChip && offerLoaded ? formatChips(selectedChip.chips) : "—"} <span className="text-sm font-bold text-on-surface-variant">fichas</span></p>
                     </div>
-                    {rankBonusPercent > 0 && selectedChip && (
+                    {rankBonusPercent > 0 && selectedChip && offerLoaded && (
                       <div>
                         <p className="text-[0.625rem] text-on-surface-variant uppercase tracking-wider font-bold">
                           Bono {RANK_META[rankStatus?.rank]?.label || "de rango"} +{rankBonusPercent}%
