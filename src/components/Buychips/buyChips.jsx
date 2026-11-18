@@ -807,15 +807,16 @@ export default function BuyChips() {
                                 }
                               />
                               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#1d1a2b] to-transparent" />
-                              <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center rounded-xl bg-gradient-to-br from-[#ff4d6a] via-[#ff1f4b] to-[#b8002a] px-2.5 py-1 leading-none text-white shadow-[0_0_14px_rgba(255,45,85,0.75),0_3px_8px_rgba(0,0,0,0.6)] ring-2 ring-[#ffd0d8]/70 whitespace-nowrap">
-                                <span className="text-base sm:text-lg font-black tracking-tight [text-shadow:0_2px_3px_rgba(0,0,0,0.45)]">+{promoPercentOf(chip)}%</span>
-                                <span className="text-[0.5rem] font-black uppercase tracking-[0.15em] text-[#ffe3e8] mt-0.5">extra</span>
-                              </span>
                               {isSelected && (
-                                <span className="absolute bottom-1.5 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
+                                <span className="absolute top-1.5 right-1.5 z-10 bg-primary rounded-full w-6 h-6 flex items-center justify-center shadow-md ring-2 ring-[#0A0A0F]">
                                   <span className="material-symbols-outlined text-[14px] text-[#0A0A0F] font-bold">check</span>
                                 </span>
                               )}
+                            </div>
+                            {/* Franja roja con el bonus, justo entre la imagen y la parte de "Recibís" */}
+                            <div className="relative z-10 -mt-2.5 flex items-center justify-center gap-1.5 py-1 bg-gradient-to-r from-[#b8002a] via-[#ff1f4b] to-[#b8002a] text-white leading-none shadow-[0_0_12px_rgba(255,45,85,0.6)] border-y border-[#ffb3c1]/60 whitespace-nowrap">
+                              <span className="text-sm sm:text-base font-black tracking-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.5)]">+{promoPercentOf(chip)}%</span>
+                              <span className="text-[0.5625rem] font-black uppercase tracking-[0.15em] text-[#ffe3e8]">extra</span>
                             </div>
                             {/* Lo que recibe (y tachado, lo que daria sin bonus) */}
                             <div className="flex-1 flex flex-col items-center justify-center px-1 pt-1.5 pb-2 leading-tight">
