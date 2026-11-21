@@ -3,17 +3,18 @@ import axios from "axios";
 import API_URL from "../../api/rutaApi";
 import { playCoinSound } from "../../utils/coinSound";
 
-import dia1 from "../../assets/dailyBonus/dia1.png";
-import dia2 from "../../assets/dailyBonus/dia2.png";
-import dia3 from "../../assets/dailyBonus/dia3.png";
-import dia4 from "../../assets/dailyBonus/dia4.png";
-import dia5 from "../../assets/dailyBonus/dia5.png";
-import dia6 from "../../assets/dailyBonus/dia6.png";
-import dia7 from "../../assets/dailyBonus/dia7.png";
-import botonReclamar from "../../assets/dailyBonus/botonReclamar.png";
+import { t } from "../../i18n/strings";
+import { LOCALE } from "../../i18n/locale";
 import chip from "../../assets/dailyBonus/chip.png";
 
-const DAY_IMAGES = [dia1, dia2, dia3, dia4, dia5, dia6, dia7];
+// Arte por idioma: dia1_en.png / botonReclamar_pt.png, etc. Si falta la version del idioma se usa la
+// española (dia1.png). Con eager + import default Vite solo empaqueta las imagenes que existen.
+const ART = import.meta.glob("../../assets/dailyBonus/*.png", { eager: true, import: "default" });
+const art = (name) =>
+  ART[`../../assets/dailyBonus/${name}_${LOCALE}.png`] ?? ART[`../../assets/dailyBonus/${name}.png`];
+
+const DAY_IMAGES = [1, 2, 3, 4, 5, 6, 7].map((n) => art(`dia${n}`));
+const botonReclamar = art("botonReclamar");
 const FLYING_CHIPS_COUNT = 7;
 const FLIGHT_DURATION_MS = 650;
 
@@ -77,7 +78,7 @@ export default function DailyBonusModal({ day, onClose, onClaimed }) {
       }, FLIGHT_DURATION_MS + FLYING_CHIPS_COUNT * 45);
     } catch (error) {
       setClaiming(false);
-      onClaimed?.({ error: error?.response?.data?.message || "No se pudo reclamar el bono diario" });
+      onClaimed?.({ error: error?.response?.data?.message || t("dailyBonus.error") });
     }
   };
 
@@ -88,12 +89,12 @@ export default function DailyBonusModal({ day, onClose, onClaimed }) {
           type="button"
           onClick={onClose}
           className="absolute -top-3 -right-3 z-10 w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/30 text-white flex items-center justify-center cursor-pointer hover:bg-surface-variant transition-colors"
-          aria-label="Cerrar"
+          aria-label={t("dailyBonus.close")}
         >
           <span className="material-symbols-outlined">close</span>
         </button>
 
-        <img src={dayImage} alt={`Bono Diario - Día ${day}`} className="w-full select-none" draggable={false} />
+        <img src={dayImage} alt={`${t("dailyBonus.title")} - ${t("dailyBonus.day")} ${day}`} className="w-full select-none" draggable={false} />
 
         <button
           ref={buttonRef}
@@ -102,7 +103,7 @@ export default function DailyBonusModal({ day, onClose, onClaimed }) {
           disabled={claiming}
           className="mt-0 w-2/3 max-w-[322px] cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed transition-transform hover:scale-105 active:scale-95"
         >
-          <img src={botonReclamar} alt="Reclamar Bono" className="w-full select-none" draggable={false} />
+          <img src={botonReclamar} alt={t("dailyBonus.claim")} className="w-full select-none" draggable={false} />
         </button>
       </div>
     </div>

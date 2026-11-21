@@ -12,7 +12,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "¿Cómo consigo fichas?",
-    a: "Los primeros 100 usuarios reciben un bono de bienvenida automático. Después de eso, podés comprar paquetes de fichas desde \"Comprar Fichas\".",
+    a: "Todos los usuarios nuevos reciben 100.000 fichas de bienvenida al registrarse. Después de eso, podés comprar paquetes de fichas desde \"Comprar Fichas\".",
   },
   {
     q: "¿Qué es el sistema de rangos (Bronce, Plata, Oro, Platino, Diamante)?",
@@ -44,7 +44,19 @@ const FAQ_ITEMS = [
   },
   {
     q: "¿Qué juegos están disponibles ahora mismo?",
-    a: "Minas, Royal Pachinka y Royal Joker ya están activos. El resto del catálogo (Royal Bingo, Royal Ruleta, RoyalChristmas, UNO, Video Bingo, Jogo do Bicho, Crazy Time Royal, Blackjack, VideoSlots) figura como \"Próximamente\".",
+    a: "Bingo online, Royal Ruleta, póker Texas Hold'em, blackjack, dominó, buraco, Minas, Royal Pachinka y más de 10 tragamonedas (Royal Joker, Sugar Calavera, Furia del Olimpo, Santa Wilds, Gilded Cobra, Joker Wilds, Sweet Treats, Gomitas Espaciales, Ocean Riches, Gamer Zone, Royal Cats, Sweet Futurist y Gema of Gold). Los juegos que vienen figuran como \"Próximamente\" en el catálogo.",
+  },
+  {
+    q: "¿Hay que descargar algo para jugar?",
+    a: "No. Todos los juegos se juegan en el navegador del celular, la tablet o la computadora, sin descargar ni instalar nada.",
+  },
+  {
+    q: "¿Puedo jugar con mis amigos?",
+    a: "Sí. En bingo, ruleta, póker, blackjack, dominó y buraco pueden sentarse en la misma sala o mesa y hablar por el chat en vivo. También podés agregarlos como amigos y mandarles mensajes privados.",
+  },
+  {
+    q: "¿Las tragamonedas son gratis?",
+    a: "Sí. Todas nuestras tragamonedas (slots o maquinitas) se juegan con fichas virtuales gratis, con giros gratis, comodines y bonos. Las fichas no se cambian por dinero.",
   },
   {
     q: "Tengo un problema que no está en esta lista, ¿qué hago?",

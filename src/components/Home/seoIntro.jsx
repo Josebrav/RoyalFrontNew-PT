@@ -23,6 +23,30 @@ const FAQ = [
     a: "En el Dominó de RoyalJuegos te sentás en mesas con jugadores reales, con chat, desde el celular o la computadora.",
   },
   {
+    q: "¿Dónde jugar póker online gratis?",
+    a: "En RoyalJuegos podés jugar póker Texas Hold'em online gratis en mesas en vivo, con fichas de regalo y chat, sin descargar nada.",
+  },
+  {
+    q: "¿Puedo jugar blackjack online gratis?",
+    a: "Sí, nuestro blackjack (21) se juega en mesas compartidas contra el crupier, con fichas virtuales gratis. El blackjack paga 3 a 2.",
+  },
+  {
+    q: "¿Dónde jugar buraco online?",
+    a: "En el Buraco de RoyalJuegos jugás 1 contra 1 o en parejas 2 contra 2 con jugadores reales, con canastas, muerto y chat en vivo.",
+  },
+  {
+    q: "¿Qué juegos de casino gratis hay en RoyalJuegos?",
+    a: "Bingo online, más de 10 tragamonedas, ruleta europea, póker Texas Hold'em, blackjack, Minas (Mines) y pachinko, además de juegos de mesa como dominó y buraco. Todos gratis y sin descargar.",
+  },
+  {
+    q: "¿Hay juegos para jugar con amigos online?",
+    a: "Sí. En bingo, ruleta, póker, blackjack, dominó y buraco jugás en la misma sala o mesa que tus amigos, y pueden hablar por el chat en vivo. También podés agregarlos como amigos y mandarles mensajes.",
+  },
+  {
+    q: "¿Necesito descargar algo para jugar?",
+    a: "No. Todos los juegos se abren en el navegador del celular, la tablet o la PC. Solo tenés que crear tu cuenta gratis para guardar tus fichas y tu progreso.",
+  },
+  {
     q: "¿Se juega con dinero real?",
     a: "No. RoyalJuegos es solo entretenimiento: se juega con fichas virtuales que no se cambian por dinero, premios ni bienes.",
   },
@@ -46,7 +70,7 @@ export default function SeoIntro() {
     <section className="py-20 px-6 border-t border-white/5">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-white font-bold text-2xl md:text-3xl tracking-tight mb-6 text-balance">
-          Juegos online gratis: bingo, tragamonedas, ruleta y dominó
+          Juegos de casino online gratis: bingo, tragamonedas, ruleta, póker y juegos de cartas
         </h2>
         <div className="space-y-4 text-on-surface-variant leading-relaxed max-w-[68ch]">
           <p>
@@ -60,6 +84,18 @@ export default function SeoIntro() {
             <strong className="text-white">ruleta online</strong> o sentate en una mesa de{" "}
             <strong className="text-white">dominó online</strong> contra jugadores reales. Sumá puntos, subí de
             rango y competí en los rankings y torneos con jugadores de toda Latinoamérica.
+          </p>
+          <p>
+            Si te gustan las cartas, tenés <strong className="text-white">póker Texas Hold'em</strong>,{" "}
+            <strong className="text-white">blackjack (21)</strong> y <strong className="text-white">buraco online</strong>{" "}
+            en mesas en vivo. Y para partidas rápidas, <strong className="text-white">Minas (Mines)</strong> y{" "}
+            <strong className="text-white">pachinko</strong>. Son juegos para jugar con amigos o con gente nueva,
+            charlando por el chat mientras se juega.
+          </p>
+          <p>
+            Nuestras <strong className="text-white">maquinitas tragamonedas</strong> (también llamadas slots o
+            tragaperras) tienen temáticas para todos los gustos: frutas clásicas, dioses griegos, antiguo Egipto,
+            Navidad, dulces, pesca, gatos y arcade neón, con giros gratis, comodines y multiplicadores.
           </p>
           <p>
             Las fichas son solo para jugar y divertirse dentro del sitio: no se cambian por dinero.

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
 import { LOCALE } from "../../i18n/locale";
@@ -30,7 +31,7 @@ const isExternal = (link) => /^https?:\/\//i.test(link || "");
  * Noticia en "primera plana" (panel de Noticias -> "Mostrar en primera plana"): su banner aparece en el centro
  * de la pantalla, como las ofertas, la primera vez del día que se entra a la página en este navegador.
  * Tocar el banner lleva al enlace de la noticia (o a la noticia en /news si no tiene enlace).
- * Se ve con o sin sesión. No interrumpe a quien entra directo a un juego o al panel, y si está abierta la
+ * Solo con la sesión iniciada (antes de entrar no se muestra). No interrumpe a quien entra directo a un juego o al panel, y si está abierta la
  * oferta del día espera a que se cierre para no taparse una con la otra.
  */
 export default function FeaturedNews() {
@@ -38,7 +39,8 @@ export default function FeaturedNews() {
   const navigate = useNavigate();
   const [article, setArticle] = useState(null);
   const [pending, setPending] = useState(null);
-  const blockedRoute = location.pathname.startsWith("/game/") || location.pathname.startsWith("/admin");
+  const loggedIn = useSelector((state) => !!state.currentUser?.id);
+  const blockedRoute = !loggedIn || location.pathname.startsWith("/game/") || location.pathname.startsWith("/admin");
 
   useEffect(() => {
     if (blockedRoute || article || pending) return undefined;

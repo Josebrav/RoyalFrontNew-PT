@@ -32,5 +32,6 @@ export function sortGames(games, order) {
 export function useOrderedGames() {
   const saved = useSelector((state) => state.siteContent[GAMES_ORDER_KEY]);
   const text = saved?.type === "text" ? saved.text : "";
-  return useMemo(() => sortGames(GAMES_CATALOG, parseGameOrder(text)), [text]);
+  // Los juegos con hidden: true no se listan (ni en el inicio ni en Juegos)
+  return useMemo(() => sortGames(GAMES_CATALOG.filter((g) => !g.hidden), parseGameOrder(text)), [text]);
 }

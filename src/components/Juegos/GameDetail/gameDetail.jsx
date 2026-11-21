@@ -4,8 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../../data/newsLinks";
 import Swal from "sweetalert2";
-import { CATEGORY_META, getGameBySlug } from "../../../data/gamesCatalog";
+import { CATEGORY_META, getDisplayedPlayers, getGameBySlug } from "../../../data/gamesCatalog";
 import { swalThemeConfig } from "../../../utils/formatters";
+import { gameFaqFor } from "../../../data/gameFaq";
 import API_URL from "../../../api/rutaApi";
 import EditableImage from "../../ui/EditableImage";
 
@@ -45,6 +46,7 @@ export default function GameDetail() {
   }
 
   const isActive = game.status === "active";
+  const extra = gameFaqFor(game);
   const categoryMeta = CATEGORY_META[game.category];
   // Color de la categoría para el panel de ranking (no todo dorado; el dorado queda para "Jugar").
   const accent = categoryMeta?.accent || "#a855f7";
@@ -86,7 +88,7 @@ export default function GameDetail() {
           fallbackIcon={game.icon}
           alt={game.name}
           className="w-full h-full object-cover"
-          recommendedSize="600×800px aprox. (vertical), JPG o PNG"
+          recommendedSize="1200×400px aprox. (horizontal), JPG o PNG"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 p-6 md:p-8">
@@ -107,7 +109,37 @@ export default function GameDetail() {
           <div>
             <h2 className="font-headline-sm text-headline-sm text-white mb-4">Sobre este juego</h2>
             <p className="text-on-surface-variant leading-relaxed">{game.description}</p>
+            {extra?.about?.map((p) => (
+              <p key={p} className="text-on-surface-variant leading-relaxed mt-3">{p}</p>
+            ))}
           </div>
+
+          {extra?.faq?.length > 0 && (
+            <div>
+              <h2 className="font-headline-sm text-headline-sm text-white mb-3">Preguntas frecuentes sobre {game.name}</h2>
+              <div className="divide-y divide-white/10 border-y border-white/10">
+                {extra.faq.map((f) => (
+                  <details key={f.q} className="group py-3">
+                    <summary className="cursor-pointer list-none flex justify-between items-center gap-4 text-white font-semibold">
+                      {f.q}
+                      <span className="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+                    </summary>
+                    <p className="text-on-surface-variant text-sm leading-relaxed mt-2">{f.a}</p>
+                  </details>
+                ))}
+              </div>
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "FAQPage",
+                    mainEntity: extra.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+                  }),
+                }}
+              />
+            </div>
+          )}
 
           {isActive && (
             <div
@@ -199,7 +231,7 @@ export default function GameDetail() {
                 <span className="text-on-surface-variant uppercase tracking-wider text-[0.6875rem]">Jugando ahora</span>
                 <span className="flex items-center gap-1 text-white font-bold">
                   <span className="material-symbols-outlined text-[16px] text-primary">person</span>
-                  {new Intl.NumberFormat("es-ES").format(game.players)}
+                  {new Intl.NumberFormat("es-ES").format(getDisplayedPlayers(game))}
                 </span>
               </div>
             )}

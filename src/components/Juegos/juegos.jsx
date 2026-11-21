@@ -12,6 +12,12 @@ export default function GameGrid() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { currentUser, favoriteGames } = useSelector((state) => state);
+  // Sin miniatura propia, las tarjetas usan la portada que ya se habia subido (games.<slug>.cover).
+  const siteContent = useSelector((state) => state.siteContent);
+  const cardFallback = (game) => {
+    const cover = siteContent?.[`games.${game.slug}.cover`];
+    return cover?.type === "image" && cover.imageUrl ? cover.imageUrl : game.image;
+  };
   const [activeCategory, setActiveCategory] = useState("all");
   const orderedGames = useOrderedGames();
 
@@ -104,8 +110,8 @@ export default function GameGrid() {
               >
                 <div className={`aspect-square overflow-hidden flex items-center justify-center bg-gradient-to-br from-surface-container-high to-surface-container-low ${!isActive ? "grayscale" : ""}`}>
                   <EditableImage
-                    contentKey={`games.${game.slug}.cover`}
-                    fallbackSrc={game.image}
+                    contentKey={`games.${game.slug}.thumbnail`}
+                    fallbackSrc={cardFallback(game)}
                     fallbackIcon={game.icon}
                     alt={game.name}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

@@ -1,16 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { CATEGORY_META, CATEGORY_ORDER, getGamesByCategory } from "../../data/gamesCatalog";
+import { CATEGORY_META, CATEGORY_ORDER, getDisplayedPlayers, getGamesByCategory } from "../../data/gamesCatalog";
 import { t } from "../../i18n/strings";
 
 function GameRow({ game, compact }) {
   const navigate = useNavigate();
   const isActive = game.status === "active";
-  // Mismo cover que un admin puede subir desde el carrusel de Home/detalle del juego (ver
-  // EditableImage) - acá se lee sin el lápiz de edición (a este ícono de 40px no le entra), pero
-  // se muestra igual para que sea consistente en todo el sitio.
-  const override = useSelector((state) => state.siteContent[`games.${game.slug}.cover`]);
-  const coverSrc = override?.type === "image" && override.imageUrl ? override.imageUrl : game.image;
+  const override = useSelector((state) => state.siteContent[`games.${game.slug}.thumbnail`]);
+  const cover = useSelector((state) => state.siteContent[`games.${game.slug}.cover`]);
+  // Sin miniatura propia, la portada que ya se habia subido; si no, la imagen del juego.
+  const thumbnailSrc =
+    override?.type === "image" && override.imageUrl
+      ? override.imageUrl
+      : cover?.type === "image" && cover.imageUrl
+        ? cover.imageUrl
+        : game.image;
 
   return (
     <button
@@ -25,8 +29,8 @@ function GameRow({ game, compact }) {
           isActive ? "border-primary/40 bg-primary/10" : "border-outline-variant/30 bg-surface-container-high grayscale"
         }`}
       >
-        {coverSrc ? (
-          <img src={coverSrc} alt={game.name} className="w-full h-full object-cover" />
+        {thumbnailSrc ? (
+          <img src={thumbnailSrc} alt={game.name} className="w-full h-full object-cover" />
         ) : (
           <span className={`material-symbols-outlined text-[20px] ${isActive ? "text-primary" : "text-on-surface-variant"}`}>
             {game.icon}
@@ -40,7 +44,7 @@ function GameRow({ game, compact }) {
         {isActive ? (
           <span className="flex items-center gap-1 text-[0.6875rem] text-on-surface-variant mt-1">
             <span className="material-symbols-outlined text-[13px]">person</span>
-            {new Intl.NumberFormat("es-ES").format(game.players)}
+            {new Intl.NumberFormat("es-ES").format(getDisplayedPlayers(game))}
           </span>
         ) : (
           <span className="inline-block mt-1 text-[0.5625rem] font-bold uppercase tracking-wider text-on-surface-variant/70 border border-outline-variant/30 rounded-full px-2 py-0.5">

@@ -118,6 +118,7 @@ const HISTORY_TYPE_LABELS = {
   prize: "Premio",
   gift_sent: "Regalo Enviado",
   gift_received: "Regalo Recibido",
+  mission: "Premio de Misión",
 };
 
 export default function BuyChips() {
@@ -1064,6 +1065,7 @@ export default function BuyChips() {
                               prize: { icon: "emoji_events", color: "text-primary" },
                               gift_sent: { icon: "card_giftcard", color: "text-error" },
                               gift_received: { icon: "card_giftcard", color: "text-green-400" },
+                              mission: { icon: "flag", color: "text-primary" },
                             }[item.type] || {
                               icon: item.chips >= 0 ? "add_circle" : "remove_circle",
                               color: item.chips >= 0 ? "text-green-400" : "text-error",

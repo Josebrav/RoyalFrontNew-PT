@@ -12,7 +12,15 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_URL || 'https://api.royalgames.lat'
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      // El index.html esta escrito para royaljuegos.com: en los sitios en portugues/ingles el nombre es RoyalGames
+      // (titulo de la pestaña, vista previa al compartir y datos para buscadores).
+      {
+        name: "site-name",
+        transformIndexHtml: (html) => ((env.VITE_SITE_LOCALE || "es") === "es" ? html : html.replace(/RoyalJuegos/g, "RoyalGames")),
+      },
+    ],
     // Prefijo que no usa nadie: así Vite no expone automáticamente ninguna variable.
     envPrefix: 'RG_PUBLIC_ONLY_VIA_DEFINE_',
     define: Object.fromEntries(

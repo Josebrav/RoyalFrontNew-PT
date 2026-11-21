@@ -3,9 +3,7 @@ import { useSelector } from "react-redux";
 import EditableImage from "../../ui/EditableImage";
 import { GAMES_CATALOG, CATEGORY_META, CATEGORY_ORDER } from "../../../data/gamesCatalog";
 
-/** Panel para que admin/mod suban la portada de cualquier juego (activo o "próximamente") desde
- *  un solo lugar, con una vista previa grande — usa el mismo mecanismo de EditableImage/Cloudinary
- *  que ya existe en Home/GameDetail/catálogo, así que lo que se suba acá aparece en todos lados. */
+/** Panel para que admin/mod gestionen por separado la miniatura y el banner de cada juego. */
 export default function GameImages() {
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.currentUser);
@@ -35,9 +33,8 @@ export default function GameImages() {
           <div>
             <h1 className="font-headline-lg text-headline-lg text-on-background mb-2">Imágenes de Juegos</h1>
             <p className="text-on-surface-variant font-body-sm max-w-2xl">
-              Pasá el mouse sobre cualquier portada y usá el lápiz para subir una nueva — se guarda al toque y aparece
-              en el Home, el catálogo y el detalle del juego a la vez. Incluye los juegos "Próximamente" para poder
-              dejarles la imagen lista antes de que se activen.
+              Usá el lápiz para cambiar por separado la miniatura vertical de las tarjetas y el banner horizontal
+              del detalle. Incluye los juegos próximos para poder dejarles las imágenes listas antes de que se activen.
             </p>
           </div>
           <button
@@ -58,20 +55,36 @@ export default function GameImages() {
             return (
               <section key={categoryKey}>
                 <h2 className={`text-xs font-black uppercase tracking-widest mb-4 ${meta.className}`}>{meta.label}</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {games.map((game) => (
-                    <div key={game.slug} className="flex flex-col gap-2">
-                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-high">
-                        <EditableImage
-                          contentKey={`games.${game.slug}.cover`}
-                          fallbackSrc={game.image}
-                          fallbackIcon={game.icon}
-                          alt={game.name}
-                          className="w-full h-full object-cover"
-                          recommendedSize="600×800px aprox. (vertical), JPG o PNG"
-                        />
+                    <div key={game.slug} className="grid grid-cols-2 gap-3">
+                      <div>
+                        <div className="relative aspect-[3/4] rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-high">
+                          <EditableImage
+                            contentKey={`games.${game.slug}.thumbnail`}
+                            fallbackSrc={game.image}
+                            fallbackIcon={game.icon}
+                            alt={`${game.name} - miniatura`}
+                            className="w-full h-full object-cover"
+                            recommendedSize="600×800px aprox. (vertical), JPG o PNG"
+                          />
+                        </div>
+                        <p className="mt-1 text-center text-xs text-on-surface-variant">Tarjetas</p>
                       </div>
-                      <div className="text-center">
+                      <div>
+                        <div className="relative aspect-[3/1] rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-high">
+                          <EditableImage
+                            contentKey={`games.${game.slug}.cover`}
+                            fallbackSrc={game.image}
+                            fallbackIcon={game.icon}
+                            alt={`${game.name} - banner del detalle`}
+                            className="w-full h-full object-cover"
+                            recommendedSize="1200×400px aprox. (horizontal), JPG o PNG"
+                          />
+                        </div>
+                        <p className="mt-1 text-center text-xs text-on-surface-variant">Detalle</p>
+                      </div>
+                      <div className="col-span-2 text-center">
                         <p className="font-bold text-label-md text-white truncate">{game.name}</p>
                         <span
                           className={`inline-block mt-0.5 text-[0.5625rem] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${

@@ -64,6 +64,13 @@ function withTabId(src) {
   return `${src}${src.includes("?") ? "&" : "?"}tabId=${encodeURIComponent(getTabId())}&lang=${LOCALE}`;
 }
 
+// Celular o tablet (pantalla tactil y chica): ahi se muestra el boton de pantalla completa.
+function isMobileDevice() {
+  if (typeof window === "undefined") return false;
+  const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+  return !!coarse && Math.min(window.screen.width, window.screen.height) < 900;
+}
+
 const HEARTBEAT_MS = 15 * 1000;
 // Pestañas en segundo plano reciben timers como mucho una vez por minuto, y el celular puede
 // pausarlas unos minutos sin que pase nada raro — por eso el umbral es holgado: un hueco así
@@ -131,6 +138,32 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
   const wrapperRef = useRef(null);
   const scaleContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // iPhone no permite pantalla completa real de una pagina: ahi el juego tapa toda la pantalla con CSS.
+  const [pseudoFullscreen, setPseudoFullscreen] = useState(false);
+  const isMobile = useMemo(isMobileDevice, []);
+  const fullscreenOn = isFullscreen || pseudoFullscreen;
+
+  const toggleFullscreen = async () => {
+    const el = wrapperRef.current;
+    if (fullscreenOn) {
+      if (pseudoFullscreen) setPseudoFullscreen(false);
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else if (document.webkitFullscreenElement) document.webkitExitFullscreen?.();
+      } catch { /* ya habia salido */ }
+      return;
+    }
+    const request = el?.requestFullscreen || el?.webkitRequestFullscreen;
+    if (request) {
+      try {
+        await request.call(el);
+        // Los juegos son horizontales: en Android se intenta girar la pantalla sola.
+        try { await window.screen.orientation?.lock?.("landscape"); } catch { /* no soportado */ }
+        return;
+      } catch { /* sigue con la version CSS */ }
+    }
+    setPseudoFullscreen(true);
+  };
   const [scale, setScale] = useState(1);
   const hasFixedResolution = !!(nativeWidth && nativeHeight);
   useReloadWhenStale();
@@ -232,16 +265,17 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
     const observer = new ResizeObserver(updateScale);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [hasFixedResolution, nativeWidth, nativeHeight, isFullscreen, src, gameToken.ready]);
+  }, [hasFixedResolution, nativeWidth, nativeHeight, fullscreenOn, src, gameToken.ready]);
 
   return (
     <Box
       ref={wrapperRef}
       w="100%"
-      h={isFullscreen ? "100dvh" : "calc(100vh - 80px)"}
+      h={fullscreenOn ? "100dvh" : "calc(100vh - 80px)"}
       bg="gray.900"
       display="flex"
       flexDirection="column"
+      {...(pseudoFullscreen ? { position: "fixed", inset: 0, zIndex: 9999 } : {})}
     >
       {src && gameToken.ready ? (
         <Box
@@ -280,6 +314,34 @@ export default function GameFrame({ src, title, nativeWidth, nativeHeight, onBac
               title={title}
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
+          )}
+          {isMobile && (
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              title={fullscreenOn ? "Salir de pantalla completa" : "Pantalla completa"}
+              aria-label={fullscreenOn ? "Salir de pantalla completa" : "Pantalla completa"}
+              style={{
+                position: "absolute",
+                bottom: 8,
+                right: 8,
+                zIndex: 10,
+                width: 40,
+                height: 40,
+                borderRadius: 10,
+                border: "1px solid rgba(255,255,255,0.2)",
+                background: "rgba(0,0,0,0.55)",
+                color: "#C9A84C",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 26 }}>
+                {fullscreenOn ? "fullscreen_exit" : "fullscreen"}
+              </span>
+            </button>
           )}
           {onBack && (
             <button

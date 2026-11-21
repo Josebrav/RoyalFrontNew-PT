@@ -5,11 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
 import { fetchConversations } from "../../redux/actions/index";
 import { t } from "../../i18n/strings";
+import useMissions from "../../utils/useMissions";
 
 export default function Sidebar() {
   const dispatch = useDispatch();
   const { currentUser, messages } = useSelector((state) => state);
   const location = useLocation();
+  // Misiones cumplidas sin cobrar: globito en "Misiones" (se vuelve a mirar al cambiar de página).
+  const { data: missions } = useMissions(currentUser?.id, location.pathname);
 
   // Mods ven el panel de admin igual que los admins (todo excepto gestión de roles).
   const canAccessAdminPanel = currentUser?.role === "admin" || currentUser?.role === "mod";
@@ -38,6 +41,7 @@ export default function Sidebar() {
   const accountItems = [
     { to: "/chips", icon: "paid", label: t("sidebar.comprarFichas"), color: "#4caf7d" },
     { to: "/chips?tab=history", icon: "receipt_long", label: t("sidebar.historial"), color: "#4f8fe0" },
+    { to: "/misiones", icon: "flag", label: t("sidebar.misiones"), badge: missions?.claimable || 0, color: "#e6c364" },
   ];
 
   const socialItems = [
@@ -58,6 +62,7 @@ export default function Sidebar() {
     ...(currentUser?.role === "admin" ? [{ to: "/admin/deposits", icon: "payments", label: t("sidebar.cargas"), color: "#4caf7d" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/staff-chips", icon: "badge", label: t("sidebar.fichasStaff"), color: "#e6c364" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/game-stats", icon: "query_stats", label: t("sidebar.estadisticasJuegos"), color: "#e6c364" }] : []),
+    ...(currentUser?.role === "admin" ? [{ to: "/admin/rtp", icon: "tune", label: t("sidebar.rtp"), color: "#e05252" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/promos", icon: "campaign", label: t("sidebar.promociones"), color: "#2dd4bf" }] : []),
     ...(currentUser?.role === "admin" ? [{ to: "/admin/ofertas", icon: "sell", label: t("sidebar.ofertas"), color: "#e6c364" }] : []),
     { to: "/admin/prizes", icon: "emoji_events", label: t("sidebar.premios"), color: "#a855f7" },

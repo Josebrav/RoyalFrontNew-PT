@@ -160,113 +160,193 @@ html.desktop-on-phone { font-size: 21px; }
   animation: ticker-scroll 30s linear infinite;
 }
 
-/* Custom premium SweetAlert2 overrides */
+/* ===== Carteles (SweetAlert2) con el estilo de la tienda de fondos: violeta con borde dorado ===== */
 body .swal2-container {
   backdrop-filter: blur(4px) !important;
   z-index: 999999 !important;
 }
-
-body .swal2-popup {
-  background: #12121A !important;
-  color: #e9e1d7 !important;
-  border: 1px solid #1A1A26 !important;
-  border-radius: 16px !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(201, 168, 76, 0.05) !important;
-  font-family: 'Inter', sans-serif !important;
-  padding: 2.5rem 1.5rem !important;
+body .swal2-container.swal2-backdrop-show {
+  background: rgba(8, 4, 24, 0.65) !important;
 }
 
-body .swal2-title {
+body .swal2-popup {
+  border: 3px solid transparent !important;
+  background:
+    linear-gradient(180deg, #3b0f8a 0%, #1a0647 100%) padding-box,
+    linear-gradient(180deg, #ffe066 0%, #c084fc 50%, #7c3aed 100%) border-box !important;
   color: #ffffff !important;
-  font-size: 1.5rem !important;
-  font-weight: 700 !important;
-  margin-bottom: 0.75rem !important;
+  border-radius: 26px !important;
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.6), 0 18px 50px rgba(0, 0, 0, 0.55) !important;
+  font-family: 'Inter', sans-serif !important;
+  padding: 1.5rem 1.25rem 1.75rem !important;
+}
+body .swal2-show {
+  animation: royal-swal-pop 0.25s ease-out !important;
+}
+@keyframes royal-swal-pop {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Titulo como pildora violeta con borde dorado */
+body .swal2-title {
+  display: block !important;
+  width: fit-content !important;
+  max-width: 92% !important;
+  margin: 0.25rem auto 0.9rem !important;
+  padding: 0.45rem 1.4rem !important;
+  border-radius: 18px !important;
+  border: 2px solid #ffd84a !important;
+  background: linear-gradient(180deg, #a855f7, #6d28d9) !important;
+  color: #ffd84a !important;
+  font-size: 1.2rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55) !important;
+  line-height: 1.3 !important;
 }
 
 body .swal2-html-container {
-  color: #d0c5b2 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   font-size: 0.95rem !important;
   line-height: 1.6 !important;
 }
+body .swal2-html-container b,
+body .swal2-html-container strong {
+  color: #ffd84a !important;
+}
 
 body .swal2-actions {
-  margin-top: 1.75rem !important;
+  margin-top: 1.5rem !important;
+  gap: 0.75rem !important;
+  flex-wrap: nowrap !important;
 }
 
+/* Confirmar: dorado con borde marron */
 body .swal2-styled.swal2-confirm {
-  background: linear-gradient(135deg, #C9A84C, #F5D980) !important;
-  color: #0A0A0F !important;
-  font-weight: 700 !important;
-  font-size: 0.9rem !important;
+  background: linear-gradient(180deg, #ffe066, #f59e0b) !important;
+  color: #4a1d00 !important;
+  font-weight: 900 !important;
+  font-size: 0.95rem !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-  padding: 0.75rem 2rem !important;
-  border-radius: 8px !important;
-  border: none !important;
-  box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2) !important;
-  transition: all 0.3s ease !important;
+  padding: 0.7rem 1.9rem !important;
+  border-radius: 999px !important;
+  border: 4px solid #7c2d12 !important;
+  box-shadow: 0 0 16px rgba(255, 216, 74, 0.55) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+  margin: 0 !important;
 }
-
 body .swal2-styled.swal2-confirm:hover {
-  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.35) !important;
-  transform: translateY(-1px) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 0 22px rgba(255, 216, 74, 0.8) !important;
 }
-
 body .swal2-styled.swal2-confirm:active {
-  transform: translateY(0) !important;
+  transform: scale(0.95) !important;
 }
 
-body .swal2-styled.swal2-cancel {
-  background: transparent !important;
-  color: #e9e1d7 !important;
-  border: 1px solid #2A2A36 !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
+/* Cancelar / no: pildora clara transparente */
+body .swal2-styled.swal2-cancel,
+body .swal2-styled.swal2-deny {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  font-weight: 900 !important;
+  font-size: 0.95rem !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
-  padding: 0.75rem 2rem !important;
-  border-radius: 8px !important;
-  transition: all 0.3s ease !important;
+  padding: 0.7rem 1.9rem !important;
+  border-radius: 999px !important;
+  transition: background 0.15s ease, transform 0.15s ease !important;
+  margin: 0 !important;
+}
+body .swal2-styled.swal2-cancel:hover,
+body .swal2-styled.swal2-deny:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+body .swal2-styled.swal2-cancel:active,
+body .swal2-styled.swal2-deny:active {
+  transform: scale(0.95) !important;
+}
+body .swal2-styled:focus {
+  box-shadow: 0 0 0 3px rgba(255, 216, 74, 0.45) !important;
 }
 
-body .swal2-styled.swal2-cancel:hover {
-  background: rgba(233, 225, 215, 0.05) !important;
-  border-color: #99907e !important;
+/* Campos de texto dentro de los carteles */
+body .swal2-input,
+body .swal2-textarea,
+body .swal2-select {
+  background: rgba(0, 0, 0, 0.35) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 216, 74, 0.5) !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+body .swal2-input:focus,
+body .swal2-textarea:focus {
+  border-color: #ffd84a !important;
+  box-shadow: 0 0 12px rgba(255, 216, 74, 0.45) !important;
+}
+body .swal2-validation-message {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #ffd1d1 !important;
+  border-radius: 12px !important;
+}
+body .swal2-close {
+  color: #ffd84a !important;
+}
+body .swal2-timer-progress-bar {
+  background: linear-gradient(90deg, #ffe066, #a855f7) !important;
 }
 
-/* Success Checkmark Custom Styles */
-body .swal2-icon.swal2-success {
-  border-color: #C9A84C !important;
+/* Iconos en dorado y violeta */
+body .swal2-icon {
+  border-color: #ffd84a !important;
+  color: #ffd84a !important;
 }
-
 body .swal2-icon.swal2-success [class^=swal2-success-line] {
-  background-color: #C9A84C !important;
+  background-color: #ffd84a !important;
 }
-
 body .swal2-icon.swal2-success .swal2-success-ring {
-  border: .25em solid rgba(201, 168, 76, .2) !important;
+  border: .25em solid rgba(255, 216, 74, .3) !important;
 }
-
 body .swal2-icon.swal2-success .swal2-success-fix,
 body .swal2-icon.swal2-success [class^=swal2-success-circular-line] {
-  background-color: #12121A !important;
+  background-color: transparent !important;
 }
-
-/* Error Cross Custom Styles */
 body .swal2-icon.swal2-error {
-  border-color: #ffb4ab !important;
+  border-color: #ff7a8a !important;
 }
-
 body .swal2-icon.swal2-error [class^=swal2-x-mark-line] {
-  background-color: #ffb4ab !important;
+  background-color: #ff7a8a !important;
 }
-
-/* Info Icon Custom Styles */
+body .swal2-icon.swal2-warning {
+  border-color: #ffb547 !important;
+  color: #ffb547 !important;
+}
+body .swal2-icon.swal2-question,
 body .swal2-icon.swal2-info {
-  border-color: #e0c56e !important;
-  color: #e0c56e !important;
+  border-color: #c084fc !important;
+  color: #e9d5ff !important;
 }
 
+/* Avisos chicos (toast): mismo color, sin pildora en el titulo */
+body .swal2-popup.swal2-toast {
+  padding: 0.75rem 1rem !important;
+  border-radius: 18px !important;
+  border-width: 2px !important;
+}
+body .swal2-popup.swal2-toast .swal2-title {
+  margin: 0 0.5rem !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  color: #ffffff !important;
+  font-size: 0.95rem !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+}
 
 /* ===== Nav futurista (barra superior + lateral) ===== */
 .hud-nav {
@@ -435,3 +515,104 @@ html::before {
   pointer-events: none;
 }
 body, .bg-background:not(input):not(select):not(textarea) { background-color: transparent !important; }
+
+/* Botones de la barra (Comprar fichas / Cerrar sesion): mismo marco con esquinas cortadas y borde
+   degradado que el recuadro del perfil. Comprar va con borde dorado y brillo; salir, violeta/cian. */
+.hud-btn {
+  --cut: 10px;
+  position: relative;
+  height: 40px;
+  padding: 1px;
+  border: 0;
+  background: linear-gradient(135deg, #a78bfa, #ec4899 35%, #22d3ee 75%, #a78bfa);
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.45));
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.15s;
+}
+.hud-btn-inner {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 45%),
+    linear-gradient(135deg, #1b1840, #0b0c1e);
+  clip-path: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+}
+.hud-btn:hover { filter: drop-shadow(0 0 12px rgba(236, 72, 153, 0.6)); transform: translateY(-1px); }
+.hud-btn:active { transform: translateY(1px); }
+.hud-btn:focus-visible { outline: 2px solid #a5f3fc; outline-offset: 3px; }
+
+.hud-btn-logout { width: 44px; }
+.hud-btn-logout .hud-btn-inner { color: #c8c3b8; transition: color 0.2s; }
+.hud-btn-logout:hover .hud-btn-inner { color: #fb7185; }
+
+.buy-chips-btn {
+  background: linear-gradient(135deg, #fff0a8, #f7cd4f 30%, #c98410 55%, #f7cd4f 80%, #fff0a8);
+  filter: drop-shadow(0 0 8px rgba(247, 190, 50, 0.45));
+}
+.buy-chips-btn:hover { filter: drop-shadow(0 0 14px rgba(247, 190, 50, 0.7)); }
+.buy-chips-btn .hud-btn-inner {
+  padding: 0 16px 0 7px;
+  background:
+    linear-gradient(180deg, rgba(255, 240, 168, 0.16), transparent 50%),
+    linear-gradient(135deg, #2a2040, #120f24);
+  color: #f5d980;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(247, 205, 79, 0.45);
+}
+.buy-chips-btn .hud-btn-inner::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 240, 168, 0.22) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  animation: buy-chips-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+/* Ficha verde de casino con el "+" */
+.buy-chips-coin {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, #4fe08f 0%, #1c9a57 55%, #0e6a3a 100%);
+  box-shadow: 0 0 0 2px #0b4d2a, 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+.buy-chips-coin::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 9999px;
+  border: 2px dashed rgba(255, 255, 255, 0.75);
+}
+.buy-chips-coin .material-symbols-outlined {
+  position: relative;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+@media (max-width: 639px) {
+  .buy-chips-btn .hud-btn-inner { padding: 0 7px; }
+}
+@keyframes buy-chips-shine {
+  0%, 60% { left: -60%; }
+  100% { left: 130%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .buy-chips-btn .hud-btn-inner::after { animation: none; display: none; }
+}

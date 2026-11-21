@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2";
@@ -16,13 +16,13 @@ import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
 import DailySpinModal from "../DailySpin/DailySpinModal";
 import DailyBonusModal from "../DailyBonus/DailyBonusModal";
+import MissionsCard from "../Missions/missionsCard";
 import EditableText from "../ui/EditableText";
 import EditableImage from "../ui/EditableImage";
 import BannerCarousel from "../ui/BannerCarousel";
-import { GAMES_CATALOG, CATEGORY_META, getGameByPlayPath, getGameBySlug, isAppActivity } from "../../data/gamesCatalog";
+import { GAMES_CATALOG, CATEGORY_META, getDisplayedPlayers, getGameBySlug } from "../../data/gamesCatalog";
 import { useOrderedGames } from "../../data/gameOrder";
 import GameOrderEditor from "../ui/GameOrderEditor";
-import { generateFakeOnlinePlayers } from "../../data/fakeOnlinePlayers";
 import { fetchUserProfile, getUserByEmail } from "../../redux/actions";
 import API_URL from "../../api/rutaApi";
 import { useAuth } from "../../context/oauthContext";
@@ -30,10 +30,6 @@ import { t } from "../../i18n/strings";
 import { LOCALE } from "../../i18n/locale";
 import SeoIntro from "./seoIntro";
 import { POINTS_AND_TOURNAMENTS_NEWS_ID, newsArticlePath } from "../../data/newsLinks";
-
-const SIMULATED_ONLINE_MIN = 18;
-const SIMULATED_ONLINE_MAX = 34;
-const ACTIVE_GAMES = GAMES_CATALOG.filter((g) => g.status === "active");
 
 // Colores del podio (1, 2, 3) y del resto de la lista de Top Ganadores.
 const PODIUM = [
@@ -48,6 +44,12 @@ export default function Home() {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
+  // Sin miniatura propia, las tarjetas usan la portada que ya se habia subido (games.<slug>.cover).
+  const siteContent = useSelector((state) => state.siteContent);
+  const cardFallback = (game) => {
+    const cover = siteContent?.[`games.${game.slug}.cover`];
+    return cover?.type === "image" && cover.imageUrl ? cover.imageUrl : game.image;
+  };
   const orderedGames = useOrderedGames();
   // Al recargar la página, restaurar la sesión (canjear la cookie httpOnly por un access token
   // nuevo) es async — mientras tanto currentUser?.id todavía es falsy en Redux, así que sin este
@@ -60,13 +62,7 @@ export default function Home() {
   const isGuestPreview = !currentUser?.id && searchParams.get("vista") === "invitado";
 
   const [topWinners, setTopWinners] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
   const [recentWins, setRecentWins] = useState([]);
-  // Target headcount for the simulated players blended into "Jugadores Conectados"
-  // below (see fakeOnlinePlayers.js). Drifts slowly so the widget feels alive.
-  const [simulatedOnlineTarget, setSimulatedOnlineTarget] = useState(
-    () => SIMULATED_ONLINE_MIN + Math.floor(Math.random() * (SIMULATED_ONLINE_MAX - SIMULATED_ONLINE_MIN + 1))
-  );
 
   // La ruleta ya NO aparece sola al loguearse (Unity tiene su propia pantalla de carga, se
   // sentia intrusivo) - se abre solo cuando el jugador clickea la tarjeta "Giro Diario VIP",
@@ -90,7 +86,7 @@ export default function Home() {
   const handleDailyBonusClaimed = ({ error }) => {
     if (error) {
       setDailyBonusStatus((prev) => (prev ? { ...prev, canClaim: false } : prev));
-      Swal.fire({ title: "Bono Diario", text: error, icon: "error", ...swalThemeConfig });
+      Swal.fire({ title: t("dailyBonus.title"), text: error, icon: "error", ...swalThemeConfig });
       return;
     }
     setDailyBonusStatus((prev) => (prev ? { ...prev, canClaim: false } : prev));
@@ -171,35 +167,16 @@ export default function Home() {
     };
   }, [currentUser, auth.loading]);
 
-  // Real top-winners leaderboard (chips actually won in games) + online players list
+  // Real top-winners leaderboard (chips actually won in games)
   useEffect(() => {
     if (!currentUser?.id) return;
     const fetchWidgets = () => {
       axios.get(`${API_URL}/leaderboard/top-winners?limit=5`).then(({ data }) => setTopWinners(data)).catch(() => {});
-      axios.get(`${API_URL}/users/online`).then(({ data }) => setOnlineUsers(data)).catch(() => {});
-      // Small random walk so the simulated headcount below feels like people are
-      // actually coming and going instead of a static number.
-      setSimulatedOnlineTarget((prev) => {
-        const drifted = prev + Math.floor(Math.random() * 7) - 3;
-        return Math.min(SIMULATED_ONLINE_MAX, Math.max(SIMULATED_ONLINE_MIN, drifted));
-      });
     };
     fetchWidgets();
     const interval = setInterval(fetchWidgets, 60 * 1000);
     return () => clearInterval(interval);
   }, [currentUser?.id]);
-
-  // Real online users blended with simulated ones so the widget hits simulatedOnlineTarget.
-  // Memoized so the simulated names/games only reshuffle when the target or real list
-  // actually changes, not on every unrelated re-render.
-  const otherOnlineUsers = useMemo(() => {
-    const realOnlineUsers = onlineUsers.filter((u) => u.id !== currentUser?.id);
-    const simulatedPlayers = generateFakeOnlinePlayers(
-      Math.max(0, simulatedOnlineTarget - realOnlineUsers.length),
-      ACTIVE_GAMES
-    );
-    return [...realOnlineUsers, ...simulatedPlayers];
-  }, [onlineUsers, simulatedOnlineTarget, currentUser?.id]);
 
   // Helper alerts and navigation functions
   const handlePlayGame = (path, title) => {
@@ -422,8 +399,8 @@ export default function Home() {
                   >
                     <div className="aspect-[3/4] overflow-hidden">
                       <EditableImage
-                        contentKey={`games.${game.slug}.cover`}
-                        fallbackSrc={game.image}
+                        contentKey={`games.${game.slug}.thumbnail`}
+                        fallbackSrc={cardFallback(game)}
                         fallbackIcon={game.icon}
                         alt={game.name}
                         className="w-full h-full object-cover"
@@ -441,7 +418,7 @@ export default function Home() {
                         <h4 className="font-bold text-label-lg font-label-lg truncate text-white min-w-0">{game.name}</h4>
                         <span className="flex items-center gap-1 text-[0.6875rem] text-on-surface-variant flex-shrink-0">
                           <span className="material-symbols-outlined text-[13px]">person</span>
-                          {new Intl.NumberFormat("es-ES").format(game.players || 0)}
+                          {new Intl.NumberFormat("es-ES").format(getDisplayedPlayers(game))}
                         </span>
                       </div>
                     </div>
@@ -464,7 +441,7 @@ export default function Home() {
                 ))}
 
                 {/* Juegos que todavia no salieron: misma tarjeta, en gris y sin jugar */}
-                {orderedGames.filter((game) => game.status !== "active").map((game) => (
+                {orderedGames.filter((game) => game.status !== "active" && game.showOnHome !== false).map((game) => (
                   <div
                     key={game.slug}
                     onClick={() => navigate(`/juegos/${game.slug}`)}
@@ -493,10 +470,10 @@ export default function Home() {
                 en pantallas grandes va "flotando" (absolute) en su lugar de la grilla, asi su alto no estira
                 las filas: el alto lo ponen las tarjetas y la lista de conectados usa scroll. */}
             <div className="col-span-2 md:col-span-4 xl:col-span-2 xl:col-start-5 xl:row-start-1 xl:row-span-3 xl:relative">
-            <aside className="xl:absolute xl:inset-0 flex flex-col gap-6 text-left min-h-0">
+            <aside className="xl:absolute xl:inset-0 flex flex-col gap-4 text-left min-h-0">
               {/* Top Winners Leaderboard */}
               <div
-                className="rounded-xl border border-emerald-400/40 overflow-hidden flex flex-col bg-gradient-to-b from-[#0f2a2a] to-[#0d0f1f]"
+                className="rounded-xl border border-emerald-400/40 overflow-hidden flex flex-col flex-shrink-0 xl:flex-[1_0_auto] bg-gradient-to-b from-[#0f2a2a] to-[#0d0f1f]"
                 style={{ boxShadow: "0 0 24px rgba(52, 211, 153, 0.22)" }}
               >
                 <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 p-4 flex justify-between items-center">
@@ -506,7 +483,7 @@ export default function Home() {
                   </h3>
                   <span className="bg-black/25 text-white px-2 py-1 rounded text-label-md font-label-md font-bold">{t("home.dashboard.enVivo")}</span>
                 </div>
-                <div className="p-6 space-y-3">
+                <div className="p-4 flex flex-col gap-2 xl:flex-[1_0_auto]">
                   {topWinners.length === 0 ? (
                     <p className="text-on-surface-variant text-sm text-center py-4">
                       {t("home.dashboard.noPrizesYet")}
@@ -515,7 +492,7 @@ export default function Home() {
                     topWinners.map((player, index) => (
                       <div
                         key={player.id}
-                        className="flex items-center justify-between p-3 rounded-lg border-l-4"
+                        className="flex items-center justify-between px-3 py-2 rounded-lg border-l-4 xl:flex-[1_0_auto]"
                         style={{ background: (PODIUM[index] || PODIUM_REST).bg, borderLeftColor: (PODIUM[index] || PODIUM_REST).c }}
                       >
                         <div className="flex items-center gap-3 min-w-0">
@@ -550,61 +527,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Online Players */}
-              <div className="rounded-xl border border-sky-400/40 overflow-hidden flex flex-col xl:flex-1 xl:min-h-0 bg-gradient-to-b from-[#0c1d33] to-[#0d0f1f] shadow-[0_0_24px_rgba(56,189,248,0.18)]">
-                <div className="p-4 flex items-center gap-2 bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600">
-                  <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse flex-shrink-0 shadow-[0_0_8px_#4ade80]"></span>
-                  <h3 className="font-bold text-headline-sm font-headline-sm text-white">
-                    {otherOnlineUsers.length} {otherOnlineUsers.length === 1 ? t("home.dashboard.jugadorConectado") : t("home.dashboard.jugadoresConectados")}
-                  </h3>
-                </div>
-                <div className="max-h-80 xl:max-h-none xl:flex-1 xl:min-h-0 overflow-y-auto divide-y divide-outline-variant/10">
-                  {otherOnlineUsers.length === 0 ? (
-                    <p className="text-on-surface-variant text-sm text-center py-6 px-4">
-                      {t("home.dashboard.noOtherPlayers")}
-                    </p>
-                  ) : (
-                    otherOnlineUsers.map((player) => {
-                      const activeGame = getGameByPlayPath(player.currentActivity);
-                      const fromApp = isAppActivity(player.currentActivity);
-                      // Simulated players (see fakeOnlinePlayers.js) have no real profile behind
-                      // them, so only real players (real DB id) link out to /perfil/:nick.
-                      const isRealPlayer = !player.id.startsWith("sim-");
-                      return (
-                        <div key={player.id} className="flex items-center justify-between gap-3 p-3">
-                          <button
-                            type="button"
-                            disabled={!isRealPlayer}
-                            onClick={() => isRealPlayer && navigate(`/perfil/${player.nick}`)}
-                            className={`flex items-center gap-3 min-w-0 bg-transparent border-0 p-0 text-left ${isRealPlayer ? "cursor-pointer group" : "cursor-default"}`}
-                          >
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                              {(player.nick || "RG").slice(0, 2).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <p className={`font-bold text-white text-sm truncate ${isRealPlayer ? "group-hover:text-sky-400 group-hover:underline" : ""}`}>
-                                {player.nick}
-                              </p>
-                              <p className="text-[0.6875rem] text-on-surface-variant truncate">
-                                {fromApp && <span className="material-symbols-outlined text-[13px] align-[-2px] mr-1 text-sky-400" title={t("home.dashboard.enLaApp")}>smartphone</span>}
-                                {activeGame ? <span className="text-sky-400">{t("home.dashboard.jugandoA")} {activeGame.name}</span> : fromApp ? t("home.dashboard.enLaApp") : t("home.dashboard.enElSitio")}
-                              </p>
-                            </div>
-                          </button>
-                          {activeGame && (
-                            <button
-                              onClick={() => handlePlayGame(activeGame.playPath, activeGame.name)}
-                              className="px-3 py-1.5 rounded bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[0.6875rem] font-bold uppercase flex-shrink-0 cursor-pointer border-0 hover:brightness-110 transition-all"
-                            >
-                              {t("home.dashboard.jugarBtn")}
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+              <MissionsCard />
 
               {/* Tarjeta de Giro Diario VIP oculta a pedido (ver handleClaimDailySpin,
                   DailySpinModal y GET /daily-spin/status, todo intacto por si se retoma) */}

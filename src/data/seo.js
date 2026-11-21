@@ -1,15 +1,17 @@
 import { getGameBySlug } from "./gamesCatalog";
+import { LOCALE } from "../i18n/locale";
 
 // Titulo y descripcion de cada pagina para buscadores y para la vista previa al compartir el link.
 // Solo el sitio en espanol (royaljuegos.com); los sitios en ingles/portugues usan el titulo generico.
 
 export const SITE_URL = "https://www.royaljuegos.com";
-export const SITE_NAME = "RoyalJuegos";
+// royaljuegos.com se llama RoyalJuegos; los sitios en portugues (royalgames.lat) e ingles, RoyalGames.
+export const SITE_NAME = LOCALE === "es" ? "RoyalJuegos" : "RoyalGames";
 
 export const DEFAULT_SEO = {
   title: "RoyalJuegos | Bingo, tragamonedas, ruleta y dominó online gratis",
   description:
-    "Jugá gratis online a bingo, tragamonedas, ruleta, dominó y minas con fichas de regalo. Chat en vivo, rankings y torneos con jugadores de toda Latinoamérica.",
+    "Juegos de casino gratis online: bingo, tragamonedas, ruleta, póker, blackjack, dominó y buraco con fichas de regalo. Sin descargar, con chat en vivo y torneos.",
 };
 
 const PAGE_SEO = {
@@ -93,6 +95,14 @@ export const GAME_SEO = {
     title: "Sweet Treats: tragamonedas de bombones en cascada gratis | RoyalJuegos",
     description: "Sweet Treats, la tragamonedas de chocolates en cascada: 4 o más iguales explotan, multiplicadores y giros gratis. Jugá gratis online.",
   },
+  gamerzone: {
+    title: "Gamer Zone: tragamonedas arcade neón gratis | RoyalJuegos",
+    description: "Gamer Zone, la tragamonedas arcade neón: 243 formas de ganar, giros gratis con WILD expansivo que cubre todo el rodillo. Jugá gratis online.",
+  },
+  oceanriches: {
+    title: "Ocean Riches: tragamonedas de pesca gratis | RoyalJuegos",
+    description: "Ocean Riches, la tragamonedas de pesca en el fondo del mar: peces con premio, el pescador que los recoge, giros gratis con marea y el bonus del cofre. Jugá gratis online.",
+  },
   gomitas: {
     title: "Gomitas Espaciales: tragamonedas de ositos de gomita gratis | RoyalJuegos",
     description: "Gomitas Espaciales, la tragamonedas neón de ositos de gomita en el espacio: 243 formas de ganar, giros gratis con premios x3 y la máquina de gomitas. Jugá gratis online.",
@@ -101,6 +111,10 @@ export const GAME_SEO = {
     title: "Gema of Gold: tragamonedas de gemas gratis | RoyalJuegos",
     description: "Gema of Gold, la tragamonedas de gemas y oro con premios y bonos. Jugá gratis online con fichas de regalo.",
   },
+  bicho: {
+    title: "Juego del Bicho online gratis | RoyalJuegos",
+    description: "Jugá al Juego del Bicho online gratis: 25 animales, un sorteo cada minuto para todos y premios de 24 veces lo apostado.",
+  },
   minas: {
     title: "Minas (Mines) online gratis | RoyalJuegos",
     description: "Jugá a Minas (Mines) online gratis: elegí casillas, evitá las bombas y multiplicá tus fichas. Retirate cuando quieras.",
@@ -108,6 +122,18 @@ export const GAME_SEO = {
   "royal-pachinka": {
     title: "Pachinko online gratis (Royal Pachinka) | RoyalJuegos",
     description: "Royal Pachinka, el pachinko online gratis: soltá las bolas, mirá cómo rebotan y ganá multiplicadores.",
+  },
+  "royal-poker": {
+    title: "Póker online gratis: Texas Hold'em con fichas | RoyalJuegos",
+    description: "Jugá póker Texas Hold'em online gratis en mesas en vivo, con fichas de regalo y chat. Sin descargar, desde el celular o la PC.",
+  },
+  royalcats: {
+    title: "Royal Cats: tragamonedas de gatos gratis | RoyalJuegos",
+    description: "Royal Cats, la tragamonedas de gatos reales con joyas: 243 formas de ganar, giros gratis con WILD pegajosos y bonus de ovillos. Jugá gratis online.",
+  },
+  sweetfuturist: {
+    title: "Sweet Futurist: tragamonedas de dulces neón gratis | RoyalJuegos",
+    description: "Sweet Futurist, la tragamonedas de chocolates de neón: 243 formas de ganar, giros gratis con WILD pegajosos y bonus de regalos. Jugá gratis online.",
   },
 };
 

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import API_URL from "../../../api/rutaApi";
 import { RANK_META } from "../../../utils/rank";
 import { activityLabel, timeAgo } from "../../../utils/activityLabel";
+import StaffChat from "./staffChat";
 
 const fmt = (n) => new Intl.NumberFormat("es-ES").format(n || 0);
 const PAGE_SIZE = 50;
@@ -118,6 +119,8 @@ const Presence = () => {
           </div>
         )}
 
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem] items-start">
+        <div className="min-w-0">
         {error && <p className="text-error text-sm mb-4">{error}</p>}
 
         <div className="bg-surface-container border border-outline-variant/20 rounded-xl overflow-x-auto">
@@ -189,6 +192,10 @@ const Presence = () => {
             <button disabled={page + 1 >= pages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 rounded-lg bg-surface-container disabled:opacity-40">Siguiente</button>
           </div>
         )}
+        </div>
+
+        <StaffChat />
+        </div>
       </div>
     </div>
   );
