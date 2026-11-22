@@ -74,6 +74,7 @@ import MinesBots from './components/AdminPanel/MinesBots/minesBots';
 import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
 import ParchisBots from './components/AdminPanel/ParchisBots/parchisBots';
 import BuracoBots from './components/AdminPanel/BuracoBots/buracoBots';
+import ChinchonBots from './components/AdminPanel/ChinchonBots/chinchonBots';
 import UnityBots from './components/AdminPanel/UnityBots/unityBots';
 import Trophies from './components/AdminPanel/Trophies/trophies';
 import GameImages from './components/AdminPanel/GameImages/gameImages';
@@ -302,6 +303,7 @@ function App() {
             <Route path="/admin/domino-bots" element={<ProtectedRoute><DominoBots /></ProtectedRoute>} />
             <Route path="/admin/parchis-bots" element={<ProtectedRoute><ParchisBots /></ProtectedRoute>} />
             <Route path="/admin/buraco-bots" element={<ProtectedRoute><BuracoBots /></ProtectedRoute>} />
+            <Route path="/admin/chinchon-bots" element={<ProtectedRoute><ChinchonBots /></ProtectedRoute>} />
             <Route path="/admin/unity-bots" element={<ProtectedRoute><UnityBots /></ProtectedRoute>} />
             <Route path="/admin/trophies" element={<ProtectedRoute><Trophies /></ProtectedRoute>} />
             <Route path="/admin/game-images" element={<ProtectedRoute><GameImages /></ProtectedRoute>} />

@@ -7,6 +7,7 @@ const TABS = [
   { key: "domino", label: "Dominó", to: "/admin/domino-bots" },
   { key: "parchis", label: "Parchís", to: "/admin/parchis-bots" },
   { key: "buraco", label: "Buraco", to: "/admin/buraco-bots" },
+  { key: "chinchon", label: "Chinchón", to: "/admin/chinchon-bots" },
 ];
 
 /** Barra de tabs compartida por las 3 páginas de bots — cada una sigue siendo una página propia
