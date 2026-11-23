@@ -21,6 +21,7 @@ import veinticeisb from "../../assets/26billones.jpg";
 import { useAuth } from "../../context/oauthContext";
 import { PayPalLogo, MercadoPagoLogo } from "../ui/PaymentLogos";
 import EditableImage from "../ui/EditableImage";
+import { LOCALE } from "../../i18n/locale";
 
 // País desde el que se paga: lo decide el backend por la IP de conexión (GET /payments/region) y
 // cada jugador solo ve las opciones de su país; solo los admins pueden cambiarlo para probar. Mercado
@@ -127,6 +128,8 @@ export default function BuyChips() {
   const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
   const viewerIsAdmin = currentUser?.role === "admin";
+  // Xsolla está en prueba: solo la ven admins y mods (el backend también lo controla).
+  const xsollaAvailable = currentUser?.role === "admin" || currentUser?.role === "mod";
   // Rango en dólares + % de fichas extra en cada compra (sistema de rangos, ver /rangos).
   const rankStatus = useRankStatus(currentUser?.id);
   const nextRank = rankStatus?.nextRank ? RANK_META[rankStatus.nextRank] : null;
@@ -183,7 +186,7 @@ export default function BuyChips() {
     setPaymentMethod(asaasAvailable ? "asaas" : mercadoPago ? "mercadopago" : "paypal");
   }, [region, mercadoPago, asaasAvailable]);
 
-  const availableMethods = [mercadoPago && "mercadopago", asaasAvailable && "asaas", PAYPAL_CLIENT_ID && "paypal"].filter(Boolean);
+  const availableMethods = [mercadoPago && "mercadopago", asaasAvailable && "asaas", PAYPAL_CLIENT_ID && "paypal", xsollaAvailable && "xsolla"].filter(Boolean);
 
   useEffect(() => {
     const el = paypalBoxRef.current;
@@ -200,10 +203,12 @@ export default function BuyChips() {
   // USD convertidos a su moneda; PayPal los de USD o EUR (España) con el precio tal cual.
   const payingWithMercadoPago = paymentMethod === "mercadopago" && !!mercadoPago;
   const payingWithAsaas = paymentMethod === "asaas" && asaasAvailable;
-  const catalogCurrency = payingWithAsaas ? "BRL" : payingWithMercadoPago ? (mercadoPago.currency === "ARS" ? "ARS" : "USD") : paypalCurrency;
+  // Xsolla vende los paquetes en dólares (cobra en la moneda local del jugador a partir de ese precio).
+  const payingWithXsolla = paymentMethod === "xsolla" && xsollaAvailable;
+  const catalogCurrency = payingWithXsolla ? "USD" : payingWithAsaas ? "BRL" : payingWithMercadoPago ? (mercadoPago.currency === "ARS" ? "ARS" : "USD") : paypalCurrency;
   const displayRate = payingWithMercadoPago && catalogCurrency === "USD" ? mercadoPago.rate : 1;
-  const currency = payingWithAsaas ? "BRL" : payingWithMercadoPago ? mercadoPago.currency : paypalCurrency;
-  const symbol = payingWithAsaas ? "R$" : payingWithMercadoPago ? mercadoPago.symbol : PAYPAL_SYMBOLS[paypalCurrency];
+  const currency = payingWithXsolla ? "USD" : payingWithAsaas ? "BRL" : payingWithMercadoPago ? mercadoPago.currency : paypalCurrency;
+  const symbol = payingWithXsolla ? "US$" : payingWithAsaas ? "R$" : payingWithMercadoPago ? mercadoPago.symbol : PAYPAL_SYMBOLS[paypalCurrency];
   const getDisplayPrice = (chip) => (chip.price * displayRate).toFixed(2);
   // Con centavos siempre 2 decimales ("0,10"); montos enteros sin decimales ("1.000").
   const formatPrice = (chip) => {
@@ -444,6 +449,47 @@ export default function BuyChips() {
     }
   };
 
+  // Xsolla (en prueba, solo admins y mods): el backend crea el pago y devuelve la página de Xsolla.
+  const createXsollaOrder = async () => {
+    try {
+      Swal.fire({
+        title: "Generando tu pago...",
+        text: "Te llevamos a la página segura de Xsolla.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      const { data } = await axios.post(`${API_URL}/xsolla/create-order`, {
+        packageId: selectedChip.catalogId ?? selectedChip.id,
+        language: LOCALE,
+      });
+      if (!data?.url) throw new Error("Sin url de Xsolla");
+      window.location.href = data.url;
+    } catch (error) {
+      const message = error?.response?.data?.message;
+      Swal.fire({
+        icon: "error",
+        title: "Xsolla",
+        text: typeof message === "string" ? message : "No se pudo iniciar el pago con Xsolla.",
+        confirmButtonColor: "#C9A84C",
+      });
+    }
+  };
+
+  // Vuelta desde Xsolla (/chips?xsolla=1&status=...): las fichas llegan cuando Xsolla confirma el pago.
+  useEffect(() => {
+    if (!searchParams.get("xsolla")) return;
+    const status = searchParams.get("status");
+    const ok = !status || ["done", "success", "processing", "created"].includes(status);
+    Swal.fire({
+      icon: ok ? "success" : "info",
+      title: ok ? "Pago enviado" : "Pago no completado",
+      text: ok
+        ? "Las fichas se acreditan apenas Xsolla confirma el pago. Si no las ves en un minuto, recargá la página."
+        : "No se realizó el pago con Xsolla.",
+      confirmButtonColor: "#C9A84C",
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Helper formatting for platform name
   const formatPlatformName = (platform) => {
     if (!platform) return "Sistema";
@@ -452,6 +498,10 @@ export default function BuyChips() {
         return "PayPal Gateway";
       case "asaas":
         return "Asaas (BRL)";
+      case "xsolla":
+        return "Xsolla";
+      case "xsolla_sandbox":
+        return "Xsolla (prueba)";
       case "mepago":
         return "Mercado Pago (USD)";
       case "mepago_mx":
@@ -679,6 +729,27 @@ export default function BuyChips() {
                           </span>
                         </button>
                       )}
+                      {xsollaAvailable && (
+                        <button
+                          type="button"
+                          onClick={() => setPaymentMethod("xsolla")}
+                          aria-pressed={paymentMethod === "xsolla"}
+                          className={`glass-card relative px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
+                            paymentMethod === "xsolla"
+                              ? "border-[#a78bfa] bg-[#8b5cf6]/25 shadow-[0_0_14px_rgba(139,92,246,0.55)]"
+                              : "border-[#a78bfa]/25 opacity-75 hover:opacity-100 hover:border-[#a78bfa]/70"
+                          }`}
+                        >
+                          {paymentMethod === "xsolla" && <SelectedMark />}
+                          <span className="w-8 h-8 rounded-full bg-[#ff005b] flex items-center justify-center flex-shrink-0">
+                            <span className="material-symbols-outlined text-[18px] text-white">credit_card</span>
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-xs font-bold text-white">Xsolla</span>
+                            <span className="block text-[0.625rem] text-on-surface-variant">En prueba · solo admin/mod</span>
+                          </span>
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -875,6 +946,7 @@ export default function BuyChips() {
                       <p className="basis-full text-[0.6875rem] text-on-surface-variant leading-snug">
                         {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix ou cartão. As fichas são creditadas assim que o pagamento é confirmado."}
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
+                        {paymentMethod === "xsolla" && xsollaAvailable && "Xsolla (en prueba, solo admins y mods): te llevamos a su página para pagar con tarjeta u otros medios locales. Las fichas se acreditan apenas se confirma el pago."}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>
                     )}
@@ -987,6 +1059,18 @@ export default function BuyChips() {
                             Pagar com cartão (em reais)
                           </button>
                         </div>
+                      )}
+
+                      {/* XSOLLA ACTIVE RENDER (en prueba, solo admins y mods) */}
+                      {paymentMethod === "xsolla" && xsollaAvailable && (
+                        <button
+                          type="button"
+                          onClick={createXsollaOrder}
+                          className="w-full bg-[#ff005b] hover:bg-[#e00050] py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0"
+                        >
+                          <span className="material-symbols-outlined">credit_card</span>
+                          Pagar con Xsolla
+                        </button>
                       )}
 
                       {/* MERCADO PAGO ACTIVE RENDER */}
