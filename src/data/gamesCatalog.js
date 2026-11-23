@@ -1,4 +1,5 @@
 import { LOCALE } from "../i18n/locale";
+import { GAME_TEXTS } from "./gameTexts";
 import rjImage from "../assets/rj.png";
 import minasImage from "../assets/minas2.png";
 import pachinkaImage from "../assets/rpachinka2.png";
@@ -449,6 +450,12 @@ export const GAMES_CATALOG = [
       "El juego de estrategia por excelencia llega a RoyalGames: planeá tus jugadas y dale jaque mate a tu rival.",
   },
 ];
+
+// En los sitios en ingles/portugues cada juego muestra su descripcion traducida (la de arriba es la de espanol).
+for (const game of GAMES_CATALOG) {
+  const text = GAME_TEXTS[LOCALE]?.[game.slug];
+  if (text?.description) game.description = text.description;
+}
 
 export const getGameBySlug = (slug) => GAMES_CATALOG.find((game) => game.slug === slug);
 

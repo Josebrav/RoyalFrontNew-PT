@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { LOCALE } from "../i18n/locale";
-import { SITE_NAME, SITE_URL, seoForPath } from "../data/seo";
+import { SITE_NAME, SITE_URL, seoForPath, alternatesForPath } from "../data/seo";
 
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);
@@ -23,21 +22,26 @@ function setCanonical(href) {
   el.setAttribute("href", href);
 }
 
+/** Enlaces a la misma pagina en los otros idiomas (hreflang); se rehacen en cada pagina. */
+function setAlternates(links) {
+  document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach((el) => el.remove());
+  for (const { hreflang, href } of links) {
+    const el = document.createElement("link");
+    el.setAttribute("rel", "alternate");
+    el.setAttribute("hreflang", hreflang);
+    el.setAttribute("href", href);
+    document.head.appendChild(el);
+  }
+}
+
 /**
- * Pone titulo, descripcion, canonical y robots de cada pagina al navegar (Google ejecuta el JS de
- * la pagina y lee estos valores). Solo en el sitio en espanol: los datos de seo.js estan en espanol.
+ * Pone titulo, descripcion, canonical, robots y los enlaces a los otros idiomas de cada pagina al
+ * navegar (Google ejecuta el JS de la pagina y lee estos valores). Cada sitio (espanol, portugues,
+ * ingles) usa sus propios textos y su propio dominio (ver data/sites.js).
  */
 export default function useSeo() {
   const { pathname } = useLocation();
   useEffect(() => {
-    if (LOCALE !== "es") {
-      // Los sitios en ingles/portugues comparten el index.html en espanol: sin canonical ni
-      // vista previa apuntando a royaljuegos.com, para que Google no los tome como copias.
-      document.head.querySelector('link[rel="canonical"]')?.remove();
-      document.head.querySelector('meta[property="og:url"]')?.remove();
-      document.title = SITE_NAME;
-      return;
-    }
     const seo = seoForPath(pathname);
     // La pestana muestra solo la marca; el titulo largo queda para la vista previa al compartir.
     document.title = SITE_NAME;
@@ -49,5 +53,6 @@ export default function useSeo() {
     setMeta("name", "twitter:description", seo.description);
     setMeta("name", "robots", seo.index ? "index, follow" : "noindex, follow");
     setCanonical(SITE_URL + (pathname === "/" ? "/" : pathname));
+    setAlternates(seo.index ? alternatesForPath(pathname) : []);
   }, [pathname]);
 }

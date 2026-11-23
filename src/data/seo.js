@@ -1,17 +1,19 @@
 import { getGameBySlug } from "./gamesCatalog";
 import { LOCALE } from "../i18n/locale";
+import { GAME_TEXTS } from "./gameTexts";
+import { SITES, SITE_LOCALES, HREFLANG } from "./sites";
 
 // Titulo y descripcion de cada pagina para buscadores y para la vista previa al compartir el link.
-// Solo el sitio en espanol (royaljuegos.com); los sitios en ingles/portugues usan el titulo generico.
+// Cada sitio usa los suyos: royaljuegos.com (espanol), royalgames.lat (portugues) y el de ingles.
 
-export const SITE_URL = "https://www.royaljuegos.com";
+const SITE = SITES[LOCALE] || SITES.es;
+export const SITE_URL = SITE.url;
 // royaljuegos.com se llama RoyalJuegos; los sitios en portugues (royalgames.lat) e ingles, RoyalGames.
-export const SITE_NAME = LOCALE === "es" ? "RoyalJuegos" : "RoyalGames";
+export const SITE_NAME = SITE.name;
 
 export const DEFAULT_SEO = {
-  title: "RoyalJuegos | Bingo, tragamonedas, ruleta y dominó online gratis",
-  description:
-    "Juegos de casino gratis online: bingo, tragamonedas, ruleta, póker, blackjack, dominó y buraco con fichas de regalo. Sin descargar, con chat en vivo y torneos.",
+  title: SITE.title,
+  description: SITE.description,
 };
 
 const PAGE_SEO = {
@@ -140,14 +142,17 @@ export const GAME_SEO = {
 /** Titulo, descripcion y si se debe indexar la ruta. */
 export function seoForPath(pathname) {
   if (pathname === "/") return { ...DEFAULT_SEO, index: true };
-  if (PAGE_SEO[pathname]) return { description: DEFAULT_SEO.description, ...PAGE_SEO[pathname], index: true };
+  // Las paginas institucionales solo estan escritas en espanol: en los otros sitios no se indexan.
+  if (PAGE_SEO[pathname]) {
+    return { description: DEFAULT_SEO.description, ...PAGE_SEO[pathname], index: LOCALE === "es" };
+  }
   const m = pathname.match(/^\/juegos\/([^/]+)$/);
   if (m) {
     const game = getGameBySlug(m[1]);
     if (game) {
-      const custom = GAME_SEO[game.slug];
+      const custom = LOCALE === "es" ? GAME_SEO[game.slug] : GAME_TEXTS[LOCALE]?.[game.slug];
       return {
-        title: custom?.title || `${game.name} online gratis | RoyalJuegos`,
+        title: custom?.title || `${game.name} | ${SITE_NAME}`,
         description: custom?.description || game.description || DEFAULT_SEO.description,
         index: game.status === "active",
       };
@@ -155,4 +160,13 @@ export function seoForPath(pathname) {
   }
   // Paginas privadas (perfil, mensajes, juegos abiertos, admin...): titulo generico y sin indexar.
   return { ...DEFAULT_SEO, index: false };
+}
+
+/** La misma pagina en los otros idiomas (solo inicio y fichas de juegos, que existen en los 3 sitios). */
+export function alternatesForPath(pathname) {
+  const shared = pathname === "/" || /^\/juegos\/[^/]+$/.test(pathname);
+  if (!shared) return [];
+  const links = SITE_LOCALES.map((loc) => ({ hreflang: HREFLANG[loc], href: SITES[loc].url + pathname }));
+  links.push({ hreflang: "x-default", href: SITES.es.url + pathname });
+  return links;
 }

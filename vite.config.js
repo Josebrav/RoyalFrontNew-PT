@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import seoBuild from './seo-build.js'
 
 // Únicas variables de entorno que llegan al navegador. Vercel agrega solo muchas VITE_VERCEL_*
 // (usuario de GitHub, mensaje del commit, URL de preview...) y Vite metía TODAS las VITE_* en la
@@ -14,12 +15,8 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      // El index.html esta escrito para royaljuegos.com: en los sitios en portugues/ingles el nombre es RoyalGames
-      // (titulo de la pestaña, vista previa al compartir y datos para buscadores).
-      {
-        name: "site-name",
-        transformIndexHtml: (html) => ((env.VITE_SITE_LOCALE || "es") === "es" ? html : html.replace(/RoyalJuegos/g, "RoyalGames")),
-      },
+      // index.html, robots.txt y sitemap.xml propios de cada sitio (espanol, portugues, ingles).
+      seoBuild(env.VITE_SITE_LOCALE || "es"),
     ],
     // Prefijo que no usa nadie: así Vite no expone automáticamente ninguna variable.
     envPrefix: 'RG_PUBLIC_ONLY_VIA_DEFINE_',

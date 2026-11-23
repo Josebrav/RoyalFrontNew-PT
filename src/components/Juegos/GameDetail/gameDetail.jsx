@@ -9,6 +9,8 @@ import { swalThemeConfig } from "../../../utils/formatters";
 import { gameFaqFor } from "../../../data/gameFaq";
 import API_URL from "../../../api/rutaApi";
 import EditableImage from "../../ui/EditableImage";
+import { t } from "../../../i18n/strings";
+import { LOCALE } from "../../../i18n/locale";
 
 export default function GameDetail() {
   const { slug } = useParams();
@@ -34,19 +36,20 @@ export default function GameDetail() {
   if (!game) {
     return (
       <div className="w-full max-w-4xl mx-auto p-8 text-center my-16 pt-20 md:pt-24">
-        <h2 className="text-2xl font-bold text-error mb-4">Juego no encontrado.</h2>
+        <h2 className="text-2xl font-bold text-error mb-4">{t("gameDetail.notFound")}</h2>
         <button
           onClick={() => navigate("/juegos")}
           className="px-6 py-2.5 rounded-lg gold-gradient text-[#0A0A0F] font-bold uppercase tracking-wider hover:brightness-110 active:scale-95 transition-all"
         >
-          Ver Todos los Juegos
+          {t("gameDetail.verTodos")}
         </button>
       </div>
     );
   }
 
   const isActive = game.status === "active";
-  const extra = gameFaqFor(game);
+  // Los parrafos y preguntas extra estan escritos solo en espanol.
+  const extra = LOCALE === "es" ? gameFaqFor(game) : null;
   const categoryMeta = CATEGORY_META[game.category];
   // Color de la categoría para el panel de ranking (no todo dorado; el dorado queda para "Jugar").
   const accent = categoryMeta?.accent || "#a855f7";
@@ -64,7 +67,7 @@ export default function GameDetail() {
     }
     Swal.fire({
       title: game.name,
-      text: "¡Este juego estará disponible muy pronto! Nuestro equipo real está trabajando para traértelo.",
+      text: t("gameDetail.pronto"),
       icon: "info",
       ...swalThemeConfig,
     });
@@ -77,7 +80,7 @@ export default function GameDetail() {
         className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors bg-transparent border-0 cursor-pointer mb-6 text-sm"
       >
         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
-        Ver Todos los Juegos
+        {t("gameDetail.verTodos")}
       </button>
 
       {/* Banner */}
@@ -93,13 +96,13 @@ export default function GameDetail() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 p-6 md:p-8">
           <span className={`text-[0.6875rem] font-black uppercase tracking-widest ${categoryMeta.className}`}>
-            {categoryMeta.label}
+            {t(`catalog.category.${game.category}`)}
           </span>
           <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tighter">{game.name}</h1>
         </div>
         {!isActive && (
           <span className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-on-surface-variant text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10">
-            Próximamente
+            {t("catalog.proximamente")}
           </span>
         )}
       </div>
@@ -107,7 +110,7 @@ export default function GameDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
           <div>
-            <h2 className="font-headline-sm text-headline-sm text-white mb-4">Sobre este juego</h2>
+            <h2 className="font-headline-sm text-headline-sm text-white mb-4">{t("gameDetail.sobre")}</h2>
             <p className="text-on-surface-variant leading-relaxed">{game.description}</p>
             {extra?.about?.map((p) => (
               <p key={p} className="text-on-surface-variant leading-relaxed mt-3">{p}</p>
@@ -151,16 +154,16 @@ export default function GameDetail() {
                 style={{ background: `linear-gradient(90deg, ${accent}, ${accentTo})` }}
               >
                 <h3 className="text-white font-bold text-headline-sm font-headline-sm">
-                  Top Ganadores de {game.name}
+                  {t("gameDetail.topGanadores")} {game.name}
                 </h3>
-                <span className="bg-black/25 text-white px-2 py-1 rounded text-label-md font-label-md font-bold">EN VIVO</span>
+                <span className="bg-black/25 text-white px-2 py-1 rounded text-label-md font-label-md font-bold">{t("gameDetail.enVivo")}</span>
               </div>
               <div className="p-6 space-y-3">
                 {isRoyalSlots && (
                   <div className="flex gap-2 mb-1">
                     {[
-                      ["weekly", "Semanal"],
-                      ["monthly", "Mensual"],
+                      ["weekly", t("gameDetail.semanal")],
+                      ["monthly", t("gameDetail.mensual")],
                     ].map(([key, label]) => (
                       <button
                         key={key}
@@ -182,8 +185,8 @@ export default function GameDetail() {
                 {topPlayers.length === 0 ? (
                   <p className="text-on-surface-variant text-sm text-center py-4">
                     {isRoyalSlots
-                      ? `Todavía no hay ganadores ${rankingPeriod === "weekly" ? "esta semana" : "este mes"}. ¡Sé el primero!`
-                      : "Todavía no hay ganadores registrados en este juego. ¡Sé el primero!"}
+                      ? t(rankingPeriod === "weekly" ? "gameDetail.sinGanadoresSemana" : "gameDetail.sinGanadoresMes")
+                      : t("gameDetail.sinGanadores")}
                   </p>
                 ) : (
                   topPlayers.map((player, index) => (
@@ -217,7 +220,7 @@ export default function GameDetail() {
                   style={{ color: accent }}
                 >
                   <span className="material-symbols-outlined text-[16px]">emoji_events</span>
-                  ¿Cómo funcionan los puntos y torneos?
+                  {t("gameDetail.comoPuntos")}
                 </button>
               </div>
             </div>
@@ -228,7 +231,7 @@ export default function GameDetail() {
           <div className="glass-card p-6 rounded-xl space-y-4">
             {isActive && (
               <div className="flex items-center justify-between text-sm">
-                <span className="text-on-surface-variant uppercase tracking-wider text-[0.6875rem]">Jugando ahora</span>
+                <span className="text-on-surface-variant uppercase tracking-wider text-[0.6875rem]">{t("gameDetail.jugandoAhora")}</span>
                 <span className="flex items-center gap-1 text-white font-bold">
                   <span className="material-symbols-outlined text-[16px] text-primary">person</span>
                   {new Intl.NumberFormat("es-ES").format(getDisplayedPlayers(game))}
@@ -246,11 +249,11 @@ export default function GameDetail() {
               <span className="material-symbols-outlined text-[20px]">
                 {isActive ? "play_circle" : "hourglass_top"}
               </span>
-              {isActive ? "Jugar" : "Próximamente"}
+              {isActive ? t("gameDetail.jugar") : t("catalog.proximamente")}
             </button>
             {isActive && (
               <p className="text-on-surface-variant text-[0.6875rem] text-center">
-                Se abrirá en una pestaña nueva.
+                {t("gameDetail.pestanaNueva")}
               </p>
             )}
           </div>
