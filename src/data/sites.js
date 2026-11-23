@@ -28,7 +28,7 @@ export const SITES = {
       "jogos online grátis, bingo online, bingo grátis, caça-níqueis grátis, slots online, roleta online, dominó online, pôquer online grátis, blackjack online, buraco online, royal games",
   },
   en: {
-    url: "https://royal-front-new-en.vercel.app",
+    url: "https://www.royal-games.fun",
     name: "RoyalGames",
     lang: "en",
     ogLocale: "en_US",
