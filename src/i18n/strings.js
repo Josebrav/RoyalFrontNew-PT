@@ -247,6 +247,8 @@ const STRINGS = {
     "dailyBonus.error": "No se pudo reclamar el bono diario",
     "dailyBonus.subtitle": "¡Iniciá sesión todos los días y recibí premios increíbles!",
     "dailyBonus.chips": "fichas",
+    "dailyBonus.today": "HOY",
+    "dailyBonus.bigPrize": "GRAN PREMIO",
   },
 
   en: {
@@ -491,6 +493,8 @@ const STRINGS = {
     "dailyBonus.error": "The daily bonus could not be claimed",
     "dailyBonus.subtitle": "Log in every day and get amazing rewards!",
     "dailyBonus.chips": "chips",
+    "dailyBonus.today": "TODAY",
+    "dailyBonus.bigPrize": "BIG PRIZE",
   },
 
   pt: {
@@ -735,6 +739,8 @@ const STRINGS = {
     "dailyBonus.error": "Não foi possível resgatar o bônus diário",
     "dailyBonus.subtitle": "Entre todos os dias e ganhe prêmios incríveis!",
     "dailyBonus.chips": "fichas",
+    "dailyBonus.today": "HOJE",
+    "dailyBonus.bigPrize": "GRANDE PRÊMIO",
   },
 };
 
