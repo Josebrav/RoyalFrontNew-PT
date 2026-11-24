@@ -144,7 +144,9 @@ export function seoForPath(pathname) {
   if (pathname === "/") return { ...DEFAULT_SEO, index: true };
   // Las paginas institucionales solo estan escritas en espanol: en los otros sitios no se indexan.
   if (PAGE_SEO[pathname]) {
-    return { description: DEFAULT_SEO.description, ...PAGE_SEO[pathname], index: LOCALE === "es" };
+    // Sus titulos estan en espanol: en los otros sitios usan el titulo general y no se indexan.
+    if (LOCALE !== "es") return { ...DEFAULT_SEO, index: false };
+    return { description: DEFAULT_SEO.description, ...PAGE_SEO[pathname], index: true };
   }
   const m = pathname.match(/^\/juegos\/([^/]+)$/);
   if (m) {
@@ -160,6 +162,18 @@ export function seoForPath(pathname) {
   }
   // Paginas privadas (perfil, mensajes, juegos abiertos, admin...): titulo generico y sin indexar.
   return { ...DEFAULT_SEO, index: false };
+}
+
+/**
+ * Titulo de la pagina (pestaña y renglon azul de Google): la marca primero, como pidio el dueño para la
+ * pestaña, y despues de que trata la pagina. "Bingo online gratis | RoyalJuegos" -> "RoyalJuegos | Bingo online gratis".
+ */
+export function pageTitle(title) {
+  if (!title) return SITE_NAME;
+  if (title.startsWith(SITE_NAME)) return title;
+  const suffix = " | " + SITE_NAME;
+  const topic = title.endsWith(suffix) ? title.slice(0, -suffix.length) : title;
+  return `${SITE_NAME} | ${topic}`;
 }
 
 /** La misma pagina en los otros idiomas (solo inicio y fichas de juegos, que existen en los 3 sitios). */

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { Container } from '@chakra-ui/react';
 import { useLocation, useNavigate, Route, Routes, Navigate } from 'react-router-dom';
@@ -8,94 +8,97 @@ import Sidebar from './components/Sidebar/sidebar';
 import Footer from './components/footer/footer';
 import Home from './components/Home/home';
 import { AuthProvider } from './context/oauthContext';
-import Perfil from './components/Perfil/perfil';
-import BuyChips from './components/Buychips/buyChips';
-import LogOut from './components/Logout/logout';
-import GameGrid from './components/Juegos/juegos';
-import News from './components/News/news';
-import RankSystem from './components/RankSystem/rankSystem';
-import Missions from './components/Missions/missions';
 import MissionsTour from './components/Missions/missionsTour';
 import RankUpNotice from './components/RankUpNotice/rankUpNotice';
 import OfferBanner from './components/OfferBanner/offerBanner';
 import FeaturedNews from './components/FeaturedNews/featuredNews';
-import AdminOffers from './components/AdminPanel/Offers/offers';
 import regaloBienvenida from '../src/assets/regalobienvenida.png';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSiteContent, getUserByEmail } from './redux/actions';
 import { HUB_ORIGINS } from './data/slotHub';
-import TermsAndConditions from './components/termsyConds/terminosYCondiciones';
 import axios from 'axios';
-import Diamantes from './components/Juegos/Diamantes/diamantes';
-import RoyalJoker from './components/Juegos/RoyalJoker/royaljoker';
-import RoyalPachinka from './components/Juegos/royalpachinka/royalpachinka';
-import Bingo from './components/Juegos/Bingo/bingo';
-import SantaWilds from './components/Juegos/SantaWilds/santawilds';
-import RoyalSlots from './components/Juegos/RoyalSlots/royalslots';
-import SugarCalavera from './components/Juegos/SugarCalavera/sugarcalavera';
-import FuriaOlimpo from './components/Juegos/FuriaOlimpo/furiaolimpo';
-import Bicho from './components/Juegos/Bicho/bicho';
-import GildedCobra from './components/Juegos/GildedCobra/gildedcobra';
-import JokerWilds from './components/Juegos/JokerWilds/jokerwilds';
-import SweetTreats from './components/Juegos/SweetTreats/sweettreats';
-import Gomitas from './components/Juegos/Gomitas/gomitas';
-import OceanRiches from './components/Juegos/OceanRiches/oceanriches';
-import GamerZone from './components/Juegos/GamerZone/gamerzone';
-import RoyalCats from './components/Juegos/RoyalCats/royalcats';
-import SweetFuturist from './components/Juegos/SweetFuturist/sweetfuturist';
-import Domino from './components/Juegos/Domino/domino';
-import Parchis from './components/Juegos/Parchis/parchis';
-import Buraco from './components/Juegos/Buraco/buraco';
-import Chinchon from './components/Juegos/Chinchon/chinchon';
-import GemaOfGold from './components/Juegos/GemaOfGold/gemaofgold';
-import RoyalRuleta from './components/Juegos/RoyalRuleta/royalruleta';
-import Blackjack from './components/Juegos/Blackjack/blackjack';
-import Poker from './components/Juegos/Poker/poker';
 import API_URL from './api/rutaApi';
 import Swal from 'sweetalert2';
 import { tokenStore } from './api/tokenStore';
 import { capturePromoFromUrl, getPendingPromo, clearPendingPromo } from './utils/promoLink';
-import AboutUs from './components/AboutUs/aboutUs';
-import UserManagement from './components/AdminPanel/UserManagement/userManagement';
-import AdminDashboard from './components/AdminPanel/AdminDashboard/adminDashboard';
-import AdminPresence from './components/AdminPanel/Presence/presence';
 import useSeo from './utils/useSeo';
-import SupportTicketsAdmin from './components/AdminPanel/SupportTickets/supportTickets';
-import AdminDeposits from './components/AdminPanel/Deposits/deposits';
-import AdminPrizes from './components/AdminPanel/Prizes/prizes';
-import AdminReferrals from './components/AdminPanel/Referrals/referrals';
-import AdminGameStats from './components/AdminPanel/GameStats/gameStats';
-import AdminPromos from './components/AdminPanel/Promos/promos';
-import AdminStaffChips from './components/AdminPanel/StaffChips/staffChips';
-import RtpAdmin from './components/AdminPanel/Rtp/rtpAdmin';
-import AdminReports from './components/AdminPanel/Reports/reports';
-import BingoBots from './components/AdminPanel/BingoBots/bingoBots';
-import MinesBots from './components/AdminPanel/MinesBots/minesBots';
-import DominoBots from './components/AdminPanel/DominoBots/dominoBots';
-import ParchisBots from './components/AdminPanel/ParchisBots/parchisBots';
-import BuracoBots from './components/AdminPanel/BuracoBots/buracoBots';
-import ChinchonBots from './components/AdminPanel/ChinchonBots/chinchonBots';
-import UnityBots from './components/AdminPanel/UnityBots/unityBots';
-import Trophies from './components/AdminPanel/Trophies/trophies';
-import GameImages from './components/AdminPanel/GameImages/gameImages';
-import ResetPassword from './components/ResetPassword/resetPassword';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import RequireAuth from './components/ProtectedRoute/RequireAuth';
-import PaymentSuccess from './components/PaymentStatus/PaymentSuccess';
-import PaymentFailure from './components/PaymentStatus/PaymentFailure';
-import PaymentPending from './components/PaymentStatus/PaymentPending';
-import RoyalStore from './components/RoyalStore/royalStore';
-import Friends from './components/Friends/friends';
-import Messages from './components/Messages/messages';
 import GameDetail from './components/Juegos/GameDetail/gameDetail';
-import Support from './components/Support/support';
-import Contact from './components/Contact/contact';
-import Faq from './components/Faq/faq';
-import Privacidad from './components/Legal/privacidad';
-import EliminarCuenta from './components/Legal/eliminarCuenta';
-import Cumplimiento from './components/Legal/cumplimiento';
-import Careers from './components/Careers/careers';
 import GlobalChat from './components/GlobalChat/globalChat';
+
+// Paginas que se descargan recien cuando alguien las abre (admin, juegos, compra, perfil...): la
+// primera pantalla carga mucho menos JavaScript. Inicio y la ficha de cada juego quedan en el paquete principal.
+const Perfil = lazy(() => import('./components/Perfil/perfil'));
+const BuyChips = lazy(() => import('./components/Buychips/buyChips'));
+const LogOut = lazy(() => import('./components/Logout/logout'));
+const GameGrid = lazy(() => import('./components/Juegos/juegos'));
+const News = lazy(() => import('./components/News/news'));
+const RankSystem = lazy(() => import('./components/RankSystem/rankSystem'));
+const Missions = lazy(() => import('./components/Missions/missions'));
+const AdminOffers = lazy(() => import('./components/AdminPanel/Offers/offers'));
+const TermsAndConditions = lazy(() => import('./components/termsyConds/terminosYCondiciones'));
+const Diamantes = lazy(() => import('./components/Juegos/Diamantes/diamantes'));
+const RoyalJoker = lazy(() => import('./components/Juegos/RoyalJoker/royaljoker'));
+const RoyalPachinka = lazy(() => import('./components/Juegos/royalpachinka/royalpachinka'));
+const Bingo = lazy(() => import('./components/Juegos/Bingo/bingo'));
+const SantaWilds = lazy(() => import('./components/Juegos/SantaWilds/santawilds'));
+const RoyalSlots = lazy(() => import('./components/Juegos/RoyalSlots/royalslots'));
+const SugarCalavera = lazy(() => import('./components/Juegos/SugarCalavera/sugarcalavera'));
+const FuriaOlimpo = lazy(() => import('./components/Juegos/FuriaOlimpo/furiaolimpo'));
+const Bicho = lazy(() => import('./components/Juegos/Bicho/bicho'));
+const GildedCobra = lazy(() => import('./components/Juegos/GildedCobra/gildedcobra'));
+const JokerWilds = lazy(() => import('./components/Juegos/JokerWilds/jokerwilds'));
+const SweetTreats = lazy(() => import('./components/Juegos/SweetTreats/sweettreats'));
+const Gomitas = lazy(() => import('./components/Juegos/Gomitas/gomitas'));
+const OceanRiches = lazy(() => import('./components/Juegos/OceanRiches/oceanriches'));
+const GamerZone = lazy(() => import('./components/Juegos/GamerZone/gamerzone'));
+const RoyalCats = lazy(() => import('./components/Juegos/RoyalCats/royalcats'));
+const SweetFuturist = lazy(() => import('./components/Juegos/SweetFuturist/sweetfuturist'));
+const Domino = lazy(() => import('./components/Juegos/Domino/domino'));
+const Parchis = lazy(() => import('./components/Juegos/Parchis/parchis'));
+const Buraco = lazy(() => import('./components/Juegos/Buraco/buraco'));
+const Chinchon = lazy(() => import('./components/Juegos/Chinchon/chinchon'));
+const GemaOfGold = lazy(() => import('./components/Juegos/GemaOfGold/gemaofgold'));
+const RoyalRuleta = lazy(() => import('./components/Juegos/RoyalRuleta/royalruleta'));
+const Blackjack = lazy(() => import('./components/Juegos/Blackjack/blackjack'));
+const Poker = lazy(() => import('./components/Juegos/Poker/poker'));
+const AboutUs = lazy(() => import('./components/AboutUs/aboutUs'));
+const UserManagement = lazy(() => import('./components/AdminPanel/UserManagement/userManagement'));
+const AdminDashboard = lazy(() => import('./components/AdminPanel/AdminDashboard/adminDashboard'));
+const AdminPresence = lazy(() => import('./components/AdminPanel/Presence/presence'));
+const SupportTicketsAdmin = lazy(() => import('./components/AdminPanel/SupportTickets/supportTickets'));
+const AdminDeposits = lazy(() => import('./components/AdminPanel/Deposits/deposits'));
+const AdminPrizes = lazy(() => import('./components/AdminPanel/Prizes/prizes'));
+const AdminReferrals = lazy(() => import('./components/AdminPanel/Referrals/referrals'));
+const AdminGameStats = lazy(() => import('./components/AdminPanel/GameStats/gameStats'));
+const AdminPromos = lazy(() => import('./components/AdminPanel/Promos/promos'));
+const AdminStaffChips = lazy(() => import('./components/AdminPanel/StaffChips/staffChips'));
+const RtpAdmin = lazy(() => import('./components/AdminPanel/Rtp/rtpAdmin'));
+const AdminReports = lazy(() => import('./components/AdminPanel/Reports/reports'));
+const BingoBots = lazy(() => import('./components/AdminPanel/BingoBots/bingoBots'));
+const MinesBots = lazy(() => import('./components/AdminPanel/MinesBots/minesBots'));
+const DominoBots = lazy(() => import('./components/AdminPanel/DominoBots/dominoBots'));
+const ParchisBots = lazy(() => import('./components/AdminPanel/ParchisBots/parchisBots'));
+const BuracoBots = lazy(() => import('./components/AdminPanel/BuracoBots/buracoBots'));
+const ChinchonBots = lazy(() => import('./components/AdminPanel/ChinchonBots/chinchonBots'));
+const UnityBots = lazy(() => import('./components/AdminPanel/UnityBots/unityBots'));
+const Trophies = lazy(() => import('./components/AdminPanel/Trophies/trophies'));
+const GameImages = lazy(() => import('./components/AdminPanel/GameImages/gameImages'));
+const ResetPassword = lazy(() => import('./components/ResetPassword/resetPassword'));
+const PaymentSuccess = lazy(() => import('./components/PaymentStatus/PaymentSuccess'));
+const PaymentFailure = lazy(() => import('./components/PaymentStatus/PaymentFailure'));
+const PaymentPending = lazy(() => import('./components/PaymentStatus/PaymentPending'));
+const RoyalStore = lazy(() => import('./components/RoyalStore/royalStore'));
+const Friends = lazy(() => import('./components/Friends/friends'));
+const Messages = lazy(() => import('./components/Messages/messages'));
+const Support = lazy(() => import('./components/Support/support'));
+const Contact = lazy(() => import('./components/Contact/contact'));
+const Faq = lazy(() => import('./components/Faq/faq'));
+const Privacidad = lazy(() => import('./components/Legal/privacidad'));
+const EliminarCuenta = lazy(() => import('./components/Legal/eliminarCuenta'));
+const Cumplimiento = lazy(() => import('./components/Legal/cumplimiento'));
+const Careers = lazy(() => import('./components/Careers/careers'));
 
 function App() {
   const [showWelcomeGift, setShowWelcomeGift] = useState(false);
@@ -277,6 +280,7 @@ function App() {
               currentUser?.id && !location.pathname.includes('/game') ? 'md:pl-16 lg:pl-56' : ''
             }`}
           >
+          <Suspense fallback={<div style={{ minHeight: '60vh' }} />}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/perfil" element={<Perfil />} />
@@ -357,6 +361,7 @@ function App() {
             <Route path="/mercadopago/failure" element={<PaymentFailure />} />
             <Route path="/mercadopago/pending" element={<PaymentPending />} />
           </Routes>
+          </Suspense>
           {!location.pathname.includes('/game') && <Footer />}
           </div>
         </div>

@@ -10,7 +10,6 @@ import { gameFaqFor } from "../../../data/gameFaq";
 import API_URL from "../../../api/rutaApi";
 import EditableImage from "../../ui/EditableImage";
 import { t } from "../../../i18n/strings";
-import { LOCALE } from "../../../i18n/locale";
 
 export default function GameDetail() {
   const { slug } = useParams();
@@ -48,8 +47,7 @@ export default function GameDetail() {
   }
 
   const isActive = game.status === "active";
-  // Los parrafos y preguntas extra estan escritos solo en espanol.
-  const extra = LOCALE === "es" ? gameFaqFor(game) : null;
+  const extra = gameFaqFor(game);
   const categoryMeta = CATEGORY_META[game.category];
   // Color de la categoría para el panel de ranking (no todo dorado; el dorado queda para "Jugar").
   const accent = categoryMeta?.accent || "#a855f7";
@@ -119,7 +117,7 @@ export default function GameDetail() {
 
           {extra?.faq?.length > 0 && (
             <div>
-              <h2 className="font-headline-sm text-headline-sm text-white mb-3">Preguntas frecuentes sobre {game.name}</h2>
+              <h2 className="font-headline-sm text-headline-sm text-white mb-3">{t("gameDetail.faq")} {game.name}</h2>
               <div className="divide-y divide-white/10 border-y border-white/10">
                 {extra.faq.map((f) => (
                   <details key={f.q} className="group py-3">

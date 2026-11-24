@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2";
@@ -11,7 +11,8 @@ import logo from "../../assets/LogoOficial.PNG";
 
 import Login from "../Login/login";
 import RegistroForm from "../Register/register";
-import { ShaderAnimation } from "../ui/shader-animation";
+// La animacion de fondo usa three.js (pesado): se descarga despues de mostrar la pagina.
+const ShaderAnimation = lazy(() => import("../ui/shader-animation").then((m) => ({ default: m.ShaderAnimation })));
 import { formatChips, swalThemeConfig } from "../../utils/formatters";
 import GamesCatalog from "../GamesCatalog/gamesCatalog";
 import DailySpinModal from "../DailySpin/DailySpinModal";
@@ -577,7 +578,9 @@ export default function Home() {
     <div className="bg-background text-on-background font-body-md overflow-x-hidden min-h-screen">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden hero-section">
-        <ShaderAnimation />
+        <Suspense fallback={null}>
+          <ShaderAnimation />
+        </Suspense>
         {/* El shader de fondo (ver shader-animation.jsx) sale mucho más intenso/saturado en vivo
             de lo que sugiere su fórmula leída en frío — un overlay oscuro fuerte en TODA el área
             (no solo arriba/abajo como antes) es lo que lo deja como una textura de fondo sutil en

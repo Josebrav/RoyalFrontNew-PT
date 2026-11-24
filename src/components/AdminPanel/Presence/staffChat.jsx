@@ -4,12 +4,19 @@ import API_URL from "../../../api/rutaApi";
 import { tokenStore } from "../../../api/tokenStore";
 
 const WS_URL = `${API_URL.replace(/^http/, "ws")}/staff-chat/ws`;
-const hhmm = (iso) => new Date(iso).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+const HISTORY_LIMIT = 40;
+// Hora del mensaje; si no es de hoy, también el día (el historial ahora sobrevive de un día a otro).
+const hhmm = (iso) => {
+  const d = new Date(iso);
+  const time = d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+  if (d.toDateString() === new Date().toDateString()) return time;
+  return `${d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })} ${time}`;
+};
 
 /**
  * Chat en vivo entre los admins/mods que tienen abierta la página "Usuarios en línea"
- * (backend: StaffChatGateway en /staff-chat/ws). El historial es en memoria del servidor:
- * los últimos 100 mensajes, se borran si se reinicia el backend.
+ * (backend: StaffChatGateway en /staff-chat/ws). El servidor guarda en la base los últimos
+ * 40 mensajes (sobreviven a los reinicios); al pasar de 40 se borran los más viejos.
  */
 const StaffChat = () => {
   const [status, setStatus] = useState("connecting"); // connecting | open | closed | forbidden
@@ -57,7 +64,7 @@ const StaffChat = () => {
           setStatus("open");
           stickToBottom.current = true;
         } else if (msg.type === "message") {
-          setMessages((list) => [...list.slice(-199), p]);
+          setMessages((list) => [...list.filter((m) => m.id !== p.id), p].slice(-HISTORY_LIMIT));
         } else if (msg.type === "members") {
           setMembers(p.list || []);
         } else if (msg.type === "error") {

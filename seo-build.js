@@ -5,6 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { SITES, SITE_LOCALES, HREFLANG, SHARED_PATHS, ES_ONLY_PATHS } from "./src/data/sites.js";
+import { prerender } from "./prerender.js";
 
 const ES_URL = SITES.es.url;
 
@@ -100,15 +101,23 @@ function sitemapXml(locale, root) {
 export default function seoBuild(localeEnv) {
   const locale = SITES[localeEnv] ? localeEnv : "es";
   let root = process.cwd();
+  let outDir = null;
   return {
     name: "seo-build",
     configResolved(config) {
       root = config.root;
+      outDir = path.resolve(config.root, config.build.outDir);
     },
     transformIndexHtml: (html) => transformHtml(html, locale),
     generateBundle() {
       this.emitFile({ type: "asset", fileName: "robots.txt", source: robotsTxt(locale) });
       this.emitFile({ type: "asset", fileName: "sitemap.xml", source: sitemapXml(locale, root) });
+    },
+    // Portada y fichas de juegos pre-armadas para buscadores (ver prerender.js).
+    async closeBundle() {
+      if (!outDir || !fs.existsSync(path.join(outDir, "index.html"))) return;
+      const n = await prerender({ root, outDir, locale });
+      console.log(`seo-build: ${n} paginas pre-armadas (${locale})`);
     },
     // En desarrollo tambien se pueden ver en /robots.txt y /sitemap.xml.
     configureServer(server) {

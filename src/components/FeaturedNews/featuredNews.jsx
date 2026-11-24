@@ -102,7 +102,7 @@ export default function FeaturedNews() {
         />
         <button
           onClick={close}
-          aria-label="Cerrar"
+          aria-label={LOCALE === "pt" ? "Fechar" : LOCALE === "en" ? "Close" : "Cerrar"}
           className="absolute top-2 right-2 w-10 h-10 rounded-full bg-black/70 border border-white/40 text-white flex items-center justify-center cursor-pointer"
         >
           <span className="material-symbols-outlined">close</span>
@@ -112,7 +112,7 @@ export default function FeaturedNews() {
             onClick={open}
             className="gold-gradient gold-glow px-8 py-2.5 rounded-lg font-bold uppercase tracking-wider text-[#0A0A0F] cursor-pointer"
           >
-            Ver más
+            {LOCALE === "pt" ? "Ver mais" : LOCALE === "en" ? "See more" : "Ver más"}
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { SITE_NAME, SITE_URL, seoForPath, alternatesForPath } from "../data/seo";
+import { SITE_URL, seoForPath, alternatesForPath, pageTitle } from "../data/seo";
 
 function setMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);
@@ -43,8 +43,8 @@ export default function useSeo() {
   const { pathname } = useLocation();
   useEffect(() => {
     const seo = seoForPath(pathname);
-    // La pestana muestra solo la marca; el titulo largo queda para la vista previa al compartir.
-    document.title = SITE_NAME;
+    // Marca primero y despues de que trata la pagina (Google usa este titulo en los resultados).
+    document.title = pageTitle(seo.title);
     setMeta("name", "description", seo.description);
     setMeta("property", "og:title", seo.title);
     setMeta("property", "og:description", seo.description);
