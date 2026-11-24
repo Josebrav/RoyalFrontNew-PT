@@ -469,6 +469,14 @@ export const createTrophy = (formData) => async () => {
     return data;
 };
 
+/** Edita un trofeo (Admin/Mod): imagen opcional, nombre, descripción y, en los VIP, applyToTier. */
+export const updateTrophy = (id, formData) => async () => {
+    const { data } = await axios.patch(`${API_URL}/trophies/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+};
+
 export const deleteTrophy = (id) => async () => {
     const { data } = await axios.delete(`${API_URL}/trophies/${id}`);
     return data;

@@ -25,12 +25,17 @@ import {
   blockUser,
   unblockUser,
   fetchUserTrophies,
+  updateTrophy,
+  deleteTrophy,
 } from "./../../redux/actions/index";
 import RankBadge from "../ui/RankBadge/rankBadge";
 import { getRankMeta, RANK_META, RANK_BONUS_PERCENT, formatUsd } from "../../utils/rank";
 import useRankStatus from "../../utils/useRankStatus";
 import { swalThemeConfig } from "../../utils/formatters";
 import { getGameByPlayPath } from "../../data/gamesCatalog";
+
+// Copa dorada para los trofeos cuya imagen no carga
+const TROPHY_FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><defs><linearGradient id=\"g\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#ffe08f\"/><stop offset=\"1\" stop-color=\"#d97706\"/></linearGradient></defs><path fill=\"url(#g)\" d=\"M18 8h28v6h8v6c0 7-5 12-11 13-2 5-6 8-9 9v6h8v6H22v-6h8v-6c-3-1-7-4-9-9-6-1-11-6-11-13v-6h8zm-4 12c0 3 2 6 5 7-1-2-1-5-1-7zm36 0h-4c0 2 0 5-1 7 3-1 5-4 5-7z\"/></svg>");
 
 const countryOptions = [
   { value: "argentina", label: "Argentina (ARS)" },
@@ -140,6 +145,102 @@ const Perfil = ({ isPublic = false }) => {
       cancelled = true;
     };
   }, [dispatch, user?.id]);
+
+  // Admin y mods pueden editar (imagen, nombre, descripción) y borrar los trofeos desde el perfil.
+  const canManageTrophies = currentUser?.role === "admin" || currentUser?.role === "mod";
+  const reloadTrophies = () =>
+    dispatch(fetchUserTrophies(user.id))
+      .then((data) => setTrophies(data || []))
+      .catch(() => {});
+
+  const editTrophy = async (trophy) => {
+    const esc = (v) => String(v ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const isVip = trophy.vipLevel != null;
+    const field = "width:100%;margin:6px 0 12px;padding:8px 10px;border-radius:8px;border:1px solid #6b5a2e;background:#0d0f1f;color:#e9e1d7;font-size:14px";
+    const label = "display:block;text-align:left;font-size:12px;color:#c9a84c;font-weight:700";
+    const { value } = await Swal.fire({
+      ...swalThemeConfig,
+      title: "Editar trofeo",
+      html: `
+        <img id="tr-prev" src="${esc(trophy.imageUrl)}" alt="" style="width:120px;height:120px;object-fit:contain;margin:0 auto 12px;display:block;border-radius:12px;background:#0d0f1f" />
+        <label style="${label}">Imagen nueva (JPG, PNG o WEBP; opcional)</label>
+        <input id="tr-img" type="file" accept="image/png,image/jpeg,image/webp" style="${field}" />
+        <label style="${label}">Nombre</label>
+        <input id="tr-title" maxlength="120" value="${esc(trophy.title)}" style="${field}" />
+        <label style="${label}">Descripción</label>
+        <textarea id="tr-desc" maxlength="500" rows="2" style="${field}">${esc(trophy.description)}</textarea>
+        ${isVip ? `<label style="display:flex;gap:8px;align-items:center;justify-content:flex-start;font-size:13px;text-align:left">
+          <input id="tr-all" type="checkbox" checked /> Aplicar a todos los trofeos de este nivel VIP (también a los que lo ganen después)</label>` : ""}`,
+      showCancelButton: true,
+      confirmButtonText: "Guardar",
+      cancelButtonText: "Cancelar",
+      focusConfirm: false,
+      didOpen: () => {
+        const input = document.getElementById("tr-img");
+        input?.addEventListener("change", () => {
+          const f = input.files?.[0];
+          if (f) document.getElementById("tr-prev").src = URL.createObjectURL(f);
+        });
+      },
+      preConfirm: () => {
+        const title = document.getElementById("tr-title").value.trim();
+        if (!title) {
+          Swal.showValidationMessage("Poné un nombre");
+          return false;
+        }
+        const file = document.getElementById("tr-img").files?.[0] || null;
+        if (file && file.size > 5 * 1024 * 1024) {
+          Swal.showValidationMessage("La imagen pesa más de 5 MB");
+          return false;
+        }
+        return {
+          title,
+          description: document.getElementById("tr-desc").value.trim(),
+          file,
+          all: isVip && document.getElementById("tr-all")?.checked,
+        };
+      },
+    });
+    if (!value) return;
+    const formData = new FormData();
+    formData.append("title", value.title);
+    formData.append("description", value.description);
+    if (value.file) formData.append("image", value.file);
+    if (isVip) formData.append("applyToTier", value.all ? "true" : "false");
+    try {
+      const res = await dispatch(updateTrophy(trophy.id, formData));
+      await reloadTrophies();
+      Swal.fire({
+        ...swalThemeConfig,
+        icon: "success",
+        title: res?.updated > 1 ? `Trofeo actualizado en ${res.updated} perfiles` : "Trofeo actualizado",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch (e) {
+      Swal.fire({ ...swalThemeConfig, icon: "error", title: "No se pudo guardar", text: e?.response?.data?.message || "" });
+    }
+  };
+
+  const removeTrophy = async (trophy) => {
+    const { isConfirmed } = await Swal.fire({
+      ...swalThemeConfig,
+      icon: "warning",
+      title: "¿Quitar este trofeo?",
+      text: `Se borra "${trophy.title}" del perfil de ${user.nick}.`,
+      showCancelButton: true,
+      confirmButtonText: "Quitar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#b91c1c",
+    });
+    if (!isConfirmed) return;
+    try {
+      await dispatch(deleteTrophy(trophy.id));
+      await reloadTrophies();
+    } catch (e) {
+      Swal.fire({ ...swalThemeConfig, icon: "error", title: "No se pudo quitar", text: e?.response?.data?.message || "" });
+    }
+  };
 
   // Cache-bust with lastSeen (refreshed on every navigation) so an avatar edit shows up right
   // away instead of the browser serving the old bytes forever from this unversioned URL.
@@ -816,12 +917,40 @@ const Perfil = ({ isPublic = false }) => {
                 <div
                   key={trophy.id}
                   title={trophy.description || trophy.title}
-                  className="rounded-xl p-3 flex flex-col items-center gap-2 border border-amber-400/30 bg-gradient-to-b from-[#2a2010]/70 to-[#0d0f1f] hover:border-amber-300 hover:shadow-[0_0_18px_rgba(250,204,21,0.35)] transition-all"
+                  className="relative rounded-xl p-3 flex flex-col items-center gap-2 border border-amber-400/30 bg-gradient-to-b from-[#2a2010]/70 to-[#0d0f1f] hover:border-amber-300 hover:shadow-[0_0_18px_rgba(250,204,21,0.35)] transition-all"
                 >
+                  {canManageTrophies && (
+                    <div className="absolute top-1.5 right-1.5 flex gap-1 z-[1]">
+                      <button
+                        type="button"
+                        onClick={() => editTrophy(trophy)}
+                        title="Editar trofeo"
+                        aria-label="Editar trofeo"
+                        className="w-7 h-7 rounded-full bg-black/60 border border-amber-400/60 text-amber-200 hover:bg-amber-500 hover:text-black flex items-center justify-center"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeTrophy(trophy)}
+                        title="Quitar trofeo"
+                        aria-label="Quitar trofeo"
+                        className="w-7 h-7 rounded-full bg-black/60 border border-red-400/60 text-red-300 hover:bg-red-600 hover:text-white flex items-center justify-center"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">delete</span>
+                      </button>
+                    </div>
+                  )}
                   <img
                     src={trophy.imageUrl}
                     alt={trophy.title}
                     className="w-full aspect-square object-contain"
+                    onError={(e) => {
+                      // imagen que no existe (ej. trofeos VIP sin arte todavia): copa dorada en su lugar
+                      if (e.currentTarget.dataset.fallback) return;
+                      e.currentTarget.dataset.fallback = "1";
+                      e.currentTarget.src = TROPHY_FALLBACK;
+                    }}
                   />
                   <p className="text-xs font-bold text-white text-center leading-tight">{trophy.title}</p>
                 </div>

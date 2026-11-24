@@ -145,7 +145,7 @@ function CodePanel({ day }) {
       ))}
       <div className="db-frame relative w-full rounded-[28px] p-[3px] shadow-[0_0_44px_rgba(168,85,247,0.6)]">
         <div className="relative rounded-[25px] bg-[radial-gradient(ellipse_at_top,_#7c3aed_0%,_#3b0764_55%,_#1e1b4b_100%)] px-3 sm:px-5 pt-4 pb-5">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 mb-5">
+          <div className="flex items-center justify-center mb-5">
             <div className="flex items-center gap-2">
               <span className="db-crown material-symbols-outlined text-yellow-300 text-4xl sm:text-5xl drop-shadow-[0_0_10px_rgba(253,224,71,0.8)]" style={FILLED}>
                 crown
@@ -154,9 +154,6 @@ function CodePanel({ day }) {
                 {t("dailyBonus.title")}
               </h2>
             </div>
-            <p className="max-w-[16rem] text-center sm:text-right text-sm sm:text-base font-extrabold text-white rounded-2xl bg-violet-950/60 border border-violet-400/50 px-3 py-2">
-              {t("dailyBonus.subtitle")}
-            </p>
           </div>
           <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 sm:gap-2.5 pt-2">
             {[1, 2, 3, 4, 5, 6, 7].map((n) => (
