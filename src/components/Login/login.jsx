@@ -8,10 +8,7 @@ import axios from "axios";
 import API_URL from "../../api/rutaApi";
 import { swalThemeConfig } from "../../utils/formatters";
 import { t } from "../../i18n/strings";
-
-// Flag a nivel de módulo: garantiza que initialize() corra solo una vez por carga de página
-// (resiste React StrictMode que ejecuta efectos dos veces en desarrollo)
-let gsiInitialized = false;
+import { renderGoogleButton } from "../../utils/googleSignIn";
 
 /**
  * Traduce el error de un intento de login a un mensaje entendible.
@@ -120,46 +117,8 @@ export default function Login({ className, children }) {
     // hasta ~5s. El div ref solo existe en el DOM cuando isLoginOpen = true.
     useEffect(() => {
         if (!isLoginOpen) return;
-
-        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-        if (!clientId) {
-            console.error("[GSI] Falta VITE_GOOGLE_CLIENT_ID en el build");
-            return;
-        }
-
-        let cancelled = false;
-        let timer;
-        const tryRender = (attempt = 0) => {
-            if (cancelled) return;
-            const gsi = window.google?.accounts?.id;
-            if (!gsi || !googleBtnRef.current) {
-                if (attempt < 50) timer = setTimeout(() => tryRender(attempt + 1), 100);
-                else console.error("[GSI] El script de Google Identity Services no cargó");
-                return;
-            }
-
-            if (!gsiInitialized) {
-                gsiInitialized = true;
-                gsi.initialize({
-                    client_id: clientId,
-                    use_fedcm_for_prompt: false,
-                    callback: (response) => googleCallbackRef.current(response),
-                });
-            }
-
-            gsi.renderButton(googleBtnRef.current, {
-                theme: "outline",
-                size: "large",
-                width: googleBtnRef.current.offsetWidth || 400,
-                text: "continue_with",
-            });
-        };
-        tryRender();
-
-        return () => {
-            cancelled = true;
-            clearTimeout(timer);
-        };
+        // GSI compartido con el modal de Registrarse (utils/googleSignIn)
+        return renderGoogleButton(() => googleBtnRef.current, (response) => googleCallbackRef.current(response));
     }, [isLoginOpen]);
 
 

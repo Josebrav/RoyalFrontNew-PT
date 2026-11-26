@@ -8,6 +8,7 @@ import { promo1millon, getUserByEmail } from "../../redux/actions";
 import { validateNick, validateEmail, validatePassword } from "./validate";
 import logo from "../../assets/LogoOficial.PNG";
 import { t } from "../../i18n/strings";
+import { renderGoogleButton } from "../../utils/googleSignIn";
 
 const RegistroForm = ({ className, children }) => {
     const navigate = useNavigate();
@@ -28,6 +29,26 @@ const RegistroForm = ({ className, children }) => {
     const emailCheckSeq = useRef(0);
 
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
+    // Registrarse con Google: la misma cuenta de Google crea la cuenta (o entra si ya existe), igual que en Entrar
+    const googleBtnRef = useRef(null);
+    const googleCallbackRef = useRef(null);
+    googleCallbackRef.current = async (response) => {
+        try {
+            Swal.fire({ title: t("login.googleLoadingTitle"), allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            const result = await auth.loginWithGoogle(response.credential);
+            setIsRegisterOpen(false);
+            navigate("/");
+            if (result?.firstChipsReceived) Swal.fire(t("login.firstChipsTitle"), t("login.firstChipsText"), "success");
+            else Swal.close();
+        } catch (error) {
+            Swal.fire({ icon: "error", title: t("login.googleErrorTitle"), text: error?.message || t("login.googleErrorText"), confirmButtonColor: "#C9A84C" });
+        }
+    };
+    useEffect(() => {
+        if (!isRegisterOpen) return;
+        return renderGoogleButton(() => googleBtnRef.current, (response) => googleCallbackRef.current(response));
+    }, [isRegisterOpen]);
     const [isTermsChecked, setIsTermsChecked] = useState(false);
     const [isMarketingChecked, setIsMarketingChecked] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -446,6 +467,17 @@ const RegistroForm = ({ className, children }) => {
                             >
                                 {t("register.submit")}
                             </button>
+
+                            {/* Registrarse con Google (botón oficial) */}
+                            <div className="relative py-1">
+                                <div aria-hidden="true" className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-outline-variant/20"></div>
+                                </div>
+                                <div className="relative flex justify-center text-[12px]">
+                                    <span className="px-3 bg-[#12121A] text-on-surface-variant uppercase tracking-widest">{t("login.or")}</span>
+                                </div>
+                            </div>
+                            <div ref={googleBtnRef} className="w-full flex justify-center" style={{ colorScheme: "light" }} />
 
                             {/* Footer Link */}
                             <p className="text-center font-body-sm text-[12px] text-on-surface-variant pt-1">
