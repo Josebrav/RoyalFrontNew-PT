@@ -111,7 +111,7 @@ export default function GlobalChat() {
   const navigate = useNavigate();
 
   // En los juegos (iframes a pantalla completa) y en la landing de invitados no se muestra.
-  const hidden = location.pathname.includes("/game") || (location.pathname === "/" && !currentUser?.id && !location.search.includes("vista=invitado"));
+  const hidden = location.pathname.includes("/game");
 
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState("connecting"); // connecting | open | reconnecting

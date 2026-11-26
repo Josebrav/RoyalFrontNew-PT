@@ -274,7 +274,7 @@ function App() {
     >
       <AuthProvider>
         <div className="flex flex-col flex-1">
-          {(location.pathname !== "/" || currentUser?.id || location.search.includes('vista=invitado')) && <Nav />}
+          <Nav />
           <Sidebar />
           <div
             className={`transition-all duration-300 flex flex-col flex-1 ${
