@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -43,7 +43,6 @@ const PODIUM_REST = { c: "#a78bfa", bg: "linear-gradient(90deg, rgba(139,92,246,
 export default function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [searchParams] = useSearchParams();
   const { currentUser } = useSelector((state) => state);
   // Sin miniatura propia, las tarjetas usan la portada que ya se habia subido (games.<slug>.cover).
   const siteContent = useSelector((state) => state.siteContent);
@@ -58,9 +57,10 @@ export default function Home() {
   // instante antes de que la sesión real apareciera y recién ahí saltara al dashboard. auth.loading
   // deja esperar ese instante en vez de comprometerse a una de las dos vistas de entrada.
   const auth = useAuth();
-  // "Entrar como Invitado": shows the same dashboard a logged-in user sees, but with no
-  // account behind it — the nav still offers Iniciar Sesión / Registrarse.
-  const isGuestPreview = !currentUser?.id && searchParams.get("vista") === "invitado";
+  // Sin sesión se entra directo al inicio con los juegos (antes había una pantalla de bienvenida con
+  // Crear cuenta / Iniciar sesión / Entrar como invitado; se quitó a pedido). La nav sigue ofreciendo
+  // Iniciar Sesión / Registrarse.
+  const isGuestPreview = !currentUser?.id;
 
   const [topWinners, setTopWinners] = useState([]);
   const [recentWins, setRecentWins] = useState([]);
