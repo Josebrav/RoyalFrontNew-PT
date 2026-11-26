@@ -71,6 +71,10 @@ export const GAME_TEXTS = {
       title: "Free online poker: Texas Hold'em with chips | RoyalGames",
       description: "Play free Texas Hold'em poker online at live tables, with free chips and chat. No download, from your phone or computer.",
     },
+    trivia: {
+      title: "Trivia Royal: free online trivia with chips | RoyalGames",
+      description: "Answer questions about football, history, movies, music, science and more before time runs out. Pick a category, bet your chips and win more the harder the question.",
+    },
     buraco: {
       title: "Free online Buraco against real players | RoyalGames",
       description: "Play Buraco online for free, 1 vs 1 or in 2 vs 2 teams, with canastas, the dead pile and live chat. Set up your table with the rules you like.",
@@ -164,6 +168,10 @@ export const GAME_TEXTS = {
     "royal-poker": {
       title: "Pôquer online grátis: Texas Hold'em com fichas | RoyalGames",
       description: "Jogue pôquer Texas Hold'em online grátis em mesas ao vivo, com fichas de presente e chat. Sem baixar, pelo celular ou pelo computador.",
+    },
+    trivia: {
+      title: "Trivia Royal: jogo de perguntas online grátis | RoyalGames",
+      description: "Responda perguntas de futebol, história, cinema, música, ciência e muito mais antes que o tempo acabe. Escolha a categoria, aposte suas fichas e ganhe mais nas perguntas difíceis.",
     },
     buraco: {
       title: "Buraco online grátis contra jogadores reais | RoyalGames",

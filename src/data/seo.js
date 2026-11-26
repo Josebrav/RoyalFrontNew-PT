@@ -57,6 +57,10 @@ export const GAME_SEO = {
     title: "Blackjack online gratis con mesas en vivo | RoyalJuegos",
     description: "Jugá blackjack online gratis en mesas compartidas con otros jugadores: vencé al crupier sin pasarte de 21. Fichas de regalo y chat en vivo.",
   },
+  trivia: {
+    title: "Trivia Royal: juego de preguntas online gratis | RoyalJuegos",
+    description: "Respondé preguntas de fútbol, historia, cine, música, ciencia y mucho más antes de que se acabe el tiempo. Elegí la categoría, apostá tus fichas y ganá más en las preguntas difíciles.",
+  },
   buraco: {
     title: "Buraco online gratis contra jugadores reales | RoyalJuegos",
     description: "Jugá al buraco online gratis en mesas 1 vs 1 o en parejas 2 vs 2, con canastas, muertos y chat en vivo. Armá tu mesa con las reglas que prefieras.",

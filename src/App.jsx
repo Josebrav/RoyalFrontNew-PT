@@ -58,6 +58,7 @@ const SweetFuturist = lazy(() => import('./components/Juegos/SweetFuturist/sweet
 const Domino = lazy(() => import('./components/Juegos/Domino/domino'));
 const Parchis = lazy(() => import('./components/Juegos/Parchis/parchis'));
 const Buraco = lazy(() => import('./components/Juegos/Buraco/buraco'));
+const Trivia = lazy(() => import('./components/Juegos/Trivia/trivia'));
 const Chinchon = lazy(() => import('./components/Juegos/Chinchon/chinchon'));
 const GemaOfGold = lazy(() => import('./components/Juegos/GemaOfGold/gemaofgold'));
 const RoyalRuleta = lazy(() => import('./components/Juegos/RoyalRuleta/royalruleta'));
@@ -340,6 +341,7 @@ function App() {
             <Route path="/game/domino" element={<RequireAuth><Domino /></RequireAuth>} />
             <Route path="/game/parchis" element={<RequireAuth><Parchis /></RequireAuth>} />
             <Route path="/game/buraco" element={<RequireAuth><Buraco /></RequireAuth>} />
+            <Route path="/game/trivia" element={<RequireAuth><Trivia /></RequireAuth>} />
             <Route path="/game/chinchon" element={<RequireAuth><Chinchon /></RequireAuth>} />
             <Route path="/game/gemaofgold" element={<RequireAuth><GemaOfGold /></RequireAuth>} />
             {/* En portugues la ruleta va en /game/royalroleta; la direccion vieja lleva a la nueva */}

@@ -9,6 +9,7 @@ import blackjackImage from "../assets/blackjack.jpg";
 import pokerImage from "../assets/poker.jpg";
 import bichoImage from "../assets/bicho.jpg";
 import buracoImage from "../assets/buraco.jpg";
+import triviaImage from "../assets/trivia.jpg";
 import gemaOfGoldImage from "../assets/gemaOfGold.png";
 import dominoImage from "../assets/domino.png";
 import jokerWildsImage from "../assets/jokerwilds.jpg";
@@ -309,6 +310,18 @@ export const GAMES_CATALOG = [
     icon: "style",
     description:
       "El clásico de los bares argentinos llega a RoyalGames: envido, truco y mucho bluff con la baraja española de toda la vida.",
+  },
+  {
+    slug: "trivia",
+    name: "Trivia Royal",
+    category: "otros",
+    status: "active",
+    image: triviaImage,
+    icon: "quiz",
+    players: 0,
+    playPath: "/game/trivia",
+    description:
+      "Preguntas de fútbol, historia, cine, música, ciencia y mucho más: elegí la categoría, respondé antes de que se acabe el tiempo y ganá fichas según la dificultad.",
   },
   {
     slug: "buraco",
