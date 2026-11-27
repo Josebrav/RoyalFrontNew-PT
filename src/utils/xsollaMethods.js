@@ -22,9 +22,9 @@ export const XSOLLA_METHOD_LABELS = {
   oxxo: "OXXO Pay",
   spei: "SPEI",
   cash: "Efectivo",
-  // Pagos viejos: antes el medio iba en la plataforma, y PayPal/Mercado Pago también salían por
-  // Xsolla (ahora solo con nuestras integraciones propias).
   paysafecard: "Paysafecard",
+  // Pagos viejos: PayPal y Mercado Pago también salían por Xsolla (ahora solo con nuestras
+  // integraciones propias). Los de Bizum/Paysafecard de antes traen el medio en la plataforma.
 };
 
 // Región de pago (GET /payments/region) -> país de Xsolla. El resto: "OTHER" (moneda local del jugador).

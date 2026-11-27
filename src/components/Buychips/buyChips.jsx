@@ -67,6 +67,8 @@ const XSOLLA_METHOD_VISUALS = {
   picpay: { Logo: PicPayLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#21c25e" },
   nupay: { Logo: NubankLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#820ad1" },
   bizum: { icon: "smartphone", bg: "#05a6b9", color: "#05a6b9" },
+  // Simple Icons solo tiene el logo de la empresa (Paysafe), no el de Paysafecard: ícono de ticket.
+  paysafecard: { icon: "confirmation_number", bg: "#008ac9", color: "#008ac9" },
   klarna: { Logo: KlarnaLogo, bg: "#ffb3c7", logoClass: "w-4 h-4", logoColor: "#0b051d", color: "#0b051d" },
   "online-banking": { icon: "account_balance", bg: "#475569", color: "#475569" },
   oxxo: { icon: "storefront", bg: "#e4002b", color: "#e4002b" },
