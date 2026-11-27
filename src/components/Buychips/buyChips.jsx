@@ -454,7 +454,7 @@ export default function BuyChips() {
     try {
       Swal.fire({
         title: "Generando tu pago...",
-        text: "Te llevamos a la página segura de Xsolla.",
+        text: "Te llevamos a la página segura de pago con Paysafecard.",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -468,8 +468,8 @@ export default function BuyChips() {
       const message = error?.response?.data?.message;
       Swal.fire({
         icon: "error",
-        title: "Xsolla",
-        text: typeof message === "string" ? message : "No se pudo iniciar el pago con Xsolla.",
+        title: "Paysafecard",
+        text: typeof message === "string" ? message : "No se pudo iniciar el pago con Paysafecard.",
         confirmButtonColor: "#C9A84C",
       });
     }
@@ -484,8 +484,8 @@ export default function BuyChips() {
       icon: ok ? "success" : "info",
       title: ok ? "Pago enviado" : "Pago no completado",
       text: ok
-        ? "Las fichas se acreditan apenas Xsolla confirma el pago. Si no las ves en un minuto, recargá la página."
-        : "No se realizó el pago con Xsolla.",
+        ? "Las fichas se acreditan apenas se confirma el pago. Si no las ves en un minuto, recargá la página."
+        : "No se realizó el pago con Paysafecard.",
       confirmButtonColor: "#C9A84C",
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -499,9 +499,9 @@ export default function BuyChips() {
       case "asaas":
         return "Asaas (BRL)";
       case "xsolla":
-        return "Xsolla";
+        return "Paysafecard";
       case "xsolla_sandbox":
-        return "Xsolla (prueba)";
+        return "Paysafecard (prueba)";
       case "mepago":
         return "Mercado Pago (USD)";
       case "mepago_mx":
@@ -741,11 +741,11 @@ export default function BuyChips() {
                           }`}
                         >
                           {paymentMethod === "xsolla" && <SelectedMark />}
-                          <span className="w-8 h-8 rounded-full bg-[#ff005b] flex items-center justify-center flex-shrink-0">
-                            <span className="material-symbols-outlined text-[18px] text-white">credit_card</span>
+                          <span className="w-8 h-8 rounded-full bg-[#008ac9] flex items-center justify-center flex-shrink-0">
+                            <span className="material-symbols-outlined text-[18px] text-white">confirmation_number</span>
                           </span>
                           <span className="min-w-0">
-                            <span className="block text-xs font-bold text-white">Xsolla</span>
+                            <span className="block text-xs font-bold text-white">Paysafecard</span>
                             <span className="block text-[0.625rem] text-on-surface-variant">En prueba · solo admin/mod</span>
                           </span>
                         </button>
@@ -946,7 +946,7 @@ export default function BuyChips() {
                       <p className="basis-full text-[0.6875rem] text-on-surface-variant leading-snug">
                         {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix ou cartão. As fichas são creditadas assim que o pagamento é confirmado."}
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
-                        {paymentMethod === "xsolla" && xsollaAvailable && "Xsolla (en prueba, solo admins y mods): te llevamos a su página para pagar con tarjeta u otros medios locales. Las fichas se acreditan apenas se confirma el pago."}
+                        {paymentMethod === "xsolla" && xsollaAvailable && "Paysafecard (en prueba, solo admins y mods): te llevamos a la página segura para pagar con tu código PIN de Paysafecard. Las fichas se acreditan apenas se confirma el pago."}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>
                     )}
@@ -1066,10 +1066,10 @@ export default function BuyChips() {
                         <button
                           type="button"
                           onClick={createXsollaOrder}
-                          className="w-full bg-[#ff005b] hover:bg-[#e00050] py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0"
+                          className="w-full bg-[#008ac9] hover:bg-[#0077ae] py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0"
                         >
-                          <span className="material-symbols-outlined">credit_card</span>
-                          Pagar con Xsolla
+                          <span className="material-symbols-outlined">confirmation_number</span>
+                          Pagar con Paysafecard
                         </button>
                       )}
 
