@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { isChunkLoadError, reloadOnceForNewVersion } from "../../utils/chunkReload";
 
 /**
  * Sin esto, un error de render en cualquier parte del árbol hace que React desmonte TODO
@@ -18,6 +19,8 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
+    // version nueva publicada con la pestaña abierta: se recarga sola en vez de quedarse en el error
+    if (isChunkLoadError(error) && reloadOnceForNewVersion()) return;
     console.error("[ErrorBoundary] Uncaught render error:", error, info?.componentStack);
   }
 

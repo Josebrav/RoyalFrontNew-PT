@@ -1162,6 +1162,7 @@ export default function BuyChips() {
                               rejected: { label: "Rechazado", className: "bg-error/10 text-error" },
                               cancelled: { label: "Cancelado", className: "bg-gray-500/10 text-gray-400" },
                               refunded: { label: "Reembolsado", className: "bg-gray-500/10 text-gray-400" },
+                              expired: { label: "Sin completar", className: "bg-gray-500/10 text-gray-400" },
                             }[item.status] || { label: item.status, className: "bg-gray-500/10 text-gray-400" };
 
                             return (

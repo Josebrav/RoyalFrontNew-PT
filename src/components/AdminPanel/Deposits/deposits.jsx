@@ -10,6 +10,8 @@ const STATUS_META = {
   rejected: { label: "Rechazado", className: "bg-error/10 text-error" },
   cancelled: { label: "Cancelado", className: "bg-gray-500/10 text-gray-400" },
   refunded: { label: "Reembolsado", className: "bg-gray-500/10 text-gray-400" },
+  // Xsolla: el jugador cerró Pay Station sin pagar y el depósito venció.
+  expired: { label: "Sin completar", className: "bg-gray-500/10 text-gray-400" },
 };
 
 const PLATFORM_LABELS = {
@@ -125,6 +127,7 @@ export default function AdminDeposits() {
               <option value="rejected">Rechazado</option>
               <option value="cancelled">Cancelado</option>
               <option value="refunded">Reembolsado</option>
+              <option value="expired">Sin completar</option>
             </select>
           </div>
         </div>
