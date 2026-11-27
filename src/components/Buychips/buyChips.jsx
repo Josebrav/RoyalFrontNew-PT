@@ -77,6 +77,36 @@ const XSOLLA_METHOD_VISUALS = {
 };
 const XSOLLA_PREFIX = "xsolla:";
 
+// Pago de Xsolla en curso: se guarda antes de ir a Pay Station para saber, al volver con el botón
+// "atrás" del navegador (o recargando /chips), qué pago cancelar. sessionStorage puede fallar
+// (modo privado, bloqueado): en ese caso solo se pierde el aviso, nunca se rompe la página.
+const XSOLLA_PENDING_KEY = "royal_xsolla_pending";
+// Más viejo que esto ya lo vence el backend solo: se descarta sin avisar.
+const XSOLLA_PENDING_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+const XSOLLA_OK_STATUSES = ["done", "success", "processing", "created"];
+function readXsollaPending() {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(XSOLLA_PENDING_KEY) || "null");
+    return value?.payId && Date.now() - Number(value.ts || 0) < XSOLLA_PENDING_MAX_AGE_MS ? value : null;
+  } catch {
+    return null;
+  }
+}
+function saveXsollaPending(payId) {
+  try {
+    sessionStorage.setItem(XSOLLA_PENDING_KEY, JSON.stringify({ payId, ts: Date.now() }));
+  } catch {
+    /* sin sessionStorage: no hay aviso al volver */
+  }
+}
+function clearXsollaPending() {
+  try {
+    sessionStorage.removeItem(XSOLLA_PENDING_KEY);
+  } catch {
+    /* nada que limpiar */
+  }
+}
+
 function XsollaMethodIcon({ methodKey }) {
   const v = XSOLLA_METHOD_VISUALS[methodKey] || { icon: "payments", bg: "#475569" };
   const Logo = v.Logo;
@@ -210,6 +240,8 @@ export default function BuyChips() {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyTypeFilter, setHistoryTypeFilter] = useState("all");
+  // Se incrementa para volver a pedir el historial (ej. después de cancelar un pago de Xsolla).
+  const [historyVersion, setHistoryVersion] = useState(0);
 
   // País de pago: el que detecta el backend por la IP (el mismo que valida al crear la orden). Si
   // no responde, "Otro país" (PayPal en dólares). Solo un admin puede elegir otro para probar.
@@ -400,7 +432,7 @@ export default function BuyChips() {
       }
     };
     fetchHistory();
-  }, [activeTab, currentUser]);
+  }, [activeTab, currentUser, historyVersion]);
 
   const filteredHistory =
     historyTypeFilter === "all" ? paymentHistory : paymentHistory.filter((item) => item.type === historyTypeFilter);
@@ -552,6 +584,8 @@ export default function BuyChips() {
         ...(viewerIsAdmin ? { country: xsollaCountry } : {}),
       });
       if (!data?.url) throw new Error("Sin url de Xsolla");
+      // Para cancelarlo si el jugador vuelve sin pagar (ver el efecto de "Vuelta desde Xsolla").
+      if (data.payId) saveXsollaPending(data.payId);
       window.location.href = data.url;
     } catch (error) {
       const message = error?.response?.data?.message;
@@ -564,20 +598,74 @@ export default function BuyChips() {
     }
   };
 
-  // Vuelta desde Xsolla (/chips?xsolla=1&status=...): las fichas llegan cuando Xsolla confirma el pago.
+  // Vuelta desde Xsolla. Tres casos:
+  // - Por return_url con estado exitoso (/chips?xsolla=1&status=done): "Pago enviado"; las fichas
+  //   llegan cuando Xsolla confirma el pago (webhook).
+  // - Por return_url con otro estado, o con el botón "atrás" del navegador (la página puede volver
+  //   del bfcache con el modal "Generando tu pago..." todavía abierto, o recargarse): se cierra el
+  //   modal, se cancela el pago pendiente (deja de verse en Movimientos) y se avisa "Pago cancelado".
+  //   Si Xsolla igual llegara a cobrarlo, el backend lo acredita y vuelve a verse como aprobado.
+  // - Sin pago en curso: nada (solo se cierra un modal que haya quedado abierto).
+  // Espera a la sesión (al recargar, el token se recupera después del primer render) y revisa
+  // una sola vez al cargar; después, cada vez que la página vuelve del bfcache.
+  const xsollaReturnHandledRef = useRef(false);
   useEffect(() => {
-    if (!searchParams.get("xsolla")) return;
-    const status = searchParams.get("status");
-    const ok = !status || ["done", "success", "processing", "created"].includes(status);
-    Swal.fire({
-      icon: ok ? "success" : "info",
-      title: ok ? "Pago enviado" : "Pago no completado",
-      text: ok
-        ? "Las fichas se acreditan apenas se confirma el pago. Si no las ves en un minuto, recargá la página."
-        : "No se realizó el pago.",
-      confirmButtonColor: "#C9A84C",
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!currentUser?.id) return;
+    const cancelXsollaPayment = async (pending) => {
+      clearXsollaPending();
+      Swal.close();
+      if (pending?.payId) {
+        try {
+          await axios.post(`${API_URL}/xsolla/cancel/${encodeURIComponent(pending.payId)}`);
+        } catch {
+          /* si falla, el backend lo vence solo (Sin completar) */
+        }
+      }
+      setHistoryVersion((v) => v + 1);
+      Swal.fire({
+        icon: "info",
+        title: "Pago cancelado",
+        text: "Volviste sin completar el pago. No se realizó ningún cobro.",
+        confirmButtonColor: "#C9A84C",
+      });
+    };
+
+    const handleXsollaReturn = (fromBackForwardCache) => {
+      const params = new URLSearchParams(window.location.search);
+      const pending = readXsollaPending();
+      if (params.get("xsolla")) {
+        const status = params.get("status");
+        if (!status || XSOLLA_OK_STATUSES.includes(status)) {
+          clearXsollaPending();
+          Swal.fire({
+            icon: "success",
+            title: "Pago enviado",
+            text: "Las fichas se acreditan apenas se confirma el pago. Si no las ves en un minuto, recargá la página.",
+            confirmButtonColor: "#C9A84C",
+          });
+          return;
+        }
+        cancelXsollaPayment(pending);
+        return;
+      }
+      if (pending) {
+        cancelXsollaPayment(pending);
+        return;
+      }
+      // Volvió del bfcache sin pago en curso: que no quede el modal de carga colgado.
+      if (fromBackForwardCache && Swal.isLoading()) Swal.close();
+    };
+
+    if (!xsollaReturnHandledRef.current) {
+      xsollaReturnHandledRef.current = true;
+      handleXsollaReturn(false);
+    }
+    const onPageShow = (event) => {
+      if (event.persisted) handleXsollaReturn(true);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Helper formatting for platform name
   const formatPlatformName = (platform, method) => {
