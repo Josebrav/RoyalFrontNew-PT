@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import API_URL from "../../../api/rutaApi";
+import { formatXsollaPlatform } from "../../../utils/xsollaMethods";
 
 const STATUS_META = {
   approved: { label: "Aprobado", className: "bg-green-500/10 text-green-400" },
@@ -174,7 +175,10 @@ export default function AdminDeposits() {
                           </button>
                         </td>
                         <td className="px-6 py-4 text-on-surface-variant text-sm">
-                          {PLATFORM_LABELS[deposit.paymentPlatform] || deposit.paymentPlatform || "—"}
+                          {formatXsollaPlatform(deposit.paymentPlatform, deposit.paymentMethod) ||
+                            PLATFORM_LABELS[deposit.paymentPlatform] ||
+                            deposit.paymentPlatform ||
+                            "—"}
                         </td>
                         <td className="px-6 py-4 text-right font-bold text-white whitespace-nowrap">
                           {formatPaid(deposit)}
