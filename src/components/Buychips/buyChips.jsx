@@ -29,7 +29,7 @@ import {
   PicPayLogo,
   PixLogo,
 } from "../ui/PaymentLogos";
-import { XSOLLA_COUNTRY_BY_REGION, formatXsollaPlatform } from "../../utils/xsollaMethods";
+import { XSOLLA_COUNTRY_BY_REGION, XSOLLA_LOCAL_CURRENCY, formatXsollaPlatform, xsollaCurrencyText } from "../../utils/xsollaMethods";
 import EditableImage from "../ui/EditableImage";
 import { LOCALE } from "../../i18n/locale";
 
@@ -51,6 +51,7 @@ const REGION_ORDER = ["ar", "co", "mx", "es", "br", "other"];
 const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
 
 // Medios de Xsolla por país (los manda el backend en GET /xsolla/methods): cómo se ve cada botón.
+// PayPal y Mercado Pago no van por Xsolla: solo con nuestras integraciones propias (botones de arriba).
 // Con logo oficial (Simple Icons) donde existe; el resto, ícono genérico + nombre. `color` es el del
 // botón de pagar.
 const XSOLLA_METHOD_VISUALS = {
@@ -59,17 +60,18 @@ const XSOLLA_METHOD_VISUALS = {
   bancolombia: { icon: "account_balance", bg: "#fdda24", iconColor: "#000000", color: "#2c2a29" },
   efecty: { icon: "storefront", bg: "#ffd200", iconColor: "#000000", color: "#e2b100" },
   card: { icon: "credit_card", bg: "#334155", color: "#334155" },
-  paypal: { Logo: PayPalLogo, bg: "#ffffff", logoClass: "w-4 h-4", color: "#0070ba" },
   "google-pay": { Logo: GooglePayLogo, bg: "#ffffff", logoClass: "w-6 h-6", color: "#1f1f1f" },
   "apple-pay": { Logo: ApplePayLogo, bg: "#ffffff", logoClass: "w-6 h-6", color: "#000000" },
   pix: { Logo: PixLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#32bcad" },
-  mercadopago: { Logo: MercadoPagoLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#009ee3" },
   "boleto-flash": { icon: "receipt_long", bg: "#1e293b", color: "#1e293b" },
   picpay: { Logo: PicPayLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#21c25e" },
   nupay: { Logo: NubankLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#820ad1" },
   bizum: { icon: "smartphone", bg: "#05a6b9", color: "#05a6b9" },
   klarna: { Logo: KlarnaLogo, bg: "#ffb3c7", logoClass: "w-4 h-4", logoColor: "#0b051d", color: "#0b051d" },
   "online-banking": { icon: "account_balance", bg: "#475569", color: "#475569" },
+  oxxo: { icon: "storefront", bg: "#e4002b", color: "#e4002b" },
+  spei: { icon: "account_balance", bg: "#1f4e79", color: "#1f4e79" },
+  cash: { icon: "payments", bg: "#15803d", color: "#15803d" },
 };
 const XSOLLA_PREFIX = "xsolla:";
 
@@ -832,7 +834,7 @@ export default function BuyChips() {
                             <XsollaMethodIcon methodKey={m.key} />
                             <span className="min-w-0">
                               <span className="block text-xs font-bold text-white">{m.label}</span>
-                              <span className="block text-[0.625rem] text-on-surface-variant">Pagás en {m.currency}</span>
+                              <span className="block text-[0.625rem] text-on-surface-variant">Pagás en {xsollaCurrencyText(m.currency)}</span>
                             </span>
                           </button>
                         );
@@ -1034,8 +1036,10 @@ export default function BuyChips() {
                         {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix ou cartão. As fichas são creditadas assim que o pagamento é confirmado."}
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
                         {payingWithXsolla &&
-                          `${selectedXsolla.label} (por Xsolla, en prueba, solo admins y mods): te llevamos a la página segura para pagar en ${selectedXsolla.currency}` +
-                            (selectedXsolla.currency !== "USD" ? `; el precio en dólares se cobra en ${selectedXsolla.currency} al cambio de Xsolla` : "") +
+                          `${selectedXsolla.label} (por Xsolla, en prueba, solo admins y mods): te llevamos a la página segura para pagar en ${xsollaCurrencyText(selectedXsolla.currency)}` +
+                            (selectedXsolla.currency === XSOLLA_LOCAL_CURRENCY
+                              ? "; el precio en dólares se cobra en tu moneda al cambio de Xsolla"
+                              : `; el precio en dólares se cobra en ${selectedXsolla.currency} al cambio de Xsolla`) +
                             ". Las fichas se acreditan apenas se confirma el pago."}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>

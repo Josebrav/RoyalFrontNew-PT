@@ -19,12 +19,22 @@ export const XSOLLA_METHOD_LABELS = {
   bizum: "Bizum",
   klarna: "Klarna",
   "online-banking": "Banca online",
-  // Pagos viejos (antes el medio iba en la plataforma).
+  oxxo: "OXXO Pay",
+  spei: "SPEI",
+  cash: "Efectivo",
+  // Pagos viejos: antes el medio iba en la plataforma, y PayPal/Mercado Pago también salían por
+  // Xsolla (ahora solo con nuestras integraciones propias).
   paysafecard: "Paysafecard",
 };
 
-// Región de pago (GET /payments/region) -> país de Xsolla. México y el resto: "OTHER" (en dólares).
-export const XSOLLA_COUNTRY_BY_REGION = { ar: "AR", co: "CO", es: "ES", br: "BR", mx: "OTHER", other: "OTHER" };
+// Región de pago (GET /payments/region) -> país de Xsolla. El resto: "OTHER" (moneda local del jugador).
+export const XSOLLA_COUNTRY_BY_REGION = { ar: "AR", co: "CO", mx: "MX", es: "ES", br: "BR", other: "OTHER" };
+
+// Moneda que manda el backend para "OTHER": Xsolla cobra en la moneda local del jugador.
+export const XSOLLA_LOCAL_CURRENCY = "LOCAL";
+
+/** "COP" / "tu moneda local", para "Pagás en ...". */
+export const xsollaCurrencyText = (currency) => (currency === XSOLLA_LOCAL_CURRENCY ? "tu moneda local" : currency);
 
 const LEGACY_PLATFORM = /^xsolla_(paysafecard|bizum)(_sandbox)?$/;
 
