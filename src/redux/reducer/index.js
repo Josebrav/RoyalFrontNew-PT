@@ -51,6 +51,8 @@ const initialState = {
         error: null,
     },
     siteContent: {},
+    // true cuando ya llego (o fallo) GET /site-content: hasta entonces no se muestran las imagenes por defecto
+    siteContentLoaded: false,
     news: {
         list: [],
         error: null,
@@ -246,10 +248,10 @@ const reducer = (state = initialState, action) => {
 
         // Manejo de contenido editable del sitio
         case SITE_CONTENT_SUCCESS:
-            return { ...state, siteContent: { ...state.siteContent, ...action.payload } };
+            return { ...state, siteContent: { ...state.siteContent, ...action.payload }, siteContentLoaded: true };
 
         case SITE_CONTENT_ACTION_ERROR:
-            return state;
+            return { ...state, siteContentLoaded: true };
 
         // Manejo de noticias
         case NEWS_LIST_SUCCESS:
