@@ -20,6 +20,11 @@ import gamerZoneImage from "../assets/gamerzone.jpg";
 import royalCatsImage from "../assets/royalcats.jpg";
 import sweetFuturistImage from "../assets/sweetfuturist.jpg";
 import chinchonImage from "../assets/chinchon.jpg";
+// Portadas de emergencia (centro de la pantalla de carga): las subidas estaban en Cloudinary, que quedo desactivado.
+import royalSlotsCover from "../assets/cover-royalslots.jpg";
+import santaWildsCover from "../assets/cover-santawilds.jpg";
+import sugarCalaveraCover from "../assets/cover-sugarcalavera.jpg";
+import furiaOlimpoCover from "../assets/cover-furiaolimpo.jpg";
 
 // `chipClassName` es la misma paleta pero como píldora (fondo + borde translúcidos), para donde
 // la categoría necesita notarse de un vistazo (ej. la grilla de "Juegos Populares" del Home) en
@@ -93,6 +98,7 @@ export const GAMES_CATALOG = [
     icon: "diamond",
     players: 1650,
     playPath: "/game/royalslots",
+    image: royalSlotsCover,
     // Sigue activo y jugable (/juegos, GameDetail, etc.) — solo se lo saca de la grilla de
     // "Juegos Populares" del Home para hacerle lugar a Domino y Gema of Gold (tope de 8 tarjetas).
     showOnHome: false,
@@ -107,6 +113,7 @@ export const GAMES_CATALOG = [
     icon: "ac_unit",
     players: 1820,
     playPath: "/game/santawilds",
+    image: santaWildsCover,
     description:
       "Tragamonedas navideña con símbolos wild que se expanden y multiplican tus ganancias. Encontrá a Santa y desbloqueá rondas bonus llenas de regalos.",
   },
@@ -118,6 +125,7 @@ export const GAMES_CATALOG = [
     icon: "cookie",
     players: 1290,
     playPath: "/game/sugarcalavera",
+    image: sugarCalaveraCover,
     description:
       "Tragamonedas con temática de calaveritas de azúcar: símbolos dulces, colores vibrantes y multiplicadores que celebran la buena suerte.",
   },
@@ -129,6 +137,7 @@ export const GAMES_CATALOG = [
     icon: "bolt",
     players: 0,
     playPath: "/game/furiaolimpo",
+    image: furiaOlimpoCover,
     description:
       "Tragamonedas de los dioses griegos: Zeus, Poseidón, Ares y Apolo en el Olimpo. Tres Zeus dan tiradas gratis, o compralas directo.",
   },

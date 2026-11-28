@@ -601,10 +601,21 @@ export const updateTicketStatus = (ticketId, status) => async (dispatch) => {
 
 // ===== Site Content (admin/mod inline editing) =====
 
+// La cuenta de Cloudinary donde estaban las imagenes subidas antes del 2026-11-28 quedo desactivada
+// (responde 401): esas imagenes se ignoran y cada lugar usa su imagen local (la del juego, etc.)
+// hasta que se vuelvan a subir (ahora van a S3).
+const DEAD_IMAGE_HOSTS = ["res.cloudinary.com/dxygofkyc/"];
+const withoutDeadImages = (content) =>
+    Object.fromEntries(
+        Object.entries(content || {}).filter(
+            ([, v]) => !(v?.type === "image" && DEAD_IMAGE_HOSTS.some((h) => String(v.imageUrl || "").includes(h)))
+        )
+    );
+
 export const fetchSiteContent = () => async (dispatch) => {
     try {
         const { data } = await axios.get(`${API_URL}/site-content`);
-        dispatch({ type: SITE_CONTENT_SUCCESS, payload: data });
+        dispatch({ type: SITE_CONTENT_SUCCESS, payload: withoutDeadImages(data) });
     } catch (error) {
         dispatch({ type: SITE_CONTENT_ACTION_ERROR, payload: error.message });
     }
