@@ -1,17 +1,54 @@
 import { Component } from "react";
-import { isChunkLoadError, reloadOnceForNewVersion } from "../../utils/chunkReload";
 
 /**
- * Sin esto, un error de render en cualquier parte del árbol hace que React desmonte TODO
- * (vuelve a <div id="root"></div> vacío) sin dejar ningún rastro visible — así se vio la
- * pantalla en blanco que reportó el usuario. Con este boundary, el error se muestra en
- * pantalla (mensaje + stack) en vez de desaparecer todo en silencio, y además queda logueado
- * en la consola con más contexto del que da el navegador solo.
+ * Si algo falla al dibujar la página (ej. una pestaña abierta con la versión vieja que busca un
+ * archivo que ya no existe), en vez del cartel rojo con el detalle técnico se muestra un
+ * "Cargando..." y la página se recarga sola. Si vuelve a fallar enseguida (2 recargas en 1 minuto),
+ * un mensaje simple con un botón para recargar. El detalle queda solo en la consola.
  */
+const KEY = "errorReloads";
+const WINDOW_MS = 60000;
+const MAX_RELOADS = 2;
+
+function recentReloads() {
+  try {
+    const list = JSON.parse(sessionStorage.getItem(KEY) || "[]");
+    return Array.isArray(list) ? list.filter((t) => Date.now() - t < WINDOW_MS) : [];
+  } catch {
+    return [];
+  }
+}
+
+function reloadIfAllowed() {
+  const list = recentReloads();
+  if (list.length >= MAX_RELOADS) return false;
+  try {
+    sessionStorage.setItem(KEY, JSON.stringify([...list, Date.now()]));
+  } catch {
+    // sin sessionStorage: se recarga igual una vez
+  }
+  window.location.reload();
+  return true;
+}
+
+const screen = {
+  minHeight: "100vh",
+  background: "#0a0b18",
+  color: "#e5e2f0",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 16,
+  padding: 24,
+  textAlign: "center",
+  fontFamily: "inherit",
+};
+
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { error: null, reloadFailed: false };
+    this.state = { error: null, gaveUp: false };
   }
 
   static getDerivedStateFromError(error) {
@@ -19,71 +56,40 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    // version nueva publicada con la pestaña abierta: se recarga sola en vez de quedarse en el error
-    if (isChunkLoadError(error)) {
-      if (reloadOnceForNewVersion()) return;
-      this.setState({ reloadFailed: true });
-    }
-    console.error("[ErrorBoundary] Uncaught render error:", error, info?.componentStack);
+    console.error("[ErrorBoundary]", error, info?.componentStack);
+    if (!reloadIfAllowed()) this.setState({ gaveUp: true });
   }
 
   render() {
-    // Mientras se recarga por una version nueva: pantalla vacia (antes se veia el cartel de error
-    // un instante). Si la recarga ya se intento hace menos de 30 s, se muestra el error.
-    if (this.state.error && isChunkLoadError(this.state.error) && !this.state.reloadFailed) {
-      return <div style={{ minHeight: "100vh", background: "#0a0b18" }} />;
-    }
-    if (this.state.error) {
+    if (!this.state.error) return this.props.children;
+
+    if (!this.state.gaveUp) {
       return (
-        <div
-          style={{
-            minHeight: "100vh",
-            background: "#16130d",
-            color: "#e9e1d7",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "24px",
-            textAlign: "center",
-            fontFamily: "monospace",
-          }}
-        >
-          <h1 style={{ color: "#ff6b6b", marginBottom: 12 }}>Se rompió algo al cargar la página</h1>
-          <p style={{ maxWidth: 640, marginBottom: 16 }}>
-            {this.state.error?.message || String(this.state.error)}
-          </p>
-          <pre
-            style={{
-              maxWidth: "90vw",
-              overflow: "auto",
-              background: "#0a0a0f",
-              padding: 16,
-              borderRadius: 8,
-              fontSize: 11,
-              textAlign: "left",
-            }}
-          >
-            {this.state.error?.stack}
-          </pre>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              marginTop: 20,
-              padding: "10px 24px",
-              borderRadius: 8,
-              background: "#e6c364",
-              color: "#3d2e00",
-              border: "none",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Recargar
-          </button>
+        <div style={screen}>
+          <span style={{ opacity: 0.6, fontSize: 14 }}>Cargando…</span>
         </div>
       );
     }
-    return this.props.children;
+
+    return (
+      <div style={screen}>
+        <p style={{ fontSize: 16, maxWidth: 420, margin: 0 }}>No pudimos cargar la página. Probá recargar.</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 28px",
+            borderRadius: 10,
+            border: "none",
+            background: "#C9A84C",
+            color: "#1a1406",
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Recargar
+        </button>
+      </div>
+    );
   }
 }
