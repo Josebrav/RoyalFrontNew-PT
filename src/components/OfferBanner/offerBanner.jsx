@@ -5,24 +5,9 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import API_URL from "../../api/rutaApi";
 
-const seenKey = (offerId) => `offerBanner:${offerId}`;
-const today = () => new Date().toLocaleDateString("en-CA");
-
-const wasSeenToday = (offerId) => {
-  try {
-    return localStorage.getItem(seenKey(offerId)) === today();
-  } catch {
-    return false;
-  }
-};
-
-const markSeenToday = (offerId) => {
-  try {
-    localStorage.setItem(seenKey(offerId), today());
-  } catch {
-    // sin localStorage (modo privado): vuelve a salir en la próxima visita
-  }
-};
+// Ofertas ya mostradas en esta carga de la página: el banner sale en cada visita (abrir o recargar
+// el sitio), pero no otra vez al navegar entre secciones ni después de cerrarlo.
+const shownThisLoad = new Set();
 
 const timeLeft = (endsAt) => {
   const ms = new Date(endsAt).getTime() - Date.now();
@@ -36,8 +21,8 @@ const timeLeft = (endsAt) => {
 };
 
 /**
- * Banner de la oferta vigente (panel -> Ofertas) en el centro de la pantalla, la primera vez del día que se
- * entra a la página en este navegador. Solo con sesión iniciada (las ofertas son para comprar fichas).
+ * Banner de la oferta vigente (panel -> Ofertas) en el centro de la pantalla, cada vez que se entra a la
+ * página (una vez por carga). Solo con sesión iniciada (las ofertas son para comprar fichas).
  * No interrumpe a quien entra directo a un juego o al panel.
  */
 export default function OfferBanner() {
@@ -53,8 +38,8 @@ export default function OfferBanner() {
     axios
       .get(`${API_URL}/chip-offers/current`)
       .then(({ data }) => {
-        if (cancelled || !data?.offer || wasSeenToday(data.offer.id)) return;
-        markSeenToday(data.offer.id);
+        if (cancelled || !data?.offer || shownThisLoad.has(data.offer.id)) return;
+        shownThisLoad.add(data.offer.id);
         setOffer(data.offer);
       })
       .catch(() => {});
