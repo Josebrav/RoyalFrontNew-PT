@@ -27,7 +27,10 @@ export default function EditableImage({ contentKey, fallbackSrc, fallbackIcon = 
   const base = useSelector((state) => state.siteContent[contentKey]);
   const canEdit = currentUser?.role === "admin" || currentUser?.role === "mod";
   const imageOf = (o) => (o?.type === "image" && o.imageUrl ? o.imageUrl : null);
-  const src = imageOf(own) || imageOf(base) || fallbackSrc;
+  // La imagen local (fallbackSrc) solo cuando ya se sabe que no hay una subida: antes se veia un
+  // instante la imagen por defecto (ej. un banner viejo) hasta que llegaba la real.
+  const loaded = useSelector((state) => state.siteContentLoaded);
+  const src = imageOf(own) || imageOf(base) || (loaded ? fallbackSrc : null);
   const linkTo = (own ? own.linkTo : base?.linkTo) || null;
 
   const handleImageClick = (e) => {
@@ -98,6 +101,9 @@ export default function EditableImage({ contentKey, fallbackSrc, fallbackIcon = 
           onClick={handleImageClick}
           className={`${className} ${linkTo ? "cursor-pointer" : ""}`}
         />
+      ) : !loaded ? (
+        // Cargando las imagenes subidas: hueco vacio del mismo tamaño, sin imagen por defecto.
+        <div className={`${className} bg-surface-container-high/40`} />
       ) : placeholder ? (
         <div className={className}>{placeholder}</div>
       ) : (

@@ -5,8 +5,6 @@ import Swal from "sweetalert2";
 import axios from "axios";
 
 import banner1 from "../../assets/banner1.png";
-import sportsBanner from "../../assets/b1.jpg";
-import bannercelu from "../../assets/bannercelu.png";
 import logo from "../../assets/LogoOficial.PNG";
 
 import Login from "../Login/login";
@@ -327,7 +325,6 @@ export default function Home() {
                 <EditableImage
                   contentKey="home.dashboard.banner2"
                   perLocale
-                  fallbackSrc={sportsBanner}
                   alt="Banner de Bono Semanal"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
@@ -345,7 +342,6 @@ export default function Home() {
                 <EditableImage
                   contentKey="home.dashboard.banner3"
                   perLocale
-                  fallbackSrc={bannercelu}
                   alt="Banner de Premios"
                   className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   recommendedSize="800×400px aprox., JPG o PNG"
