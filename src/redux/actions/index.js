@@ -615,7 +615,8 @@ const withoutDeadImages = (content) =>
 export const fetchSiteContent = () => async (dispatch) => {
     try {
         const { data } = await axios.get(`${API_URL}/site-content`);
-        dispatch({ type: SITE_CONTENT_SUCCESS, payload: withoutDeadImages(data) });
+        // Solo en los sitios PT y EN: en el de español se dejan las imagenes subidas como estaban (pedido 2026-11-28).
+        dispatch({ type: SITE_CONTENT_SUCCESS, payload: LOCALE === "es" ? data : withoutDeadImages(data) });
     } catch (error) {
         dispatch({ type: SITE_CONTENT_ACTION_ERROR, payload: error.message });
     }
