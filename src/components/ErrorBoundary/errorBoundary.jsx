@@ -11,7 +11,7 @@ import { isChunkLoadError, reloadOnceForNewVersion } from "../../utils/chunkRelo
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { error: null };
+    this.state = { error: null, reloadFailed: false };
   }
 
   static getDerivedStateFromError(error) {
@@ -20,11 +20,19 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     // version nueva publicada con la pestaña abierta: se recarga sola en vez de quedarse en el error
-    if (isChunkLoadError(error) && reloadOnceForNewVersion()) return;
+    if (isChunkLoadError(error)) {
+      if (reloadOnceForNewVersion()) return;
+      this.setState({ reloadFailed: true });
+    }
     console.error("[ErrorBoundary] Uncaught render error:", error, info?.componentStack);
   }
 
   render() {
+    // Mientras se recarga por una version nueva: pantalla vacia (antes se veia el cartel de error
+    // un instante). Si la recarga ya se intento hace menos de 30 s, se muestra el error.
+    if (this.state.error && isChunkLoadError(this.state.error) && !this.state.reloadFailed) {
+      return <div style={{ minHeight: "100vh", background: "#0a0b18" }} />;
+    }
     if (this.state.error) {
       return (
         <div
