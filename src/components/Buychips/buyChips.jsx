@@ -19,7 +19,17 @@ import doscincuenta from "../../assets/250millones.jpg";
 import billon from "../../assets/1billon.jpg";
 import veinticeisb from "../../assets/26billones.jpg";
 import { useAuth } from "../../context/oauthContext";
-import { PayPalLogo, MercadoPagoLogo } from "../ui/PaymentLogos";
+import {
+  PayPalLogo,
+  MercadoPagoLogo,
+  ApplePayLogo,
+  GooglePayLogo,
+  KlarnaLogo,
+  NubankLogo,
+  PicPayLogo,
+  PixLogo,
+} from "../ui/PaymentLogos";
+import { XSOLLA_COUNTRY_BY_REGION, XSOLLA_LOCAL_CURRENCY, formatXsollaPlatform, xsollaCurrencyText } from "../../utils/xsollaMethods";
 import EditableImage from "../ui/EditableImage";
 import { LOCALE } from "../../i18n/locale";
 
@@ -40,13 +50,78 @@ const REGION_ORDER = ["ar", "co", "mx", "es", "br", "other"];
 
 const PAYPAL_SYMBOLS = { USD: "US$", EUR: "€" };
 
-// Medios de Xsolla que se muestran como opción propia (solo España). El backend abre Pay Station
-// directo en ese medio (xsolla-methods.ts).
-const XSOLLA_METHOD_NAMES = { paysafecard: "Paysafecard", bizum: "Bizum" };
-const XSOLLA_METHOD_CARDS = [
-  { key: "paysafecard", color: "#008ac9", icon: "confirmation_number" },
-  { key: "bizum", color: "#05a6b9", icon: "smartphone" },
-];
+// Medios de Xsolla por país (los manda el backend en GET /xsolla/methods): cómo se ve cada botón.
+// PayPal y Mercado Pago no van por Xsolla: solo con nuestras integraciones propias (botones de arriba).
+// Con logo oficial (Simple Icons) donde existe; el resto, ícono genérico + nombre. `color` es el del
+// botón de pagar.
+const XSOLLA_METHOD_VISUALS = {
+  nequi: { icon: "smartphone", bg: "#200020", color: "#da0081" },
+  pse: { icon: "account_balance", bg: "#003a70", color: "#003a70" },
+  bancolombia: { icon: "account_balance", bg: "#fdda24", iconColor: "#000000", color: "#2c2a29" },
+  efecty: { icon: "storefront", bg: "#ffd200", iconColor: "#000000", color: "#e2b100" },
+  card: { icon: "credit_card", bg: "#334155", color: "#334155" },
+  "google-pay": { Logo: GooglePayLogo, bg: "#ffffff", logoClass: "w-6 h-6", color: "#1f1f1f" },
+  "apple-pay": { Logo: ApplePayLogo, bg: "#ffffff", logoClass: "w-6 h-6", color: "#000000" },
+  pix: { Logo: PixLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#32bcad" },
+  "boleto-flash": { icon: "receipt_long", bg: "#1e293b", color: "#1e293b" },
+  picpay: { Logo: PicPayLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#21c25e" },
+  nupay: { Logo: NubankLogo, bg: "#ffffff", logoClass: "w-5 h-5", color: "#820ad1" },
+  bizum: { icon: "smartphone", bg: "#05a6b9", color: "#05a6b9" },
+  // Simple Icons solo tiene el logo de la empresa (Paysafe), no el de Paysafecard: ícono de ticket.
+  paysafecard: { icon: "confirmation_number", bg: "#008ac9", color: "#008ac9" },
+  klarna: { Logo: KlarnaLogo, bg: "#ffb3c7", logoClass: "w-4 h-4", logoColor: "#0b051d", color: "#0b051d" },
+  "online-banking": { icon: "account_balance", bg: "#475569", color: "#475569" },
+  oxxo: { icon: "storefront", bg: "#e4002b", color: "#e4002b" },
+  spei: { icon: "account_balance", bg: "#1f4e79", color: "#1f4e79" },
+  cash: { icon: "payments", bg: "#15803d", color: "#15803d" },
+};
+const XSOLLA_PREFIX = "xsolla:";
+
+// Pago de Xsolla en curso: se guarda antes de ir a Pay Station para saber, al volver con el botón
+// "atrás" del navegador (o recargando /chips), qué pago cancelar. sessionStorage puede fallar
+// (modo privado, bloqueado): en ese caso solo se pierde el aviso, nunca se rompe la página.
+const XSOLLA_PENDING_KEY = "royal_xsolla_pending";
+// Más viejo que esto ya lo vence el backend solo: se descarta sin avisar.
+const XSOLLA_PENDING_MAX_AGE_MS = 6 * 60 * 60 * 1000;
+const XSOLLA_OK_STATUSES = ["done", "success", "processing", "created"];
+function readXsollaPending() {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(XSOLLA_PENDING_KEY) || "null");
+    return value?.payId && Date.now() - Number(value.ts || 0) < XSOLLA_PENDING_MAX_AGE_MS ? value : null;
+  } catch {
+    return null;
+  }
+}
+function saveXsollaPending(payId) {
+  try {
+    sessionStorage.setItem(XSOLLA_PENDING_KEY, JSON.stringify({ payId, ts: Date.now() }));
+  } catch {
+    /* sin sessionStorage: no hay aviso al volver */
+  }
+}
+function clearXsollaPending() {
+  try {
+    sessionStorage.removeItem(XSOLLA_PENDING_KEY);
+  } catch {
+    /* nada que limpiar */
+  }
+}
+
+function XsollaMethodIcon({ methodKey }) {
+  const v = XSOLLA_METHOD_VISUALS[methodKey] || { icon: "payments", bg: "#475569" };
+  const Logo = v.Logo;
+  return (
+    <span className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: v.bg }}>
+      {Logo ? (
+        <Logo className={v.logoClass || "w-5 h-5"} {...(v.logoColor ? { color: v.logoColor } : {})} />
+      ) : (
+        <span className="material-symbols-outlined text-[18px]" style={{ color: v.iconColor || "#ffffff" }}>
+          {v.icon}
+        </span>
+      )}
+    </span>
+  );
+}
 const OFFER_LINK_KEY = "royal_offer_link";
 
 // "Fichas base" de la promo: lo que da la tasa de siempre (500.000 fichas por dólar o euro, 500 por
@@ -165,6 +240,8 @@ export default function BuyChips() {
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [historyTypeFilter, setHistoryTypeFilter] = useState("all");
+  // Se incrementa para volver a pedir el historial (ej. después de cancelar un pago de Xsolla).
+  const [historyVersion, setHistoryVersion] = useState(0);
 
   // País de pago: el que detecta el backend por la IP (el mismo que valida al crear la orden). Si
   // no responde, "Otro país" (PayPal en dólares). Solo un admin puede elegir otro para probar.
@@ -188,8 +265,31 @@ export default function BuyChips() {
   const paypalCurrency = regionConfig.paypalCurrency;
 
   const asaasAvailable = !!regionConfig.asaas;
-  // Paysafecard y Bizum (por Xsolla): solo en España. Un admin los prueba eligiendo "España" arriba.
-  const xsollaMethodsAvailable = xsollaAvailable && region === "es";
+
+  // Medios de Xsolla del país (en prueba: solo admins y mods). El backend decide el país por la IP;
+  // solo a un admin le respeta el que eligió arriba, y valida el medio de nuevo al crear el pago.
+  const xsollaCountry = XSOLLA_COUNTRY_BY_REGION[region] || "OTHER";
+  const [xsolla, setXsolla] = useState({ country: null, currency: null, methods: [] });
+  useEffect(() => {
+    const none = { country: null, currency: null, methods: [] };
+    if (!xsollaAvailable || regionLoading) {
+      setXsolla(none);
+      return;
+    }
+    let cancelled = false;
+    axios
+      .get(`${API_URL}/xsolla/methods`, { params: viewerIsAdmin ? { country: xsollaCountry } : {} })
+      .then(({ data }) => {
+        if (cancelled) return;
+        setXsolla(data?.enabled ? { country: data.country, currency: data.currency, methods: data.methods || [] } : none);
+      })
+      .catch(() => !cancelled && setXsolla(none));
+    return () => {
+      cancelled = true;
+    };
+  }, [xsollaAvailable, viewerIsAdmin, xsollaCountry, regionLoading]);
+  const selectedXsollaKey = String(paymentMethod).startsWith(XSOLLA_PREFIX) ? paymentMethod.slice(XSOLLA_PREFIX.length) : null;
+  const selectedXsolla = xsolla.methods.find((m) => m.key === selectedXsollaKey) || null;
 
   // Medio de pago por defecto al cambiar de país: el local donde existe, si no PayPal.
   useEffect(() => {
@@ -200,8 +300,7 @@ export default function BuyChips() {
     mercadoPago && "mercadopago",
     asaasAvailable && "asaas",
     PAYPAL_CLIENT_ID && "paypal",
-    xsollaMethodsAvailable && "paysafecard",
-    xsollaMethodsAvailable && "bizum",
+    ...xsolla.methods.map((m) => XSOLLA_PREFIX + m.key),
   ].filter(Boolean);
 
   useEffect(() => {
@@ -219,8 +318,9 @@ export default function BuyChips() {
   // USD convertidos a su moneda; PayPal los de USD o EUR (España) con el precio tal cual.
   const payingWithMercadoPago = paymentMethod === "mercadopago" && !!mercadoPago;
   const payingWithAsaas = paymentMethod === "asaas" && asaasAvailable;
-  // Xsolla vende los paquetes en dólares (cobra en la moneda local del jugador a partir de ese precio).
-  const payingWithXsolla = !!XSOLLA_METHOD_NAMES[paymentMethod] && xsollaMethodsAvailable;
+  // Xsolla vende los paquetes en dólares; cobra en la moneda del país (COP, BRL, EUR o USD)
+  // con el precio del artículo en esa moneda o convertido desde el de dólares.
+  const payingWithXsolla = !!selectedXsolla;
   const catalogCurrency = payingWithXsolla ? "USD" : payingWithAsaas ? "BRL" : payingWithMercadoPago ? (mercadoPago.currency === "ARS" ? "ARS" : "USD") : paypalCurrency;
   const displayRate = payingWithMercadoPago && catalogCurrency === "USD" ? mercadoPago.rate : 1;
   const currency = payingWithXsolla ? "USD" : payingWithAsaas ? "BRL" : payingWithMercadoPago ? mercadoPago.currency : paypalCurrency;
@@ -332,7 +432,7 @@ export default function BuyChips() {
       }
     };
     fetchHistory();
-  }, [activeTab, currentUser]);
+  }, [activeTab, currentUser, historyVersion]);
 
   const filteredHistory =
     historyTypeFilter === "all" ? paymentHistory : paymentHistory.filter((item) => item.type === historyTypeFilter);
@@ -467,7 +567,8 @@ export default function BuyChips() {
 
   // Xsolla (en prueba, solo admins y mods): el backend crea el pago y devuelve la página de Xsolla.
   const createXsollaOrder = async () => {
-    const methodName = XSOLLA_METHOD_NAMES[paymentMethod];
+    if (!selectedXsolla) return;
+    const methodName = selectedXsolla.label;
     try {
       Swal.fire({
         title: "Generando tu pago...",
@@ -478,9 +579,13 @@ export default function BuyChips() {
       const { data } = await axios.post(`${API_URL}/xsolla/create-order`, {
         packageId: selectedChip.catalogId ?? selectedChip.id,
         language: LOCALE,
-        method: paymentMethod,
+        method: selectedXsolla.key,
+        // Solo un admin puede elegir el país; a los demás el backend les usa el de su IP.
+        ...(viewerIsAdmin ? { country: xsollaCountry } : {}),
       });
       if (!data?.url) throw new Error("Sin url de Xsolla");
+      // Para cancelarlo si el jugador vuelve sin pagar (ver el efecto de "Vuelta desde Xsolla").
+      if (data.payId) saveXsollaPending(data.payId);
       window.location.href = data.url;
     } catch (error) {
       const message = error?.response?.data?.message;
@@ -493,41 +598,86 @@ export default function BuyChips() {
     }
   };
 
-  // Vuelta desde Xsolla (/chips?xsolla=1&status=...): las fichas llegan cuando Xsolla confirma el pago.
+  // Vuelta desde Xsolla. Tres casos:
+  // - Por return_url con estado exitoso (/chips?xsolla=1&status=done): "Pago enviado"; las fichas
+  //   llegan cuando Xsolla confirma el pago (webhook).
+  // - Por return_url con otro estado, o con el botón "atrás" del navegador (la página puede volver
+  //   del bfcache con el modal "Generando tu pago..." todavía abierto, o recargarse): se cierra el
+  //   modal, se cancela el pago pendiente (deja de verse en Movimientos) y se avisa "Pago cancelado".
+  //   Si Xsolla igual llegara a cobrarlo, el backend lo acredita y vuelve a verse como aprobado.
+  // - Sin pago en curso: nada (solo se cierra un modal que haya quedado abierto).
+  // Espera a la sesión (al recargar, el token se recupera después del primer render) y revisa
+  // una sola vez al cargar; después, cada vez que la página vuelve del bfcache.
+  const xsollaReturnHandledRef = useRef(false);
   useEffect(() => {
-    if (!searchParams.get("xsolla")) return;
-    const status = searchParams.get("status");
-    const ok = !status || ["done", "success", "processing", "created"].includes(status);
-    Swal.fire({
-      icon: ok ? "success" : "info",
-      title: ok ? "Pago enviado" : "Pago no completado",
-      text: ok
-        ? "Las fichas se acreditan apenas se confirma el pago. Si no las ves en un minuto, recargá la página."
-        : "No se realizó el pago.",
-      confirmButtonColor: "#C9A84C",
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!currentUser?.id) return;
+    const cancelXsollaPayment = async (pending) => {
+      clearXsollaPending();
+      Swal.close();
+      if (pending?.payId) {
+        try {
+          await axios.post(`${API_URL}/xsolla/cancel/${encodeURIComponent(pending.payId)}`);
+        } catch {
+          /* si falla, el backend lo vence solo (Sin completar) */
+        }
+      }
+      setHistoryVersion((v) => v + 1);
+      Swal.fire({
+        icon: "info",
+        title: "Pago cancelado",
+        text: "Volviste sin completar el pago. No se realizó ningún cobro.",
+        confirmButtonColor: "#C9A84C",
+      });
+    };
+
+    const handleXsollaReturn = (fromBackForwardCache) => {
+      const params = new URLSearchParams(window.location.search);
+      const pending = readXsollaPending();
+      if (params.get("xsolla")) {
+        const status = params.get("status");
+        if (!status || XSOLLA_OK_STATUSES.includes(status)) {
+          clearXsollaPending();
+          Swal.fire({
+            icon: "success",
+            title: "Pago enviado",
+            text: "Las fichas se acreditan apenas se confirma el pago. Si no las ves en un minuto, recargá la página.",
+            confirmButtonColor: "#C9A84C",
+          });
+          return;
+        }
+        cancelXsollaPayment(pending);
+        return;
+      }
+      if (pending) {
+        cancelXsollaPayment(pending);
+        return;
+      }
+      // Volvió del bfcache sin pago en curso: que no quede el modal de carga colgado.
+      if (fromBackForwardCache && Swal.isLoading()) Swal.close();
+    };
+
+    if (!xsollaReturnHandledRef.current) {
+      xsollaReturnHandledRef.current = true;
+      handleXsollaReturn(false);
+    }
+    const onPageShow = (event) => {
+      if (event.persisted) handleXsollaReturn(true);
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Helper formatting for platform name
-  const formatPlatformName = (platform) => {
+  const formatPlatformName = (platform, method) => {
     if (!platform) return "Sistema";
+    // Xsolla: "Xsolla · Nequi" (o "Xsolla (prueba) · Nequi").
+    const xsollaName = formatXsollaPlatform(platform, method);
+    if (xsollaName) return xsollaName;
     switch (platform.toLowerCase()) {
       case "paypal":
         return "PayPal Gateway";
       case "asaas":
         return "Asaas (BRL)";
-      case "xsolla":
-        return "Xsolla";
-      case "xsolla_sandbox":
-        return "Xsolla (prueba)";
-      case "xsolla_paysafecard":
-        return "Paysafecard";
-      case "xsolla_paysafecard_sandbox":
-        return "Paysafecard (prueba)";
-      case "xsolla_bizum":
-        return "Bizum";
-      case "xsolla_bizum_sandbox":
-        return "Bizum (prueba)";
       case "mepago":
         return "Mercado Pago (USD)";
       case "mepago_mx":
@@ -755,29 +905,30 @@ export default function BuyChips() {
                           </span>
                         </button>
                       )}
-                      {xsollaMethodsAvailable &&
-                        XSOLLA_METHOD_CARDS.map((m) => (
+                      {xsolla.methods.map((m) => {
+                        const value = XSOLLA_PREFIX + m.key;
+                        return (
                           <button
-                            key={m.key}
+                            key={value}
                             type="button"
-                            onClick={() => setPaymentMethod(m.key)}
-                            aria-pressed={paymentMethod === m.key}
+                            onClick={() => setPaymentMethod(value)}
+                            aria-pressed={paymentMethod === value}
+                            title="Xsolla · en prueba, solo admin/mod"
                             className={`glass-card relative px-2.5 py-2 rounded-xl flex items-center gap-2 text-left border-2 transition-all cursor-pointer ${
-                              paymentMethod === m.key
+                              paymentMethod === value
                                 ? "border-[#a78bfa] bg-[#8b5cf6]/25 shadow-[0_0_14px_rgba(139,92,246,0.55)]"
                                 : "border-[#a78bfa]/25 opacity-75 hover:opacity-100 hover:border-[#a78bfa]/70"
                             }`}
                           >
-                            {paymentMethod === m.key && <SelectedMark />}
-                            <span className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: m.color }}>
-                              <span className="material-symbols-outlined text-[18px] text-white">{m.icon}</span>
-                            </span>
+                            {paymentMethod === value && <SelectedMark />}
+                            <XsollaMethodIcon methodKey={m.key} />
                             <span className="min-w-0">
-                              <span className="block text-xs font-bold text-white">{XSOLLA_METHOD_NAMES[m.key]}</span>
-                              <span className="block text-[0.625rem] text-on-surface-variant">En prueba · solo admin/mod</span>
+                              <span className="block text-xs font-bold text-white">{m.label}</span>
+                              <span className="block text-[0.625rem] text-on-surface-variant">Pagás en {xsollaCurrencyText(m.currency)}</span>
                             </span>
                           </button>
-                        ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -974,8 +1125,12 @@ export default function BuyChips() {
                       <p className="basis-full text-[0.6875rem] text-on-surface-variant leading-snug">
                         {paymentMethod === "asaas" && asaasAvailable && "Levamos você à página segura do Asaas para pagar em reais com Pix ou cartão. As fichas são creditadas assim que o pagamento é confirmado."}
                         {paymentMethod === "paypal" && `Pagás con PayPal en ${paypalCurrency}. Las fichas se acreditan apenas se confirma el pago.`}
-                        {paymentMethod === "paysafecard" && payingWithXsolla && "Paysafecard (en prueba, solo admins y mods): te llevamos a la página segura para pagar en euros con tu código PIN de Paysafecard. Las fichas se acreditan apenas se confirma el pago."}
-                        {paymentMethod === "bizum" && payingWithXsolla && "Bizum (en prueba, solo admins y mods): te llevamos a la página segura para pagar en euros con Bizum desde tu móvil. Las fichas se acreditan apenas se confirma el pago."}
+                        {payingWithXsolla &&
+                          `${selectedXsolla.label} (por Xsolla, en prueba, solo admins y mods): te llevamos a la página segura para pagar en ${xsollaCurrencyText(selectedXsolla.currency)}` +
+                            (selectedXsolla.currency === XSOLLA_LOCAL_CURRENCY
+                              ? "; el precio en dólares se cobra en tu moneda al cambio de Xsolla"
+                              : `; el precio en dólares se cobra en ${selectedXsolla.currency} al cambio de Xsolla`) +
+                            ". Las fichas se acreditan apenas se confirma el pago."}
                         {paymentMethod === "mercadopago" && mercadoPago && `Te llevamos a Mercado Pago para pagar en ${mercadoPago.currency} de forma segura. Las fichas se acreditan apenas se aprueba el pago.`}
                       </p>
                     )}
@@ -1095,11 +1250,11 @@ export default function BuyChips() {
                         <button
                           type="button"
                           onClick={createXsollaOrder}
-                          style={{ background: XSOLLA_METHOD_CARDS.find((m) => m.key === paymentMethod)?.color }}
+                          style={{ background: XSOLLA_METHOD_VISUALS[selectedXsolla.key]?.color || "#475569" }}
                           className="w-full hover:brightness-110 py-3.5 rounded-xl text-white font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border-0"
                         >
-                          <span className="material-symbols-outlined">{XSOLLA_METHOD_CARDS.find((m) => m.key === paymentMethod)?.icon}</span>
-                          Pagar con {XSOLLA_METHOD_NAMES[paymentMethod]}
+                          <span className="material-symbols-outlined">lock</span>
+                          Pagar con {selectedXsolla.label}
                         </button>
                       )}
 
@@ -1210,7 +1365,7 @@ export default function BuyChips() {
                                   </div>
                                 </td>
                                 <td className="px-6 py-4 text-on-surface-variant">
-                                  {formatPlatformName(item.paymentPlatform)}
+                                  {formatPlatformName(item.paymentPlatform, item.paymentMethod)}
                                 </td>
                                 <td className="px-6 py-4 text-right font-bold text-white">
                                   {item.type === "deposit" ? (
